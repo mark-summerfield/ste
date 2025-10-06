@@ -5,46 +5,48 @@
 
 namespace eval textx {}
 
-array set textx::ColorTags {
-    black "#000000"
-    apricot "#FFD8B1"
-    beige "#FFFAC8"
-    blue "#4363D8"
-    brown "#9A6324"
-    cyan "#42D4F4"
-    green "#3CB44B"
-    grey "#A9A9A9"
-    lavender "#DCB3FF"
-    lime "#BFEF45"
-    magenta "#F032E6"
-    maroon "#800000"
-    mint "#AAFFC3"
-    navy "#000075"
-    olive "#808000"
-    orange "#F58231"
-    pink "#FABEB4"
-    purple "#911EB4"
-    red "#E6194B"
-    teal "#469990"
-}
+set textx::ColorTags [dict create \
+    black "#000000" \
+    apricot "#FFD8B1" \
+    beige "#FFFAC8" \
+    blue "#4363D8" \
+    brown "#9A6324" \
+    cyan "#42D4F4" \
+    green "#3CB44B" \
+    grey "#A9A9A9" \
+    lavender "#DCB3FF" \
+    lime "#BFEF45" \
+    magenta "#F032E6" \
+    maroon "#800000" \
+    mint "#AAFFC3" \
+    navy "#000075" \
+    olive "#808000" \
+    orange "#F58231" \
+    pink "#FABEB4" \
+    purple "#911EB4" \
+    red "#E6194B" \
+    teal "#469990" \
+    ]
 
-proc textx::prepare txt_widget {
-    foreach font_name {Sans Bold Italic BoldItalic} {
-        catch { font delete $font_name }
+proc textx::make_fonts {txt_widget family size} {
+    foreach name {Sans Bold Italic BoldItalic} {
+        catch { font delete $name }
     }
-    set family [font actual TkDefaultFont -family]
-    set size [font actual TkDefaultFont -size]
     font create Sans -family $family -size $size
     font create Bold -family $family -size $size -weight bold
     font create Italic -family $family -size $size -slant italic
     font create BoldItalic -family $family -size $size -weight bold \
         -slant italic
-    $txt_widget configure -font Sans -foreground $::textx::ColorTags(black)
+    $txt_widget configure -font Sans \
+        -foreground [dict get $::textx::ColorTags black]
+}
+
+proc textx::make_tags txt_widget {
     $txt_widget tag configure bold -font Bold
     $txt_widget tag configure italic -font Italic
     $txt_widget tag configure bolditalic -font BoldItalic
     $txt_widget tag configure highlight -background "#FFE119" ;# yellow
-    foreach {key value} [array get ColorTags] {
+    dict for {key value} $::textx::ColorTags {
         $txt_widget tag configure $key -foreground $value
     }
     const WIDTH [font measure Sans "•. "]
@@ -63,7 +65,7 @@ proc textx::dump txt_widget {
     $txt_widget dump -text -mark -tag 1.0 "end -1 char"
 }
 
-proc textx::load {txt_widget txt_dump} {
+proc textx::undump {txt_widget txt_dump} {
     array set tags {}
     set current_index end
     set insert_index end

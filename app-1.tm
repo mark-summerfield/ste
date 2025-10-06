@@ -4,6 +4,7 @@ package require about_form
 package require config
 package require config_form
 package require message_form
+package require ref
 package require textx
 package require ui
 package require util
@@ -25,6 +26,7 @@ oo::define App method show {} {
     wm geometry . [$config geometry]
     raise .
     update
+    focus $TextWidget
 }
 
 oo::define App method make_ui {} {
@@ -88,7 +90,8 @@ oo::define App method make_widgets {} {
     ttk::frame .mf
     ttk::frame .mf.tf
     set TextWidget [text .mf.tf.txt]
-    textx::prepare $TextWidget
+    textx::make_fonts $TextWidget [$config family] [$config size]
+    textx::make_tags $TextWidget
     ui::scrollize .mf.tf txt vertical
 }
 
@@ -103,7 +106,19 @@ oo::define App method make_bindings {} {
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
 
-oo::define App method on_config {} { ConfigForm new }
+oo::define App method on_config {} {
+    set config [Config new]
+    set ok [Ref new false]
+    set family [$config family]
+    set size [$config size]
+    set form [ConfigForm new $ok]
+    tkwait window [$form form]
+    if {[$ok get]} {
+        if {$family ne [$config family] || $size != [$config size]} {
+            textx::make_fonts $TextWidget [$config family] [$config size]
+        }
+    }
+}
 
 oo::define App method on_about {} {
     AboutForm new "A Styled Text Editor" \

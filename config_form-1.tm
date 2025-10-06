@@ -7,12 +7,18 @@ package require ui
 oo::class create ConfigForm {
     superclass AbstractForm
 
+    variable Ok
     variable Blinking
+    variable FontFamily
+    variable FontSize
 }
 
-oo::define ConfigForm constructor {} {
+oo::define ConfigForm constructor ok {
+    set Ok $ok
     set config [Config new]
     set Blinking [$config blinking]
+    set FontFamily [$config family]
+    set FontSize [$config size]
     my make_widgets 
     my make_layout
     my make_bindings
@@ -41,6 +47,13 @@ oo::define ConfigForm method make_widgets {} {
     $tip .configForm.frame.blinkCheckbutton \
         "Whether the text cursor should blink."
     set opts "-compound left -width 15"
+    ttk::button .configForm.frame.fontButton -text Font… -underline 0 \
+        -image [ui::icon preferences-desktop-font.svg $::ICON_SIZE] \
+        -command [callback on_font] {*}$opts
+    $tip .configForm.frame.fontButton "The font to use.\nBest to set the\
+        application’s scale (and restart) first."
+    ttk::label .configForm.frame.fontLabel -relief sunken \
+        -text "[$config family] [$config size]"
     ttk::label .configForm.frame.configFileLabel -foreground gray25 \
         -text "Config file"
     ttk::label .configForm.frame.configFilenameLabel -foreground gray25 \
@@ -59,6 +72,9 @@ oo::define ConfigForm method make_layout {} {
     grid .configForm.frame.scaleLabel -row 0 -column 0 -sticky w {*}$opts
     grid .configForm.frame.scaleSpinbox -row 0 -column 1 -columnspan 2 \
         -sticky we {*}$opts
+    grid .configForm.frame.fontButton -row 1 -column 0 -sticky w {*}$opts
+    grid .configForm.frame.fontLabel -row 1 -column 1 -columnspan 2 \
+        -sticky news {*}$opts
     grid .configForm.frame.blinkCheckbutton -row 2 -column 1 -sticky we
     grid .configForm.frame.configFileLabel -row 8 -column 0 -sticky we \
         {*}$opts
@@ -80,15 +96,39 @@ oo::define ConfigForm method make_bindings {} {
     bind .configForm <Return> [callback on_ok]
     bind .configForm <Alt-b> \
         {.configForm.frame.blinkCheckbutton invoke}
+    bind .configForm <Alt-f> [callback on_font]
     bind .configForm <Alt-o> [callback on_ok]
     bind .configForm <Alt-s> \
         {focus .configForm.frame.scaleSpinbox}
 }
 
+oo::define ConfigForm method on_font {} {
+    tk fontchooser configure -parent .configForm \
+        -title "[tk appname] — Choose Font" -font Sans \
+        -command [callback on_font_chosen]
+    tk fontchooser show
+}
+
+oo::define ConfigForm method on_font_chosen args {
+    if {[llength $args] > 0} {
+        set args [lindex $args 0]
+        if {[llength $args] > 1} {
+            set FontFamily [lindex $args 0]
+            set FontSize [lindex $args 1]
+            .configForm.frame.fontLabel configure \
+                -text "$FontFamily $FontSize"
+        }
+    }
+}
+
+
 oo::define ConfigForm method on_ok {} {
     set config [Config new]
     tk scaling [.configForm.frame.scaleSpinbox get]
     $config set_blinking $Blinking
+    $config set_family $FontFamily
+    $config set_size $FontSize
+    $Ok set true
     my delete
 }
 

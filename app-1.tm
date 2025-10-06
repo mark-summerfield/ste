@@ -4,10 +4,13 @@ package require about_form
 package require config
 package require config_form
 package require message_form
+package require textx
 package require ui
 package require util
 
-oo::class create App {}
+oo::class create App {
+    variable TextWidget
+}
 
 oo::define App constructor {} {
     ui::wishinit
@@ -26,6 +29,7 @@ oo::define App method show {} {
 
 oo::define App method make_ui {} {
     my prepare_ui
+    my make_menu
     my make_widgets
     my make_layout
     my make_bindings
@@ -37,15 +41,65 @@ oo::define App method prepare_ui {} {
     wm iconphoto . -default [ui::icon icon.svg]
 }
 
+oo::define App method make_menu {} {
+    menu .menu
+    my make_file_menu
+    my make_edit_menu
+    my make_style_menu
+    . configure -menu .menu
+}
+
+oo::define App method make_file_menu {} {
+    menu .menu.file
+    .menu add cascade -menu .menu.file -label File -underline 0
+    # TODO icons
+    # TODO &Open…
+    # TODO &Save
+    # TODO Save &As…
+    .menu.file add separator
+    .menu.file add command -command [callback on_config] -label Config… \
+            -underline 0
+    .menu.file add command -command [callback on_about] -label About \
+            -underline 0
+    .menu.file add separator
+    .menu.file add command -command [callback on_quit] -label Quit \
+            -underline 0 -accelerator Ctrl+Q
+}
+
+oo::define App method make_edit_menu {} {
+    menu .menu.edit
+    .menu add cascade -menu .menu.edit -label Edit -underline 0
+    # TODO icons
+    # TODO Undo Redo Copy Cut Paste
+    # TODO Insert→Bullet Arrow ... Character…
+}
+
+oo::define App method make_style_menu {} {
+    menu .menu.style
+    .menu add cascade -menu .menu.style -label Style -underline 0
+    # TODO icons
+    # TODO Roman Bold Italic BoldItalic Highlight
+    #   Color→(title-cased ColorTag names)
+    #   Indent→Level 1 | Level 2 | Level 3
+}
+
 oo::define App method make_widgets {} {
     set config [Config new]
+    ttk::frame .mf
+    ttk::frame .mf.tf
+    set TextWidget [text .mf.tf.txt]
+    textx::prepare $TextWidget
+    ui::scrollize .mf.tf txt vertical
 }
 
 oo::define App method make_layout {} {
     const opts "-pady 3 -padx 3"
+    pack .mf -fill both -expand true
+    pack .mf.tf -fill both -expand true
 }
 
 oo::define App method make_bindings {} {
+    bind . <Control-q> [callback on_quit]
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
 

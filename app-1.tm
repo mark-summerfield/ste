@@ -15,7 +15,7 @@ oo::class create App {
 
 oo::define App constructor {} {
     ui::wishinit
-    tk appname Styled
+    tk appname STE
     Config new ;# we need tk scaling done early
     my make_ui
 }
@@ -121,7 +121,7 @@ oo::define App method on_config {} {
 }
 
 oo::define App method on_about {} {
-    AboutForm new "A Styled Text Editor" \
+    AboutForm new "Styled Text Editor" \
         https://github.com/mark-summerfield/styled
 }
 

@@ -49,3 +49,6 @@ build/
 zOld/
 .qmake.stash
 *.str
+*.ste
+*.html
+*.txt

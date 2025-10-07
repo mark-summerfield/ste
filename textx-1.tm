@@ -3,6 +3,8 @@
 # Unique Styles: bold italic bolditalic ColorTags
 # Mixable Styles: highlight indent[1-3]
 
+package require html 1
+
 namespace eval textx {}
 
 set textx::ColorTags [dict create \
@@ -61,11 +63,11 @@ proc textx::make_tags txt_widget {
         -lmargin2 [expr {$indent + $WIDTH}]
 }
 
-proc textx::dump txt_widget {
+proc textx::serialize txt_widget {
     $txt_widget dump -text -mark -tag 1.0 "end -1 char"
 }
 
-proc textx::undump {txt_widget txt_dump} {
+proc textx::deserialize {txt_widget txt_dump} {
     array set tags {}
     set current_index end
     set insert_index end
@@ -96,4 +98,112 @@ proc textx::undump {txt_widget txt_dump} {
     }
     $txt_widget mark set current $current_index
     $txt_widget mark set insert $insert_index 
+}
+
+proc textx::html txt_widget {
+    set txt_dump [$txt_widget dump -text -mark -tag 1.0 "end -1 char"]
+    set out [list]
+    set pending [list]
+    foreach {key value _} $txt_dump {
+        switch $key {
+            text { lappend out [html::html_entities $value]}
+            tagon {
+                switch $value {
+                    bold {}
+                    italic {}
+                    bolditalic {}
+                    highlight {}
+                    indent1 {}
+                    indent2 {}
+                    indent3 {}
+                    black {}
+                    apricot {}
+                    beige {}
+                    blue {}
+                    brown {}
+                    cyan {}
+                    green {}
+                    grey {}
+                    lavender {}
+                    lime {}
+                    magenta {}
+                    maroon {}
+                    mint {}
+                    navy {}
+                    olive {}
+                    orange {}
+                    pink {}
+                    purple {}
+                    red {}
+                    teal {}
+                }
+                lappend pending $value
+            }
+            tagoff {
+                switch $value {
+                    bold {}
+                    italic {}
+                    bolditalic {}
+                    highlight {}
+                    indent1 {}
+                    indent2 {}
+                    indent3 {}
+                    black {}
+                    apricot {}
+                    beige {}
+                    blue {}
+                    brown {}
+                    cyan {}
+                    green {}
+                    grey {}
+                    lavender {}
+                    lime {}
+                    magenta {}
+                    maroon {}
+                    mint {}
+                    navy {}
+                    olive {}
+                    orange {}
+                    pink {}
+                    purple {}
+                    red {}
+                    teal {}
+                }
+                lpop pending
+            }
+        }
+    }
+    while {[llength $pending]} {
+        set value [lpop pending]
+        switch $value {
+            bold {}
+            italic {}
+            bolditalic {}
+            highlight {}
+            indent1 {}
+            indent2 {}
+            indent3 {}
+            black {}
+            apricot {}
+            beige {}
+            blue {}
+            brown {}
+            cyan {}
+            green {}
+            grey {}
+            lavender {}
+            lime {}
+            magenta {}
+            maroon {}
+            mint {}
+            navy {}
+            olive {}
+            orange {}
+            pink {}
+            purple {}
+            red {}
+            teal {}
+        }
+    }
+    join $out \n
 }

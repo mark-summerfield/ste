@@ -10,14 +10,16 @@ oo::singleton create Config {
     variable Geometry
     variable FontFamily
     variable FontSize
+    variable LastFile
 }
 
 oo::define Config constructor {} {
+    set Filename [util::get_ini_filename]
     set Blinking true
     set Geometry ""
     set FontFamily [font configure TkDefaultFont -family]
     set FontSize [expr {1 + [font configure TkDefaultFont -size]}]
-    set Filename [util::get_ini_filename]
+    set LastFile ""
     if {[file exists $Filename] && [file size $Filename]} {
         set ini [ini::open $Filename -encoding utf-8 r]
         try {
@@ -30,6 +32,7 @@ oo::define Config constructor {} {
             set Geometry [ini::value $ini General Geometry $Geometry]
             set FontFamily [ini::value $ini General FontFamily $FontFamily]
             set FontSize [ini::value $ini General FontSize $FontSize]
+            set LastFile [ini::value $ini General LastFile $LastFile]
         } on error err {
             puts "invalid config in '$Filename'; using defaults: $err"
         } finally {
@@ -38,7 +41,7 @@ oo::define Config constructor {} {
     }
 }
 
-oo::define Config method save {} {
+oo::define Config method save filename {
     set ini [ini::open $Filename -encoding utf-8 w]
     try {
         ini::set $ini General Scale [tk scaling]
@@ -46,6 +49,7 @@ oo::define Config method save {} {
         ini::set $ini General Geometry [wm geometry .]
         ini::set $ini General FontFamily [my family]
         ini::set $ini General FontSize [my size]
+        ini::set $ini General LastFile $filename
         ini::commit $ini
     } finally {
         ini::close $ini
@@ -67,8 +71,11 @@ oo::define Config method set_size size { set FontSize $size }
 oo::define Config method family {} { return $FontFamily }
 oo::define Config method set_family family { set FontFamily $family }
 
+oo::define Config method lastfile {} { return $LastFile }
+oo::define Config method set_lastfile lastfile { set LastFile $lastfile }
+
 oo::define Config method to_string {} {
     return "Config filename=$Filename blinking=$Blinking\
         scaling=[tk scaling] geometry=$Geometry fontfamily=$FontFamily\
-        fontsize=$FontSize"
+        fontsize=$FontSize lastfile=$LastFile"
 }

@@ -185,7 +185,7 @@ oo::define App method on_save_as {} {
 oo::define App method on_export_html {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .html]
-    writeFile $filename [textx::html $TextEdit]
+    writeFile $filename [textx::html $TextEdit $filename]
     my show_message "Exported '$filename'"
 }
 

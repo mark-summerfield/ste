@@ -100,110 +100,92 @@ proc textx::deserialize {txt_widget txt_dump} {
     $txt_widget mark set insert $insert_index 
 }
 
-proc textx::html txt_widget {
+proc textx::html {txt_widget filename} {
     set txt_dump [$txt_widget dump -text -mark -tag 1.0 "end -1 char"]
-    set out [list]
+    set title [html::html_entities [file rootname [file tail $filename]]]
+    set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
     set pending [list]
     foreach {key value _} $txt_dump {
         switch $key {
             text { lappend out [html::html_entities $value]}
             tagon {
-                switch $value {
-                    bold {}
-                    italic {}
-                    bolditalic {}
-                    highlight {}
-                    indent1 {}
-                    indent2 {}
-                    indent3 {}
-                    black {}
-                    apricot {}
-                    beige {}
-                    blue {}
-                    brown {}
-                    cyan {}
-                    green {}
-                    grey {}
-                    lavender {}
-                    lime {}
-                    magenta {}
-                    maroon {}
-                    mint {}
-                    navy {}
-                    olive {}
-                    orange {}
-                    pink {}
-                    purple {}
-                    red {}
-                    teal {}
-                }
+                lappend out [html_on $value]
                 lappend pending $value
             }
             tagoff {
-                switch $value {
-                    bold {}
-                    italic {}
-                    bolditalic {}
-                    highlight {}
-                    indent1 {}
-                    indent2 {}
-                    indent3 {}
-                    black {}
-                    apricot {}
-                    beige {}
-                    blue {}
-                    brown {}
-                    cyan {}
-                    green {}
-                    grey {}
-                    lavender {}
-                    lime {}
-                    magenta {}
-                    maroon {}
-                    mint {}
-                    navy {}
-                    olive {}
-                    orange {}
-                    pink {}
-                    purple {}
-                    red {}
-                    teal {}
-                }
+                lappend out [html_off $value]
                 lpop pending
             }
         }
     }
     while {[llength $pending]} {
         set value [lpop pending]
-        switch $value {
-            bold {}
-            italic {}
-            bolditalic {}
-            highlight {}
-            indent1 {}
-            indent2 {}
-            indent3 {}
-            black {}
-            apricot {}
-            beige {}
-            blue {}
-            brown {}
-            cyan {}
-            green {}
-            grey {}
-            lavender {}
-            lime {}
-            magenta {}
-            maroon {}
-            mint {}
-            navy {}
-            olive {}
-            orange {}
-            pink {}
-            purple {}
-            red {}
-            teal {}
-        }
+        lappend out [html_off $value]
     }
+    lappend out "</body>\n</html>\n"
     join $out \n
+}
+
+proc textx::html_on tag {
+    switch $tag {
+        bold {}
+        italic {}
+        bolditalic {}
+        highlight {}
+        indent1 {}
+        indent2 {}
+        indent3 {}
+        black {}
+        apricot {}
+        beige {}
+        blue {}
+        brown {}
+        cyan {}
+        green {}
+        grey {}
+        lavender {}
+        lime {}
+        magenta {}
+        maroon {}
+        mint {}
+        navy {}
+        olive {}
+        orange {}
+        pink {}
+        purple {}
+        red {}
+        teal {}
+    }
+}
+
+proc textx::html_off tag {
+    switch $tag {
+        bold {}
+        italic {}
+        bolditalic {}
+        highlight {}
+        indent1 {}
+        indent2 {}
+        indent3 {}
+        black {}
+        apricot {}
+        beige {}
+        blue {}
+        brown {}
+        cyan {}
+        green {}
+        grey {}
+        lavender {}
+        lime {}
+        magenta {}
+        maroon {}
+        mint {}
+        navy {}
+        olive {}
+        orange {}
+        pink {}
+        purple {}
+        red {}
+        teal {}
+    }
 }

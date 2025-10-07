@@ -174,7 +174,7 @@ oo::define App method make_style_toolbar {} {
 oo::define App method make_widgets {} {
     set config [Config new]
     ttk::frame .mf.tf
-    set TextEdit [text .mf.tf.txt -undo true]
+    set TextEdit [text .mf.tf.txt -undo true -wrap word]
     textx::make_fonts $TextEdit [$config family] [$config size]
     textx::make_tags $TextEdit
     ui::scrollize .mf.tf txt vertical

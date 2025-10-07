@@ -1,6 +1,6 @@
 ste.tk
-app-1.tm # TODO
-textx-1.tm # TODO test
+app-1.tm # TODO edit toolbar | style menu | style toolbar
+textx-1.tm # TODO ste {de}serialize | html export
 ins_char_form-1.tm
 config-1.tm
 config_form-1.tm

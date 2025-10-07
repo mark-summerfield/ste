@@ -58,7 +58,6 @@ oo::define App method prepare_ui {} {
     wm title . [tk appname]
     wm iconname . [tk appname]
     wm iconphoto . -default [ui::icon icon.svg]
-    # TODO List.Treeview style with 0 indent
 }
 
 oo::define App method make_menus {} {

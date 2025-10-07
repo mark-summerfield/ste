@@ -1,13 +1,15 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-# Unique Styles: bold italic bolditalic ColorTags
+# Unique Styles: bold italic bolditalic COLOR_TAGS
 # Mixable Styles: highlight indent[1-3]
 
 package require html 1
 
 namespace eval textx {}
 
-set textx::ColorTags [dict create \
+const textx::HIGHLIGHT "#FFE119"
+
+const textx::COLOR_TAGS [dict create \
     black "#000000" \
     apricot "#FFD8B1" \
     beige "#FFFAC8" \
@@ -40,15 +42,15 @@ proc textx::make_fonts {txt_widget family size} {
     font create BoldItalic -family $family -size $size -weight bold \
         -slant italic
     $txt_widget configure -font Sans \
-        -foreground [dict get $::textx::ColorTags black]
+        -foreground [dict get $::textx::COLOR_TAGS black]
 }
 
 proc textx::make_tags txt_widget {
     $txt_widget tag configure bold -font Bold
     $txt_widget tag configure italic -font Italic
     $txt_widget tag configure bolditalic -font BoldItalic
-    $txt_widget tag configure highlight -background "#FFE119" ;# yellow
-    dict for {key value} $::textx::ColorTags {
+    $txt_widget tag configure highlight -background $::textx::HIGHLIGHT
+    dict for {key value} $::textx::COLOR_TAGS {
         $txt_widget tag configure $key -foreground $value
     }
     const WIDTH [font measure Sans "•. "]
@@ -64,10 +66,12 @@ proc textx::make_tags txt_widget {
 }
 
 proc textx::serialize txt_widget {
-    $txt_widget dump -text -mark -tag 1.0 "end -1 char"
+    set txt_dump [$txt_widget dump -text -mark -tag 1.0 "end -1 char"]
+    zlib deflate [encoding convertto utf-8 $txt_dump] 9
 }
 
-proc textx::deserialize {txt_widget txt_dump} {
+proc textx::deserialize {txt_widget txt_dumpz} {
+    set txt_dump [encoding convertfrom utf-8 [zlib inflate $txt_dumpz]]
     array set tags {}
     set current_index end
     set insert_index end
@@ -103,11 +107,15 @@ proc textx::deserialize {txt_widget txt_dump} {
 proc textx::html {txt_widget filename} {
     set txt_dump [$txt_widget dump -text -mark -tag 1.0 "end -1 char"]
     set title [html::html_entities [file rootname [file tail $filename]]]
-    set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
+    set out [list "<html>\n<head><title>$title</title></head>\n<body>"]
     set pending [list]
     foreach {key value _} $txt_dump {
         switch $key {
-            text { lappend out [html::html_entities $value]}
+            text {
+                set value [regsub -all \n\n $value <p>]
+                set value [regsub -all \n $value " "]
+                lappend out [html::html_entities $value]
+            }
             tagon {
                 lappend out [html_on $value]
                 lappend pending $value
@@ -128,64 +136,30 @@ proc textx::html {txt_widget filename} {
 
 proc textx::html_on tag {
     switch $tag {
-        bold {}
-        italic {}
-        bolditalic {}
-        highlight {}
-        indent1 {}
-        indent2 {}
-        indent3 {}
-        black {}
-        apricot {}
-        beige {}
-        blue {}
-        brown {}
-        cyan {}
-        green {}
-        grey {}
-        lavender {}
-        lime {}
-        magenta {}
-        maroon {}
-        mint {}
-        navy {}
-        olive {}
-        orange {}
-        pink {}
-        purple {}
-        red {}
-        teal {}
+        bold { return <b> }
+        italic { return <i> }
+        bolditalic { return <b><i> }
+        highlight { return "<span style=\"background-color:\
+            $::textx::HIGHLIGHT;\">" }
+        indent1 { return "<div style=\"text-indent: 2em;\">" }
+        indent2 { return "<div style=\"text-indent: 4em;\">" }
+        indent3 { return "<div style=\"text-indent: 6em;\">" }
+        default {
+            return "<span style=\"color: \
+                [dict get $::textx::COLOR_TAGS $tag];\">"
+        }
     }
 }
 
 proc textx::html_off tag {
     switch $tag {
-        bold {}
-        italic {}
-        bolditalic {}
-        highlight {}
-        indent1 {}
-        indent2 {}
-        indent3 {}
-        black {}
-        apricot {}
-        beige {}
-        blue {}
-        brown {}
-        cyan {}
-        green {}
-        grey {}
-        lavender {}
-        lime {}
-        magenta {}
-        maroon {}
-        mint {}
-        navy {}
-        olive {}
-        orange {}
-        pink {}
-        purple {}
-        red {}
-        teal {}
+        bold { return </b> }
+        italic { return </i> }
+        bolditalic { return </i></b> }
+        highlight { return </span> }
+        indent1 { return </div> }
+        indent2 { return </div> }
+        indent3 { return </div> }
+        default { return </span> }
     }
 }

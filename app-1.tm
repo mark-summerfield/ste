@@ -5,9 +5,8 @@ package require config
 package require config_form
 package require ins_char_form
 package require message_form
-package require ntext 1
 package require ref
-package require textx
+package require textedit
 package require tooltip 2
 package require ui
 package require util
@@ -18,7 +17,7 @@ const LONG_TIMEOUT 20_000
 
 oo::class create App {
     variable Filename
-    variable TextEdit
+    variable TheTextEdit
     variable StatusLabel
 }
 
@@ -40,8 +39,10 @@ oo::define App method show {} {
     if {$Filename ne ""} {
         my file_open
     } else {
-        focus $TextEdit
-        $TextEdit mark set insert end
+        set textEdit [$TheTextEdit textedit]
+        focus $textEdit
+        $textEdit mark set insert end
+        $textEdit see insert
     }
 }
 
@@ -173,18 +174,9 @@ oo::define App method make_style_toolbar {} {
 }
 
 oo::define App method make_widgets {} {
-    my make_textedit
-    set StatusLabel [ttk::label .mf.statusLabel]
-}
-
-oo::define App method make_textedit {} {
     set config [Config new]
-    ttk::frame .mf.tf
-    set TextEdit [text .mf.tf.txt -undo true -wrap word]
-    bindtags $TextEdit {$TextEdit Ntext . all}
-    textx::make_fonts $TextEdit [$config family] [$config size]
-    textx::make_tags $TextEdit
-    ui::scrollize .mf.tf txt vertical
+    set TheTextEdit [TextEdit make .mf [$config family] [$config size]]
+    set StatusLabel [ttk::label .mf.statusLabel]
 }
 
 oo::define App method make_layout {} {
@@ -226,10 +218,11 @@ oo::define App method make_bindings {} {
 oo::define App method on_file_new {} {
     my on_file_save
     set Filename ""
-    $TextEdit delete 1.0 end
-    $TextEdit edit modified false
-    $TextEdit edit reset
-    focus $TextEdit
+    set textEdit [$TheTextEdit textedit]
+    $textEdit delete 1.0 end
+    $textEdit edit modified false
+    $textEdit edit reset
+    focus $textEdit
 }
 
 oo::define App method on_file_open {} {
@@ -266,19 +259,21 @@ oo::define App method on_file_save_as {} {
 oo::define App method on_file_export_html {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .html]
-    writeFile $filename [textx::html $TextEdit $filename]
+    writeFile $filename [$TheTextEdit as_html $filename]
     my show_message "Exported '$filename'"
 }
 
 oo::define App method on_file_export_text {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .txt]
-    writeFile $filename [$TextEdit get 1.0 end]
+    writeFile $filename [$TheTextEdit as_text]
     my show_message "Exported '$filename'"
 }
 
 oo::define App method on_file_print {} {
-    if {[catch {tk print $TextEdit} err]} { my show_error $err }
+    if {[catch {tk print [$TheTextEdit textedit]} err]} {
+        my show_error $err
+    }
 }
 
 oo::define App method on_config {} {
@@ -290,7 +285,7 @@ oo::define App method on_config {} {
     tkwait window [$form form]
     if {[$ok get]} {
         if {$family ne [$config family] || $size != [$config size]} {
-            textx::make_fonts $TextEdit [$config family] [$config size]
+            $TheTextEdit make_fonts [$config family] [$config size]
         }
     }
 }
@@ -301,43 +296,47 @@ oo::define App method on_about {} {
 }
 
 oo::define App method on_quit {} {
-    if {[$TextEdit edit modified]} { my on_file_save }
+    if {[[$TheTextEdit textedit] edit modified]} { my on_file_save }
     set config [Config new]
     $config save $Filename
     exit
 }
 
 oo::define App method on_undo {} {
-    if {[$TextEdit edit canundo]} { $TextEdit edit undo }
+    set textEdit [$TheTextEdit textedit]
+    if {[$textEdit edit canundo]} { $textEdit edit undo }
 }
 
 oo::define App method on_redo {} {
-    if {[$TextEdit edit canredo]} { $TextEdit edit redo }
+    set textEdit [$TheTextEdit textedit]
+    if {[$textEdit edit canredo]} { $textEdit edit redo }
 }
 
-oo::define App method on_copy {} { tk_textCopy $TextEdit }
+oo::define App method on_copy {} { tk_textCopy [$TheTextEdit textedit] }
 
-oo::define App method on_cut {} { tk_textCut $TextEdit }
+oo::define App method on_cut {} { tk_textCut [$TheTextEdit textedit] }
 
-oo::define App method on_paste {} { tk_textPaste $TextEdit }
+oo::define App method on_paste {} { tk_textPaste [$TheTextEdit textedit] }
 
 oo::define App method on_ins_char {} {
     set ch [InsCharForm show]
-    if {$ch ne ""} { $TextEdit insert insert $ch }
+    if {$ch ne ""} { [$TheTextEdit textedit] insert insert $ch }
 }
 
 oo::define App method file_open {} {
-    textx::deserialize $TextEdit [readFile $Filename binary]
-    $TextEdit mark set insert end
-    $TextEdit edit modified false
-    $TextEdit edit reset
-    focus $TextEdit
+    $TheTextEdit deserialize [readFile $Filename binary]
+    set textEdit [$TheTextEdit textedit]
+    $textEdit edit modified false
+    $textEdit edit reset
+    $textEdit mark set insert end
+    $textEdit see insert
+    focus $textEdit
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Opened '$Filename'."
 }
 
 oo::define App method file_save {} {
-    writeFile $Filename binary [textx::serialize $TextEdit]
+    writeFile $Filename binary [$TheTextEdit serialize]
     my show_message "Saved '$Filename'."
 }
 

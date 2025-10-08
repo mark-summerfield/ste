@@ -1,15 +1,15 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-# Unique Styles: bold italic bolditalic COLOR_TAGS
+# Unique Styles: bold italic bolditalic COLOR_FOR_TAG
 # Mixable Styles: highlight indent[1-3]
 
 package require html 1
+package require ntext 1
+package require textutil
 
-namespace eval textx {}
+const HIGHLIGHT_COLOR "#FFE119"
 
-const textx::HIGHLIGHT "#FFE119"
-
-const textx::COLOR_TAGS [dict create \
+const COLOR_FOR_TAG [dict create \
     black "#000000" \
     apricot "#FFD8B1" \
     beige "#FFFAC8" \
@@ -32,7 +32,28 @@ const textx::COLOR_TAGS [dict create \
     teal "#469990" \
     ]
 
-proc textx::make_fonts {txt_widget family size} {
+
+oo::class create TextEdit {
+    variable Text
+}
+
+oo::define TextEdit classmethod make {panel family size} {
+    set theTextEdit [TextEdit new $panel]
+    $theTextEdit make_fonts $family $size
+    $theTextEdit make_tags
+    return $theTextEdit
+}
+
+oo::define TextEdit constructor panel {
+    ttk::frame $panel.tf
+    set Text [text $panel.tf.txt -undo true -wrap word]
+    bindtags $Text {$Text Ntext . all}
+    ui::scrollize $panel.tf txt vertical
+}
+
+oo::define TextEdit method textedit {} { return $Text }
+
+oo::define TextEdit method make_fonts {family size} {
     foreach name {Sans Bold Italic BoldItalic} {
         catch { font delete $name }
     }
@@ -41,36 +62,36 @@ proc textx::make_fonts {txt_widget family size} {
     font create Italic -family $family -size $size -slant italic
     font create BoldItalic -family $family -size $size -weight bold \
         -slant italic
-    $txt_widget configure -font Sans \
-        -foreground [dict get $::textx::COLOR_TAGS black]
+    $Text configure -font Sans \
+        -foreground [dict get $::COLOR_FOR_TAG black]
 }
 
-proc textx::make_tags txt_widget {
-    $txt_widget tag configure bold -font Bold
-    $txt_widget tag configure italic -font Italic
-    $txt_widget tag configure bolditalic -font BoldItalic
-    $txt_widget tag configure highlight -background $::textx::HIGHLIGHT
-    dict for {key value} $::textx::COLOR_TAGS {
-        $txt_widget tag configure $key -foreground $value
+oo::define TextEdit method make_tags {} {
+    $Text tag configure bold -font Bold
+    $Text tag configure italic -font Italic
+    $Text tag configure bolditalic -font BoldItalic
+    $Text tag configure highlight -background $::HIGHLIGHT_COLOR
+    dict for {key value} $::COLOR_FOR_TAG {
+        $Text tag configure $key -foreground $value
     }
     const WIDTH [font measure Sans "•. "]
     set indent [font measure Sans "xxxx"]
-    $txt_widget tag configure indent1 -lmargin1 $indent \
+    $Text tag configure indent1 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
     set indent [expr {$indent * 2}]
-    $txt_widget tag configure indent2 -lmargin1 $indent \
+    $Text tag configure indent2 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
     set indent [expr {$indent * 3}]
-    $txt_widget tag configure indent3 -lmargin1 $indent \
+    $Text tag configure indent3 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
 }
 
-proc textx::serialize txt_widget {
-    set txt_dump [$txt_widget dump -text -mark -tag 1.0 "end -1 char"]
+oo::define TextEdit method serialize {} {
+    set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
     zlib deflate [encoding convertto utf-8 $txt_dump] 9
 }
 
-proc textx::deserialize {txt_widget txt_dumpz} {
+oo::define TextEdit method deserialize txt_dumpz {
     set txt_dump [encoding convertfrom utf-8 [zlib inflate $txt_dumpz]]
     array set tags {}
     set current_index end
@@ -78,12 +99,12 @@ proc textx::deserialize {txt_widget txt_dumpz} {
     set pending [list]
     foreach {key value index} $txt_dump {
         switch $key {
-            text { $txt_widget insert $index $value }
+            text { $Text insert $index $value }
             mark { 
                 switch $value {
                     current { set current_index $index }
                     insert { set insert_index $index}
-                    default { $txt_widget mark set $value $index }
+                    default { $Text mark set $value $index }
                 }
             }
             tagon {
@@ -91,67 +112,83 @@ proc textx::deserialize {txt_widget txt_dumpz} {
                 lappend pending $value
             }
             tagoff {
-                $txt_widget tag add $value $tags($value) $index
+                $Text tag add $value $tags($value) $index
                 lpop pending
             }
         }
     }
     while {[llength $pending]} {
         set value [lpop pending]
-        $txt_widget tag add $value $tags($value) end
+        $Text tag add $value $tags($value) end
     }
-    $txt_widget mark set current $current_index
-    $txt_widget mark set insert $insert_index 
+    $Text mark set current $current_index
+    $Text mark set insert $insert_index 
 }
 
-proc textx::html {txt_widget filename} {
-    set txt_dump [$txt_widget dump -text -mark -tag 1.0 "end -1 char"]
+oo::define TextEdit method as_text {} {
+    set lines [list]
+    foreach line [split [$Text get 1.0 end] \n] {
+        lappend lines [textutil::adjust $line -length 76]
+    }
+    join $lines \n
+}
+
+oo::define TextEdit method as_html filename {
+    set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
     set title [html::html_entities [file rootname [file tail $filename]]]
     set out [list "<html>\n<head><title>$title</title></head>\n<body>"]
     set pending [list]
-    foreach {key value _} $txt_dump {
+    set flip true
+    foreach {key value index} $txt_dump {
         switch $key {
             text {
-                set value [regsub -all \n\n $value <p>]
-                set value [regsub -all \n $value " "]
-                lappend out [html::html_entities $value]
+                if {$value eq "\n"} {
+                    lappend out </p>\n
+                    set flip true
+                } else {
+                    if {$flip} {
+                        lappend out <p>
+                        set flip false
+                    }
+                    lappend out [string trim [html::html_entities $value]]
+                }
             }
             tagon {
-                lappend out [html_on $value]
+                lappend out [my HtmlOn $value]
                 lappend pending $value
             }
             tagoff {
-                lappend out [html_off $value]
+                lappend out [my HtmlOff $value]
                 lpop pending
             }
         }
     }
     while {[llength $pending]} {
         set value [lpop pending]
-        lappend out [html_off $value]
+        lappend out [my HtmlOff $value]
     }
-    lappend out "</body>\n</html>\n"
+    lappend out "</p>\n</body>\n</html>\n"
     join $out \n
 }
 
-proc textx::html_on tag {
+oo::define TextEdit method HtmlOn tag {
     switch $tag {
         bold { return <b> }
         italic { return <i> }
         bolditalic { return <b><i> }
         highlight { return "<span style=\"background-color:\
-            $::textx::HIGHLIGHT;\">" }
+            $::HIGHLIGHT_COLOR;\">" }
         indent1 { return "<div style=\"text-indent: 2em;\">" }
         indent2 { return "<div style=\"text-indent: 4em;\">" }
         indent3 { return "<div style=\"text-indent: 6em;\">" }
         default {
             return "<span style=\"color: \
-                [dict get $::textx::COLOR_TAGS $tag];\">"
+                [dict get $::COLOR_FOR_TAG $tag];\">"
         }
     }
 }
 
-proc textx::html_off tag {
+oo::define TextEdit method HtmlOff tag {
     switch $tag {
         bold { return </b> }
         italic { return </i> }

@@ -119,19 +119,14 @@ oo::define App method on_edit_ins_char {} {
     if {$ch ne ""} { [$TheTextEdit textedit] insert insert $ch }
 }
 
-oo::define App method file_open {} {
-    $TheTextEdit deserialize [readFile $Filename binary]
-    set textEdit [$TheTextEdit textedit]
-    $textEdit edit modified false
-    $textEdit edit reset
-    $textEdit mark set insert end
-    $textEdit see insert
-    focus $textEdit
-    wm title . "[tk appname] — [file tail $Filename]"
-    my show_message "Opened '$Filename'."
+oo::define App method on_style_bold {} {
+    $TheTextEdit apply_style [$TheTextEdit selected] bold
 }
 
-oo::define App method file_save {} {
-    writeFile $Filename binary [$TheTextEdit serialize]
-    my show_message "Saved '$Filename'."
+oo::define App method on_style_italic {} {
+    $TheTextEdit apply_style [$TheTextEdit selected] italic
+}
+
+oo::define App method on_style_highlight {} {
+    $TheTextEdit apply_style [$TheTextEdit selected] highlight
 }

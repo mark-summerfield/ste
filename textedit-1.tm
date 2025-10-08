@@ -13,7 +13,7 @@ oo::define TextEdit initialize {
     variable HIGHLIGHT_COLOR
     variable COLOR_FOR_TAG
 
-    const HIGHLIGHT_COLOR "#FFE119"
+    const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
         apricot "#FFD8B1" \
@@ -54,6 +54,43 @@ oo::define TextEdit constructor panel {
 }
 
 oo::define TextEdit method textedit {} { return $Text }
+
+oo::define TextEdit method selected {} {
+    set indexes [$Text tag ranges sel]
+    if {$indexes eq ""} {
+        set indexes "[$Text index "insert wordstart"]\
+                     [$Text index "insert wordend"]"
+    }
+    return $indexes
+}
+
+oo::define TextEdit method apply_style {indexes style} {
+    if {$indexes ne ""} {
+        set styles [$Text tag names [lindex $indexes 0]]
+        if {$style eq "bold" && [expr {"bolditalic" in $styles}]} {
+            $Text tag remove bolditalic {*}$indexes
+            $Text tag add italic {*}$indexes
+        } elseif {$style eq "italic" && [expr {"bolditalic" in $styles}]} {
+            $Text tag remove bolditalic {*}$indexes
+            $Text tag add bold {*}$indexes
+        } elseif {($style eq "bold" && [expr {"italic" in $styles}]) ||
+            ($style eq "italic" && [expr {"bold" in $styles}])} {
+            $Text tag remove bold {*}$indexes
+            $Text tag remove italic {*}$indexes
+            $Text tag add bolditalic {*}$indexes
+        } elseif {$style eq "bold" && [expr {"bold" in $styles}]} {
+            $Text tag remove bold {*}$indexes
+        } elseif {$style eq "italic" && [expr {"italic" in $styles}]} {
+            $Text tag remove italic {*}$indexes
+        } elseif {$style eq "highlight" && \
+                [expr {"highlight" in $styles}]} {
+            $Text tag remove highlight {*}$indexes
+        } else {
+            $Text tag add $style {*}$indexes
+        }
+        $Text edit modified true
+    }
+}
 
 oo::define TextEdit method colors {} {
     classvariable COLOR_FOR_TAG
@@ -159,7 +196,8 @@ oo::define TextEdit method as_html filename {
                         lappend out <p>\n
                         set flip false
                     }
-                    lappend out [string trim [html::html_entities $value]]
+                    lappend out [string trim \
+                        [html::html_entities $value] \n]
                 }
             }
             tagon {
@@ -192,6 +230,7 @@ oo::define TextEdit method HtmlOn tag {
         indent1 { return "<div style=\"text-indent: 2em;\">" }
         indent2 { return "<div style=\"text-indent: 4em;\">" }
         indent3 { return "<div style=\"text-indent: 6em;\">" }
+        sel {}
         default {
             return "<span style=\"color: [dict get $COLOR_FOR_TAG $tag];\">"
         }
@@ -207,6 +246,7 @@ oo::define TextEdit method HtmlOff tag {
         indent1 { return </div> }
         indent2 { return </div> }
         indent3 { return </div> }
+        sel {}
         default { return </span> }
     }
 }

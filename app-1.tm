@@ -15,6 +15,8 @@ oo::define App constructor {} {
     set config [Config new] ;# we need tk scaling done early
     set Filename [expr {$::argc ? [lindex $::argv 0] : ""}]
     if {$Filename eq ""} { set Filename [$config lastfile] }
+    set Bold 0
+    set Italic 0
     my make_ui
 }
 

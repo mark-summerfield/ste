@@ -11,6 +11,7 @@ tcl::tm::path add $APPPATH
 package require app
 package require app_make
 package require app_actions
+package require app_support
 package require globals
 
 set app [App new]

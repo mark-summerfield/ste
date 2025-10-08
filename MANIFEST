@@ -1,7 +1,10 @@
 ste.tk
 app-1.tm
-app_make-1.tm # TODO edit toolbar | style menu | style toolbar
+# TODO color toggle | bullet item (indent1 + • ) | indent[1-3] |
+# preserve indent on Enter
+app_make-1.tm # TODO style menu | style toolbar
 app_actions-1.tm
+app_support-1.tm
 textedit-1.tm # TODO as_html & {de}serialize
 ins_char_form-1.tm
 globals-1.tm # VERSION
@@ -16,5 +19,8 @@ message_form-1.tm
 ui-1.tm
 
 st.sh
+
+# NOTE ideas
+# Add status indicators: [nnn Lines][MOD]
 
 # vim: syn=yaml

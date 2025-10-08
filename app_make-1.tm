@@ -94,7 +94,16 @@ oo::define App method make_edit_menu {} {
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
-    # TODO Roman Bold Italic BoldItalic Highlight
+    .menu.style add command -command [callback on_style_bold] \
+            -label Bold -underline 0 -compound left -accelerator Ctrl+B \
+            -image [ui::icon format-text-bold.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style_italic] \
+            -label Italic -underline 0 -compound left -accelerator Ctrl+I \
+            -image [ui::icon format-text-italic.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style_highlight] \
+            -label Highlight -underline 0 -compound left \
+            -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
+    # TODO 
     #   Color→(title-cased ColorTag names)
     #   Indent→Level 1 | Level 2 | Level 3
 }
@@ -151,7 +160,20 @@ oo::define App method make_edit_toolbar {} {
 }
 
 oo::define App method make_style_toolbar {} {
-    puts make_style_toolbar ;# TODO
+    set tip tooltip::tooltip
+    ttk::button .mf.tb.style_bold -style Toolbutton -takefocus 0 \
+        -command [callback on_style_bold] \
+        -image [ui::icon format-text-bold.svg $::ICON_SIZE]
+    $tip .mf.tb.style_bold "Style Bold"
+    ttk::button .mf.tb.style_italic -style Toolbutton -takefocus 0 \
+        -command [callback on_style_italic] \
+        -image [ui::icon format-text-italic.svg $::ICON_SIZE]
+    $tip .mf.tb.style_italic "Style Italic"
+    ttk::button .mf.tb.style_highlight -style Toolbutton -takefocus 0 \
+        -command [callback on_style_highlight] \
+        -image [ui::icon draw-highlight.svg $::ICON_SIZE]
+    $tip .mf.tb.style_highlight "Style Highlight"
+    # TODO
 }
 
 oo::define App method make_widgets {} {
@@ -191,11 +213,19 @@ oo::define App method make_toolbars_layout {} {
     pack .mf.tb.edit_ins_char -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
-    # TODO Style toolbar buttons
+    pack .mf.tb.style_bold -side left
+    pack .mf.tb.style_italic -side left
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
+        -fill y {*}$opts
+    pack .mf.tb.style_highlight -side left
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
+        -fill y {*}$opts
 }
 
 oo::define App method make_bindings {} {
+    bind . <Control-b> [callback on_style_bold]
     # Auto: Control-c Copy
+    bind . <Control-i> [callback on_style_italic]
     bind . <Control-n> [callback on_file_new]
     bind . <Control-o> [callback on_file_open]
     bind . <Control-p> [callback on_file_print]

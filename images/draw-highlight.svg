@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
-     inkscape:zoom="5.8693182"
-     inkscape:cx="11.07454"
-     inkscape:cy="11.330106"
+     inkscape:zoom="8.3004694"
+     inkscape:cx="11.204186"
+     inkscape:cy="32.106618"
      inkscape:current-layer="svg5" />
   <style
      id="current-color-scheme"
@@ -37,5 +37,5 @@
      class="ColorScheme-Text"
      d="M 49.628091,3.0002368 20.945295,28.1228 35.30153,42.479035 60.424942,13.766564 Z M 17.356236,31.711858 v 10.767177 l -7.178118,7.178118 h 7.178118 l 3.589059,-3.589059 H 31.712471 Z M 3.0000001,53.246212 v 7.17642 l 57.4249419,0.0017 v -7.178118 z"
      fill="currentColor"
-     style="fill:#ffff00;stroke-width:1" />
+     style="fill:#ffff00;stroke-width:1;stroke:#808000" />
 </svg>

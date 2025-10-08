@@ -10,11 +10,8 @@ package require textedit
 oo::define App method on_file_new {} {
     my on_file_save
     set Filename ""
-    set textEdit [$TheTextEdit textedit]
-    $textEdit delete 1.0 end
-    $textEdit edit modified false
-    $textEdit edit reset
-    focus $textEdit
+    $TheTextEdit clear
+    focus [$TheTextEdit textedit]
 }
 
 oo::define App method on_file_open {} {
@@ -94,39 +91,25 @@ oo::define App method on_quit {} {
     exit
 }
 
-oo::define App method on_edit_undo {} {
-    set textEdit [$TheTextEdit textedit]
-    if {[$textEdit edit canundo]} { $textEdit edit undo }
-}
+oo::define App method on_edit_undo {} { $TheTextEdit maybe_undo }
 
-oo::define App method on_edit_redo {} {
-    set textEdit [$TheTextEdit textedit]
-    if {[$textEdit edit canredo]} { $textEdit edit redo }
-}
+oo::define App method on_edit_redo {} { $TheTextEdit maybe_redo }
 
-oo::define App method on_edit_copy {} {
-    tk_textCopy [$TheTextEdit textedit]
-}
+oo::define App method on_edit_copy {} { $TheTextEdit copy }
 
-oo::define App method on_edit_cut {} { tk_textCut [$TheTextEdit textedit] }
+oo::define App method on_edit_cut {} { $TheTextEdit cut }
 
-oo::define App method on_edit_paste {} {
-    tk_textPaste [$TheTextEdit textedit]
-}
+oo::define App method on_edit_paste {} { $TheTextEdit paste }
 
 oo::define App method on_edit_ins_char {} {
     set ch [InsCharForm show]
-    if {$ch ne ""} { [$TheTextEdit textedit] insert insert $ch }
+    if {$ch ne ""} { $TheTextEdit insert_char $ch }
 }
 
-oo::define App method on_style_bold {} {
-    $TheTextEdit apply_style [$TheTextEdit selected] bold
-}
+oo::define App method on_style_bold {} { $TheTextEdit apply_style bold }
 
-oo::define App method on_style_italic {} {
-    $TheTextEdit apply_style [$TheTextEdit selected] italic
-}
+oo::define App method on_style_italic {} { $TheTextEdit apply_style italic }
 
 oo::define App method on_style_highlight {} {
-    $TheTextEdit apply_style [$TheTextEdit selected] highlight
+    $TheTextEdit apply_style highlight
 }

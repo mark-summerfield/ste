@@ -55,6 +55,28 @@ oo::define TextEdit constructor panel {
 
 oo::define TextEdit method textedit {} { return $Text }
 
+oo::define TextEdit method clear {} {
+    $Text delete 1.0 end
+    $Text edit modified false
+    $Text edit reset
+}
+
+oo::define TextEdit method maybe_undo {} {
+    if {[$Text edit canundo]} { $Text edit undo }
+}
+
+oo::define TextEdit method maybe_redo {} {
+    if {[$Text edit canredo]} { $Text edit redo }
+}
+
+oo::define TextEdit method copy {} { tk_textCopy $Text }
+
+oo::define TextEdit method cut {} { tk_textCut $Text }
+
+oo::define TextEdit method paste {} { tk_textPaste $Text }
+
+oo::define TextEdit method insert_char ch { $Text insert insert $ch }
+
 oo::define TextEdit method selected {} {
     set indexes [$Text tag ranges sel]
     if {$indexes eq ""} {
@@ -64,7 +86,11 @@ oo::define TextEdit method selected {} {
     return $indexes
 }
 
-oo::define TextEdit method apply_style {indexes style} {
+oo::define TextEdit method apply_style style {
+    my apply_style_to [my selected] $style
+}
+
+oo::define TextEdit method apply_style_to {indexes style} {
     if {$indexes ne ""} {
         set styles [$Text tag names [lindex $indexes 0]]
         if {$style eq "bold" && [expr {"bolditalic" in $styles}]} {
@@ -196,8 +222,9 @@ oo::define TextEdit method as_html filename {
                         lappend out <p>\n
                         set flip false
                     }
-                    lappend out [string trim \
-                        [html::html_entities $value] \n]
+                    lappend out [html::html_entities \
+                        [string trim $value \n]]
+                    
                 }
             }
             tagon {

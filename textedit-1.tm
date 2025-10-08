@@ -33,9 +33,7 @@ const COLOR_FOR_TAG [dict create \
     ]
 
 
-oo::class create TextEdit {
-    variable Text
-}
+oo::class create TextEdit { variable Text }
 
 oo::define TextEdit classmethod make {panel family size} {
     set theTextEdit [TextEdit new $panel]
@@ -44,6 +42,7 @@ oo::define TextEdit classmethod make {panel family size} {
     return $theTextEdit
 }
 
+# Use make (above)
 oo::define TextEdit constructor panel {
     ttk::frame $panel.tf
     set Text [text $panel.tf.txt -undo true -wrap word]

@@ -94,12 +94,10 @@ oo::define ConfigForm method make_layout {} {
 oo::define ConfigForm method make_bindings {} {
     bind .configForm <Escape> [callback on_cancel]
     bind .configForm <Return> [callback on_ok]
-    bind .configForm <Alt-b> \
-        {.configForm.frame.blinkCheckbutton invoke}
+    bind .configForm <Alt-b> {.configForm.frame.blinkCheckbutton invoke}
     bind .configForm <Alt-f> [callback on_font]
     bind .configForm <Alt-o> [callback on_ok]
-    bind .configForm <Alt-s> \
-        {focus .configForm.frame.scaleSpinbox}
+    bind .configForm <Alt-s> {focus .configForm.frame.scaleSpinbox}
 }
 
 oo::define ConfigForm method on_font {} {
@@ -119,6 +117,7 @@ oo::define ConfigForm method on_font_chosen args {
                 -text "$FontFamily $FontSize"
         }
     }
+    focus .configForm
 }
 
 

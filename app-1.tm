@@ -202,16 +202,16 @@ oo::define App method make_toolbars_layout {} {
 }
 
 oo::define App method make_bindings {} {
-    # Control-c Copy
+    # Auto: Control-c Copy
     bind . <Control-n> [callback on_file_new]
     bind . <Control-o> [callback on_file_open]
     bind . <Control-p> [callback on_file_print]
     bind . <Control-q> [callback on_quit]
     bind . <Control-s> [callback on_file_save]
-    # Control-v Paste
-    # Control-x Cut
-    # Control-z Undo
-    # Control-Shift-z Redo
+    # Auto: Control-v Paste
+    # Auto: Control-x Cut
+    # Auto: Control-z Undo
+    # Auto: Control-Shift-z Redo
     wm protocol . WM_DELETE_WINDOW [callback on_quit]
 }
 

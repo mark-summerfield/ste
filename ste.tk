@@ -9,8 +9,9 @@ if {![catch {file readlink [info script]} name]} {
 tcl::tm::path add $APPPATH
 
 package require app
-
-const VERSION 0.1.0
+package require app_make
+package require app_actions
+package require globals
 
 set app [App new]
 $app show

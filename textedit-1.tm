@@ -7,33 +7,36 @@ package require html 1
 package require ntext 1
 package require textutil
 
-const HIGHLIGHT_COLOR "#FFE119"
-
-const COLOR_FOR_TAG [dict create \
-    black "#000000" \
-    apricot "#FFD8B1" \
-    beige "#FFFAC8" \
-    blue "#4363D8" \
-    brown "#9A6324" \
-    cyan "#42D4F4" \
-    green "#3CB44B" \
-    grey "#A9A9A9" \
-    lavender "#DCB3FF" \
-    lime "#BFEF45" \
-    magenta "#F032E6" \
-    maroon "#800000" \
-    mint "#AAFFC3" \
-    navy "#000075" \
-    olive "#808000" \
-    orange "#F58231" \
-    pink "#FABEB4" \
-    purple "#911EB4" \
-    red "#E6194B" \
-    teal "#469990" \
-    ]
-
-
 oo::class create TextEdit { variable Text }
+
+oo::define TextEdit initialize {
+    variable HIGHLIGHT_COLOR
+    variable COLOR_FOR_TAG
+
+    const HIGHLIGHT_COLOR "#FFE119"
+    const COLOR_FOR_TAG [dict create \
+        black "#000000" \
+        apricot "#FFD8B1" \
+        beige "#FFFAC8" \
+        blue "#4363D8" \
+        brown "#9A6324" \
+        cyan "#42D4F4" \
+        green "#3CB44B" \
+        grey "#A9A9A9" \
+        lavender "#DCB3FF" \
+        lime "#BFEF45" \
+        magenta "#F032E6" \
+        maroon "#800000" \
+        mint "#AAFFC3" \
+        navy "#000075" \
+        olive "#808000" \
+        orange "#F58231" \
+        pink "#FABEB4" \
+        purple "#911EB4" \
+        red "#E6194B" \
+        teal "#469990" \
+        ]
+}
 
 oo::define TextEdit classmethod make {panel family size} {
     set theTextEdit [TextEdit new $panel]
@@ -52,7 +55,13 @@ oo::define TextEdit constructor panel {
 
 oo::define TextEdit method textedit {} { return $Text }
 
+oo::define TextEdit method colors {} {
+    classvariable COLOR_FOR_TAG
+    return $COLOR_FOR_TAG
+}
+
 oo::define TextEdit method make_fonts {family size} {
+    classvariable COLOR_FOR_TAG
     foreach name {Sans Bold Italic BoldItalic} {
         catch { font delete $name }
     }
@@ -61,16 +70,17 @@ oo::define TextEdit method make_fonts {family size} {
     font create Italic -family $family -size $size -slant italic
     font create BoldItalic -family $family -size $size -weight bold \
         -slant italic
-    $Text configure -font Sans \
-        -foreground [dict get $::COLOR_FOR_TAG black]
+    $Text configure -font Sans -foreground [dict get $COLOR_FOR_TAG black]
 }
 
 oo::define TextEdit method make_tags {} {
+    classvariable HIGHLIGHT_COLOR
+    classvariable COLOR_FOR_TAG
     $Text tag configure bold -font Bold
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
-    $Text tag configure highlight -background $::HIGHLIGHT_COLOR
-    dict for {key value} $::COLOR_FOR_TAG {
+    $Text tag configure highlight -background $HIGHLIGHT_COLOR
+    dict for {key value} $COLOR_FOR_TAG {
         $Text tag configure $key -foreground $value
     }
     const WIDTH [font measure Sans "•. "]
@@ -171,18 +181,19 @@ oo::define TextEdit method as_html filename {
 }
 
 oo::define TextEdit method HtmlOn tag {
+    classvariable HIGHLIGHT_COLOR
+    classvariable COLOR_FOR_TAG
     switch $tag {
         bold { return <b> }
         italic { return <i> }
         bolditalic { return <b><i> }
         highlight { return "<span style=\"background-color:\
-            $::HIGHLIGHT_COLOR;\">" }
+            $HIGHLIGHT_COLOR;\">" }
         indent1 { return "<div style=\"text-indent: 2em;\">" }
         indent2 { return "<div style=\"text-indent: 4em;\">" }
         indent3 { return "<div style=\"text-indent: 6em;\">" }
         default {
-            return "<span style=\"color: \
-                [dict get $::COLOR_FOR_TAG $tag];\">"
+            return "<span style=\"color: [dict get $COLOR_FOR_TAG $tag];\">"
         }
     }
 }

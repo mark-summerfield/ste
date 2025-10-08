@@ -93,23 +93,22 @@ oo::define TextEdit method apply_style style {
 oo::define TextEdit method apply_style_to {indexes style} {
     if {$indexes ne ""} {
         set styles [$Text tag names [lindex $indexes 0]]
-        if {$style eq "bold" && [expr {"bolditalic" in $styles}]} {
+        if {$style eq "bold" && "bolditalic" in $styles} {
             $Text tag remove bolditalic {*}$indexes
             $Text tag add italic {*}$indexes
-        } elseif {$style eq "italic" && [expr {"bolditalic" in $styles}]} {
+        } elseif {$style eq "italic" && "bolditalic" in $styles} {
             $Text tag remove bolditalic {*}$indexes
             $Text tag add bold {*}$indexes
-        } elseif {($style eq "bold" && [expr {"italic" in $styles}]) ||
-            ($style eq "italic" && [expr {"bold" in $styles}])} {
+        } elseif {($style eq "bold" && "italic" in $styles) ||
+                  ($style eq "italic" && "bold" in $styles)} {
             $Text tag remove bold {*}$indexes
             $Text tag remove italic {*}$indexes
             $Text tag add bolditalic {*}$indexes
-        } elseif {$style eq "bold" && [expr {"bold" in $styles}]} {
+        } elseif {$style eq "bold" && "bold" in $styles} {
             $Text tag remove bold {*}$indexes
-        } elseif {$style eq "italic" && [expr {"italic" in $styles}]} {
+        } elseif {$style eq "italic" && "italic" in $styles} {
             $Text tag remove italic {*}$indexes
-        } elseif {$style eq "highlight" && \
-                [expr {"highlight" in $styles}]} {
+        } elseif {$style eq "highlight" && "highlight" in $styles} {
             $Text tag remove highlight {*}$indexes
         } else {
             $Text tag add $style {*}$indexes

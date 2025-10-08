@@ -135,18 +135,18 @@ oo::define TextEdit method as_text {} {
 oo::define TextEdit method as_html filename {
     set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
     set title [html::html_entities [file rootname [file tail $filename]]]
-    set out [list "<html>\n<head><title>$title</title></head>\n<body>"]
+    set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
     set pending [list]
     set flip true
     foreach {key value index} $txt_dump {
         switch $key {
             text {
                 if {$value eq "\n"} {
-                    lappend out </p>\n
+                    lappend out \n</p>\n\n
                     set flip true
                 } else {
                     if {$flip} {
-                        lappend out <p>
+                        lappend out <p>\n
                         set flip false
                     }
                     lappend out [string trim [html::html_entities $value]]
@@ -166,8 +166,8 @@ oo::define TextEdit method as_html filename {
         set value [lpop pending]
         lappend out [my HtmlOff $value]
     }
-    lappend out "</p>\n</body>\n</html>\n"
-    join $out \n
+    lappend out "\n</p>\n</body>\n</html>\n"
+    join $out ""
 }
 
 oo::define TextEdit method HtmlOn tag {

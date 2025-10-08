@@ -111,24 +111,24 @@ oo::define App method make_file_menu {} {
 oo::define App method make_edit_menu {} {
     menu .menu.edit
     .menu add cascade -menu .menu.edit -label Edit -underline 0
-    .menu.edit add command -command [callback on_undo] -label Undo \
+    .menu.edit add command -command [callback on_edit_undo] -label Undo \
             -underline 0 -accelerator Ctrl+Z -compound left \
             -image [ui::icon edit-undo.svg $::MENU_ICON_SIZE]
-    .menu.edit add command -command [callback on_redo] -label Redo \
+    .menu.edit add command -command [callback on_edit_redo] -label Redo \
             -underline 0 -accelerator Ctrl+Shift+Z -compound left \
             -image [ui::icon edit-redo.svg $::MENU_ICON_SIZE]
     .menu.edit add separator
-    .menu.edit add command -command [callback on_copy] -label Copy \
+    .menu.edit add command -command [callback on_edit_copy] -label Copy \
             -underline 0 -accelerator Ctrl+C -compound left \
             -image [ui::icon edit-copy.svg $::MENU_ICON_SIZE]
-    .menu.edit add command -command [callback on_cut] -label Cut \
+    .menu.edit add command -command [callback on_edit_cut] -label Cut \
             -underline 2 -accelerator Ctrl+X -compound left \
             -image [ui::icon edit-cut.svg $::MENU_ICON_SIZE]
-    .menu.edit add command -command [callback on_paste] -label Paste \
+    .menu.edit add command -command [callback on_edit_paste] -label Paste \
             -underline 0 -accelerator Ctrl+V -compound left \
             -image [ui::icon edit-paste.svg $::MENU_ICON_SIZE]
     .menu.edit add separator
-    .menu.edit add command -command [callback on_ins_char] \
+    .menu.edit add command -command [callback on_edit_ins_char] \
             -label "Insert Character…" -underline 0 -compound left \
             -image [ui::icon ins-char.svg $::MENU_ICON_SIZE]
 }
@@ -143,6 +143,7 @@ oo::define App method make_style_menu {} {
 }
 
 oo::define App method make_toolbars {} {
+    ttk::frame .mf.tb
     my make_file_toolbar
     my make_edit_toolbar
     my make_style_toolbar
@@ -150,7 +151,6 @@ oo::define App method make_toolbars {} {
 
 oo::define App method make_file_toolbar {} {
     set tip tooltip::tooltip
-    ttk::frame .mf.tb
     ttk::button .mf.tb.file_new -style Toolbutton \
         -command [callback on_file_new] \
         -image [ui::icon document-new.svg $::ICON_SIZE]
@@ -166,7 +166,31 @@ oo::define App method make_file_toolbar {} {
 }
 
 oo::define App method make_edit_toolbar {} {
-    puts make_edit_toolbar ;# TODO
+    set tip tooltip::tooltip
+    ttk::button .mf.tb.edit_undo -style Toolbutton -takefocus 0 \
+        -command [callback on_edit_undo] \
+        -image [ui::icon edit-undo.svg $::ICON_SIZE]
+    $tip .mf.tb.edit_undo "Edit Undo"
+    ttk::button .mf.tb.edit_redo -style Toolbutton -takefocus 0 \
+        -command [callback on_edit_redo] \
+        -image [ui::icon edit-redo.svg $::ICON_SIZE]
+    $tip .mf.tb.edit_redo "Edit Redo"
+    ttk::button .mf.tb.edit_copy -style Toolbutton -takefocus 0 \
+        -command [callback on_edit_copy] \
+        -image [ui::icon edit-copy.svg $::ICON_SIZE]
+    $tip .mf.tb.edit_copy "Edit Copy"
+    ttk::button .mf.tb.edit_cut -style Toolbutton -takefocus 0 \
+        -command [callback on_edit_cut] \
+        -image [ui::icon edit-cut.svg $::ICON_SIZE]
+    $tip .mf.tb.edit_cut "Edit Cut"
+    ttk::button .mf.tb.edit_paste -style Toolbutton -takefocus 0 \
+        -command [callback on_edit_paste] \
+        -image [ui::icon edit-paste.svg $::ICON_SIZE]
+    $tip .mf.tb.edit_paste "Edit Paste"
+    ttk::button .mf.tb.edit_ins_char -style Toolbutton -takefocus 0 \
+        -command [callback on_edit_ins_char] \
+        -image [ui::icon ins-char.svg $::ICON_SIZE]
+    $tip .mf.tb.edit_ins_char "Edit Insert Character…"
 }
 
 oo::define App method make_style_toolbar {} {
@@ -189,13 +213,23 @@ oo::define App method make_layout {} {
 
 oo::define App method make_toolbars_layout {} {
     const opts "-pady 3 -padx 3"
+    set n 0
     pack .mf.tb.file_new -side left
     pack .mf.tb.file_open -side left
     pack .mf.tb.file_save -side left
-    pack [ttk::separator .mf.tb.sep1 -orient vertical] -side left \
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
-    # TODO Edit toolbar buttons
-    pack [ttk::separator .mf.tb.sep2 -orient vertical] -side left \
+    pack .mf.tb.edit_undo -side left
+    pack .mf.tb.edit_redo -side left
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
+        -fill y {*}$opts
+    pack .mf.tb.edit_copy -side left
+    pack .mf.tb.edit_cut -side left
+    pack .mf.tb.edit_paste -side left
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
+        -fill y {*}$opts
+    pack .mf.tb.edit_ins_char -side left
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
     # TODO Style toolbar buttons
     pack .mf.tb -fill x {*}$opts
@@ -302,23 +336,27 @@ oo::define App method on_quit {} {
     exit
 }
 
-oo::define App method on_undo {} {
+oo::define App method on_edit_undo {} {
     set textEdit [$TheTextEdit textedit]
     if {[$textEdit edit canundo]} { $textEdit edit undo }
 }
 
-oo::define App method on_redo {} {
+oo::define App method on_edit_redo {} {
     set textEdit [$TheTextEdit textedit]
     if {[$textEdit edit canredo]} { $textEdit edit redo }
 }
 
-oo::define App method on_copy {} { tk_textCopy [$TheTextEdit textedit] }
+oo::define App method on_edit_copy {} {
+    tk_textCopy [$TheTextEdit textedit]
+}
 
-oo::define App method on_cut {} { tk_textCut [$TheTextEdit textedit] }
+oo::define App method on_edit_cut {} { tk_textCut [$TheTextEdit textedit] }
 
-oo::define App method on_paste {} { tk_textPaste [$TheTextEdit textedit] }
+oo::define App method on_edit_paste {} {
+    tk_textPaste [$TheTextEdit textedit]
+}
 
-oo::define App method on_ins_char {} {
+oo::define App method on_edit_ins_char {} {
     set ch [InsCharForm show]
     if {$ch ne ""} { [$TheTextEdit textedit] insert insert $ch }
 }

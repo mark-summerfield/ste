@@ -1,15 +1,8 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require about_form
 package require config
-package require config_form
-package require ins_char_form
-package require message_form
-package require ref
-package require textedit
 package require tooltip 2
 package require ui
-package require util
 
 oo::define App method make_ui {} {
     my prepare_ui
@@ -170,8 +163,11 @@ oo::define App method make_widgets {} {
 oo::define App method make_layout {} {
     const opts "-pady 3 -padx 3"
     my make_toolbars_layout
-    pack .mf.tf -fill both -expand true
-    pack .mf.statusLabel -fill x -side bottom {*}$opts
+    pack .mf.tb -side top -fill x {*}$opts
+    pack .mf.statusLabel -side bottom -fill x  {*}$opts
+    pack [ttk::sizegrip .mf.statusLabel.sizer] -side right -anchor se \
+        {*}$opts
+    pack .mf.tf -fill both -expand true {*}$opts
     pack .mf -fill both -expand true
 }
 
@@ -196,7 +192,6 @@ oo::define App method make_toolbars_layout {} {
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
     # TODO Style toolbar buttons
-    pack .mf.tb -fill x {*}$opts
 }
 
 oo::define App method make_bindings {} {

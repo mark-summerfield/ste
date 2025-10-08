@@ -4,12 +4,8 @@ package require about_form
 package require config
 package require config_form
 package require ins_char_form
-package require message_form
 package require ref
 package require textedit
-package require tooltip 2
-package require ui
-package require util
 
 oo::define App method on_file_new {} {
     my on_file_save

@@ -1,15 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-package require about_form
 package require config
-package require config_form
-package require ins_char_form
-package require message_form
-package require ref
-package require textedit
-package require tooltip 2
 package require ui
-package require util
 
 oo::class create App {
     variable Filename

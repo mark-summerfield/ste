@@ -1,13 +1,16 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 # Unique Styles: bold italic bolditalic COLOR_FOR_TAG
-# Mixable Styles: highlight indent[1-3]
+# Mixable Styles: highlight listindent[1-3]
 
 package require html 1
 package require ntext 1
 package require textutil
 
-oo::class create TextEdit { variable Text }
+oo::class create TextEdit {
+    variable Text
+    variable FrameName
+}
 
 oo::define TextEdit initialize {
     variable HIGHLIGHT_COLOR
@@ -47,11 +50,14 @@ oo::define TextEdit classmethod make {panel family size} {
 
 # Use make (above)
 oo::define TextEdit constructor panel {
-    ttk::frame $panel.tf
-    set Text [text $panel.tf.txt -undo true -wrap word]
+    set FrameName tf#[string range [clock clicks] end-8 end] ;# unique
+    ttk::frame $panel.$FrameName
+    set Text [text $panel.$FrameName.txt -undo true -wrap word]
     bindtags $Text {$Text Ntext . all}
-    ui::scrollize $panel.tf txt vertical
+    ui::scrollize $panel.$FrameName txt vertical
 }
+
+oo::define TextEdit method frame_name {} { return $FrameName }
 
 oo::define TextEdit method textedit {} { return $Text }
 
@@ -147,13 +153,13 @@ oo::define TextEdit method make_tags {} {
     }
     const WIDTH [font measure Sans "•. "]
     set indent [font measure Sans "xxxx"]
-    $Text tag configure indent1 -lmargin1 $indent \
+    $Text tag configure listindent1 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
     set indent [expr {$indent * 2}]
-    $Text tag configure indent2 -lmargin1 $indent \
+    $Text tag configure listindent2 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
     set indent [expr {$indent * 3}]
-    $Text tag configure indent3 -lmargin1 $indent \
+    $Text tag configure listindent3 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
 }
 

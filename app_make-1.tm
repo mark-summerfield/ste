@@ -1,10 +1,10 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require config
-package require tooltip 2
-package require ui
 package require textedit
 package require textedit_export
+package require tooltip 2
+package require ui
 
 oo::define App method make_ui {} {
     my prepare_ui
@@ -191,7 +191,7 @@ oo::define App method make_layout {} {
     pack .mf.statusLabel -side bottom -fill x  {*}$opts
     pack [ttk::sizegrip .mf.statusLabel.sizer] -side right -anchor se \
         {*}$opts
-    pack .mf.tf -fill both -expand true {*}$opts
+    pack .mf.[$TheTextEdit frame_name] -fill both -expand true {*}$opts
     pack .mf -fill both -expand true
 }
 

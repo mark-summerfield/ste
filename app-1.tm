@@ -5,6 +5,7 @@ package require config
 package require config_form
 package require ins_char_form
 package require message_form
+package require ntext 1
 package require ref
 package require textx
 package require tooltip 2
@@ -172,13 +173,18 @@ oo::define App method make_style_toolbar {} {
 }
 
 oo::define App method make_widgets {} {
+    my make_textedit
+    set StatusLabel [ttk::label .mf.statusLabel]
+}
+
+oo::define App method make_textedit {} {
     set config [Config new]
     ttk::frame .mf.tf
     set TextEdit [text .mf.tf.txt -undo true -wrap word]
+    bindtags $TextEdit {$TextEdit Ntext . all}
     textx::make_fonts $TextEdit [$config family] [$config size]
     textx::make_tags $TextEdit
     ui::scrollize .mf.tf txt vertical
-    set StatusLabel [ttk::label .mf.statusLabel]
 }
 
 oo::define App method make_layout {} {

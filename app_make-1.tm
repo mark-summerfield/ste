@@ -3,6 +3,8 @@
 package require config
 package require tooltip 2
 package require ui
+package require textedit
+package require textedit_export
 
 oo::define App method make_ui {} {
     my prepare_ui

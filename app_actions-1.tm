@@ -5,8 +5,6 @@ package require config
 package require config_form
 package require ins_char_form
 package require ref
-package require textedit
-package require textedit_export
 
 oo::define App method on_file_new {} {
     my on_file_save

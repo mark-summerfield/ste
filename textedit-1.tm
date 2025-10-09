@@ -73,6 +73,10 @@ oo::define TextEdit method framename {} { return $FrameName }
 
 oo::define TextEdit method textedit {} { return $Text }
 
+oo::define TextEdit method isempty {} {
+    expr {[string trim [$Text get 1.0 end]] eq ""}
+}
+
 oo::define TextEdit method clear {} {
     $Text delete 1.0 end
     $Text edit modified false

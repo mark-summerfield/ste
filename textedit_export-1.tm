@@ -18,19 +18,22 @@ oo::define TextEdit method as_html filename {
         switch $key {
             text {
                 if {$value eq "\n"} {
-                    lappend out \n</p>\n\n
+                    lappend out </p>\n
                     set flip true
                 } else {
                     if {$flip} {
-                        lappend out <p>\n
+                        lappend out \n<p>\n
                         set flip false
                     }
-                    lappend out [html::html_entities \
-                        [string trim $value \n]]
+                    lappend out [html::html_entities $value]
                     
                 }
             }
             tagon {
+                if {$flip} {
+                    lappend out \n<p>\n
+                    set flip false
+                }
                 lappend out [my HtmlOn $value]
                 lappend pending $value
             }

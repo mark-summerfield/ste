@@ -27,10 +27,11 @@ oo::define App method show {} {
     if {$Filename ne ""} {
         my file_open
     } else {
+        $TheTextEdit clear
         set textEdit [$TheTextEdit textedit]
-        focus $textEdit
         $textEdit mark set insert end
         $textEdit see insert
+        focus $textEdit
     }
 }
 

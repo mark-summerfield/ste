@@ -41,7 +41,7 @@ oo::define App method on_file_import_text {} {
 oo::define App method on_file_save {} {
     if {$Filename ne ""} {
         my file_save
-    } else {
+    } elseif {![$TheTextEdit isempty]} {
         my on_file_save_as
     }
 }

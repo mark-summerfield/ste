@@ -1,3 +1,14 @@
+# TODO fix Style|Color...
+#   when color chosen don't cally apply_style; instead call
+#   apply_color: this has two steps:
+#   - (1) remove all color tags
+#   - (2) add the given color tag (unless it is black)
+# TODO File|New then File|Quit (make sure if Filename is "" & text edit
+#	is empty then we don't prompt to save)
+# TODO delete LastFile from .ini & run (so we come up empty), then Quit
+#	ditto above
+# TODO delete LastFile from .ini & run (so we come up empty), then edit
+#	& then Quit - now it should prompt to save
 # TODO Style|Colors icon
 # TODO darken colors that are too light (most of them)
 # TODO For Color menu use: 0. Black | 1. Apricot | …

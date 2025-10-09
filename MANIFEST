@@ -21,7 +21,12 @@ ui-1.tm
 
 st.sh
 
-# NOTE ideas
-# Add status indicators: [nnn Lines][MOD]
+# NOTE ideas:
+# - Add status indicators: [nnn Lines][MOD]
+# - Add support for: as_md .md export & as_adoc .adoc export
+# - Add support for (including for exports where possible):
+#   . {sub,super}scripts, underline, strikethrough
+#   . alignment (left, center, right)
+
 
 # vim: syn=yaml

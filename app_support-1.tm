@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 oo::define App method file_open {} {
+    $TheTextEdit clear
     $TheTextEdit deserialize [readFile $Filename binary]
     set textEdit [$TheTextEdit textedit]
     $textEdit edit modified false
@@ -13,6 +14,10 @@ oo::define App method file_open {} {
 }
 
 oo::define App method file_save {} {
-    writeFile $Filename binary [$TheTextEdit serialize]
+    if {[string match *.tkt $Filename]} {
+        writeFile $Filename [$TheTextEdit serialize false]
+    } else {
+        writeFile $Filename binary [$TheTextEdit serialize]
+    }
     my show_message "Saved '$Filename'."
 }

@@ -17,7 +17,8 @@ oo::define App method on_file_open {} {
     my on_file_save
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    set filename [tk_getOpenFile -initialdir $dir -filetypes $::STE_FILES \
+    set filetypes [$TheTextEdit filetypes]
+    set filename [tk_getOpenFile -initialdir $dir -filetypes $filetypes \
             -title "[tk appname] — Open" -parent .]
     if {$filename ne ""} {
         set Filename $filename
@@ -36,7 +37,8 @@ oo::define App method on_file_save {} {
 oo::define App method on_file_save_as {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    set filename [tk_getSaveFile -initialdir $dir -filetypes $::STE_FILES \
+    set filetypes [$TheTextEdit filetypes]
+    set filename [tk_getSaveFile -initialdir $dir -filetypes $filetypes \
             -title "[tk appname] — Save As" -parent .]
     if {$filename ne ""} {
         set Filename $filename
@@ -102,7 +104,7 @@ oo::define App method on_edit_paste {} { $TheTextEdit paste }
 
 oo::define App method on_edit_ins_char {} {
     set ch [InsCharForm show]
-    if {$ch ne ""} { $TheTextEdit insert_char $ch }
+    if {$ch ne ""} { $TheTextEdit insert_chr $ch }
 }
 
 oo::define App method on_style_bold {} { $TheTextEdit apply_style bold }

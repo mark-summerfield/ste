@@ -8,14 +8,16 @@ package require ntext 1
 package require textutil
 
 oo::class create TextEdit {
-    variable Text
     variable FrameName
+    variable Text
 }
 
 oo::define TextEdit initialize {
     variable HIGHLIGHT_COLOR
     variable COLOR_FOR_TAG
+    variable STE_FILES
 
+    const STE_FILES {{{ste files} {.ste}} {{tkt files} {.tkt}}}
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
@@ -41,25 +43,35 @@ oo::define TextEdit initialize {
         ]
 }
 
-oo::define TextEdit classmethod make {panel family size} {
-    set theTextEdit [TextEdit new $panel]
+oo::define TextEdit classmethod make {parent family size} {
+    set theTextEdit [TextEdit new $parent]
     $theTextEdit make_fonts $family $size
     $theTextEdit make_tags
     return $theTextEdit
 }
 
 # Use make (above)
-oo::define TextEdit constructor panel {
+oo::define TextEdit constructor parent {
     set FrameName tf#[string range [clock clicks] end-8 end] ;# unique
-    ttk::frame $panel.$FrameName
-    set Text [text $panel.$FrameName.txt -undo true -wrap word]
+    ttk::frame $parent.$FrameName
+    set Text [text $parent.$FrameName.txt -undo true -wrap word]
     bindtags $Text {$Text Ntext . all}
-    ui::scrollize $panel.$FrameName txt vertical
+    ui::scrollize $parent.$FrameName txt vertical
 }
 
-oo::define TextEdit method frame_name {} { return $FrameName }
+oo::define TextEdit method framename {} { return $FrameName }
 
 oo::define TextEdit method textedit {} { return $Text }
+
+oo::define TextEdit method filetypes {} {
+    classvariable STE_FILES
+    return $STE_FILES
+}
+
+oo::define TextEdit method colors {} {
+    classvariable COLOR_FOR_TAG
+    return $COLOR_FOR_TAG
+}
 
 oo::define TextEdit method clear {} {
     $Text delete 1.0 end
@@ -81,7 +93,7 @@ oo::define TextEdit method cut {} { tk_textCut $Text }
 
 oo::define TextEdit method paste {} { tk_textPaste $Text }
 
-oo::define TextEdit method insert_char ch { $Text insert insert $ch }
+oo::define TextEdit method insert_chr ch { $Text insert insert $ch }
 
 oo::define TextEdit method selected {} {
     set indexes [$Text tag ranges sel]
@@ -123,11 +135,6 @@ oo::define TextEdit method apply_style_to {indexes style} {
     }
 }
 
-oo::define TextEdit method colors {} {
-    classvariable COLOR_FOR_TAG
-    return $COLOR_FOR_TAG
-}
-
 oo::define TextEdit method make_fonts {family size} {
     classvariable COLOR_FOR_TAG
     foreach name {Sans Bold Italic BoldItalic} {
@@ -152,7 +159,7 @@ oo::define TextEdit method make_tags {} {
         $Text tag configure $key -foreground $value
     }
     const WIDTH [font measure Sans "•. "]
-    set indent [font measure Sans "xxxx"]
+    set indent [font measure Sans "nnnn"]
     $Text tag configure listindent1 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
     set indent [expr {$indent * 2}]
@@ -163,13 +170,24 @@ oo::define TextEdit method make_tags {} {
         -lmargin2 [expr {$indent + $WIDTH}]
 }
 
-oo::define TextEdit method serialize {} {
+oo::define TextEdit method serialize {{compress true}} {
     set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
-    zlib deflate [encoding convertto utf-8 $txt_dump] 9
+    if {$compress} {
+        return STE1\n[zlib deflate [encoding convertto utf-8 $txt_dump] 9]
+    } else {
+        return $txt_dump
+    }
 }
 
 oo::define TextEdit method deserialize txt_dumpz {
-    set txt_dump [encoding convertfrom utf-8 [zlib inflate $txt_dumpz]]
+    set i [string first \n $txt_dumpz]
+    set prefix [string range $txt_dumpz 0 $i]
+    set raw [string range $txt_dumpz [incr i] end]
+    if {[string match STE* $prefix]} {
+        set txt_dump [encoding convertfrom utf-8 [zlib inflate $raw]]
+    } else {
+        set txt_dump [encoding convertfrom utf-8 $txt_dumpz]
+    }
     array set tags {}
     set current_index end
     set insert_index end

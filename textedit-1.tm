@@ -1,7 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-# Unique Styles: bold italic bolditalic COLOR_FOR_TAG
-# Mixable Styles: highlight listindent[1-3]
+# Unique Styles: bold italic bolditalic
+# Mixable Styles: highlight COLOR_FOR_TAG listindent[1-3]
 
 package require html 1
 package require ntext 1
@@ -13,9 +13,9 @@ oo::class create TextEdit {
 }
 
 oo::define TextEdit initialize {
+    variable FILETYPES
     variable HIGHLIGHT_COLOR
     variable COLOR_FOR_TAG
-    variable FILETYPES
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}}}
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?

@@ -136,5 +136,5 @@ oo::define App method on_style_highlight {} {
 }
 
 oo::define App method on_style_color color {
-    $TheTextEdit apply_style $color
+    $TheTextEdit apply_color $color
 }

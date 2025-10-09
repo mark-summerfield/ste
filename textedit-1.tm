@@ -140,6 +140,21 @@ oo::define TextEdit method apply_style_to {indexes style} {
     }
 }
 
+oo::define TextEdit method apply_color color {
+    my apply_color_to [my selected] $color
+}
+
+oo::define TextEdit method apply_color_to {indexes color} {
+    classvariable COLOR_FOR_TAG
+    foreach tag [dict keys $COLOR_FOR_TAG] {
+        $Text tag remove $tag {*}$indexes
+    }
+    if {$color ne "black"} {
+        $Text tag add $color {*}$indexes
+    }
+    $Text edit modified true
+}
+
 oo::define TextEdit method make_fonts {family size} {
     classvariable COLOR_FOR_TAG
     foreach name {Sans Bold Italic BoldItalic} {

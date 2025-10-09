@@ -7,7 +7,7 @@ app_actions-1.tm
 app_support-1.tm
 textedit-1.tm # TODO {de}serialize
 textedit_export-1.tm # TODO as_html
-ins_char_form-1.tm
+ins_chr_form-1.tm
 globals-1.tm # VERSION
 config-1.tm
 config_form-1.tm

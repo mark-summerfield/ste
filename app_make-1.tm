@@ -39,6 +39,9 @@ oo::define App method make_file_menu {} {
     .menu.file add command -command [callback on_file_open] -label Open… \
             -underline 0 -accelerator Ctrl+O -compound left \
             -image [ui::icon document-open.svg $::MENU_ICON_SIZE]
+    .menu.file add command -command [callback on_file_import_text] \
+            -label "Import Text…" -underline 0 -compound left \
+            -image [ui::icon import.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_save] -label Save \
             -underline 0 -accelerator Ctrl+S -compound left \
             -image [ui::icon document-save.svg $::MENU_ICON_SIZE]
@@ -88,7 +91,7 @@ oo::define App method make_edit_menu {} {
             -underline 0 -accelerator Ctrl+V -compound left \
             -image [ui::icon edit-paste.svg $::MENU_ICON_SIZE]
     .menu.edit add separator
-    .menu.edit add command -command [callback on_edit_ins_char] \
+    .menu.edit add command -command [callback on_edit_ins_chr] \
             -label "Insert Character…" -underline 0 -compound left \
             -image [ui::icon ins-char.svg $::MENU_ICON_SIZE]
 }
@@ -155,10 +158,10 @@ oo::define App method make_edit_toolbar {} {
         -command [callback on_edit_paste] \
         -image [ui::icon edit-paste.svg $::ICON_SIZE]
     $tip .mf.tb.edit_paste "Edit Paste"
-    ttk::button .mf.tb.edit_ins_char -style Toolbutton -takefocus 0 \
-        -command [callback on_edit_ins_char] \
+    ttk::button .mf.tb.edit_ins_chr -style Toolbutton -takefocus 0 \
+        -command [callback on_edit_ins_chr] \
         -image [ui::icon ins-char.svg $::ICON_SIZE]
-    $tip .mf.tb.edit_ins_char "Edit Insert Character…"
+    $tip .mf.tb.edit_ins_chr "Edit Insert Character…"
 }
 
 oo::define App method make_style_toolbar {} {
@@ -212,7 +215,7 @@ oo::define App method make_toolbars_layout {} {
     pack .mf.tb.edit_paste -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
-    pack .mf.tb.edit_ins_char -side left
+    pack .mf.tb.edit_ins_chr -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
     pack .mf.tb.style_bold -side left

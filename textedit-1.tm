@@ -79,6 +79,13 @@ oo::define TextEdit method clear {} {
     $Text edit reset
 }
 
+oo::define TextEdit method after_load {} {
+    $Text edit modified false
+    $Text edit reset
+    $Text mark set insert end
+    $Text see insert
+}
+
 oo::define TextEdit method maybe_undo {} {
     if {[$Text edit canundo]} { $Text edit undo }
 }
@@ -170,6 +177,12 @@ oo::define TextEdit method make_tags {} {
         -lmargin2 [expr {$indent + $WIDTH}]
 }
 
+oo::define TextEdit method load txt {
+    my clear
+    $Text insert end $txt
+    my after_load
+}
+
 oo::define TextEdit method serialize {{compress true}} {
     set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
     if {$compress} {
@@ -180,6 +193,7 @@ oo::define TextEdit method serialize {{compress true}} {
 }
 
 oo::define TextEdit method deserialize txt_dumpz {
+    my clear
     set i [string first \n $txt_dumpz]
     set prefix [string range $txt_dumpz 0 $i]
     set raw [string range $txt_dumpz [incr i] end]
@@ -218,4 +232,5 @@ oo::define TextEdit method deserialize txt_dumpz {
     }
     $Text mark set current $current_index
     $Text mark set insert $insert_index 
+    my after_load
 }

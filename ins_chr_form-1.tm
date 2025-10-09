@@ -4,21 +4,21 @@ package require abstract_form
 package require ref
 package require ui
 
-oo::class create InsCharForm {
+oo::class create InsChrForm {
     superclass AbstractForm
 
     variable Ch
     variable CharRadio
 }
 
-oo::define InsCharForm classmethod show {} {
+oo::define InsChrForm classmethod show {} {
     set ch [Ref new ""]
-    set form [InsCharForm new $ch]
+    set form [InsChrForm new $ch]
     tkwait window .inschar_form
     $ch get
 }
 
-oo::define InsCharForm constructor ch {
+oo::define InsChrForm constructor ch {
     set Ch $ch
     my make_widgets
     my make_layout
@@ -27,7 +27,7 @@ oo::define InsCharForm constructor ch {
     my show_modal
 }
 
-oo::define InsCharForm method make_widgets {} {
+oo::define InsChrForm method make_widgets {} {
     tk::toplevel .inschar_form
     wm resizable .inschar_form false false
     wm title .inschar_form "[tk appname] — Insert Character"
@@ -58,7 +58,7 @@ oo::define InsCharForm method make_widgets {} {
     .inschar_form.mf.bullet_radio invoke
 }
 
-oo::define InsCharForm method make_layout {} {
+oo::define InsChrForm method make_layout {} {
     set opts "-padx 3 -pady 3"
     grid .inschar_form.mf.arrow_radio -row 0 -column 0 -columnspan 2 \
         -sticky w {*}$opts
@@ -81,7 +81,7 @@ oo::define InsCharForm method make_layout {} {
     pack .inschar_form.mf -fill both -expand true
 }
 
-oo::define InsCharForm method make_bindings {} {
+oo::define InsChrForm method make_bindings {} {
     bind .inschar_form <Escape> [callback on_cancel]
     bind .inschar_form <Return> [callback on_ok]
     bind .inschar_form <Alt-a> {.inschar_form.mf.arrow_radio invoke}
@@ -99,7 +99,7 @@ oo::define InsCharForm method make_bindings {} {
     }
 }
 
-oo::define InsCharForm method on_ok {} {
+oo::define InsChrForm method on_ok {} {
     if {$CharRadio eq "U"} {
         set ch [.inschar_form.mf.unicode_entry get]
         if {[string is xdigit $ch]} {
@@ -111,7 +111,7 @@ oo::define InsCharForm method on_ok {} {
     my delete
 }
 
-oo::define InsCharForm method on_cancel {} {
+oo::define InsChrForm method on_cancel {} {
     $Ch set ""
     my delete
 }

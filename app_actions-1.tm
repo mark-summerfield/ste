@@ -3,7 +3,7 @@
 package require about_form
 package require config
 package require config_form
-package require ins_char_form
+package require ins_chr_form
 package require ref
 
 oo::define App method on_file_new {} {
@@ -17,12 +17,24 @@ oo::define App method on_file_open {} {
     my on_file_save
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    set filetypes [$TheTextEdit filetypes]
-    set filename [tk_getOpenFile -initialdir $dir -filetypes $filetypes \
+    const FILETYPES [$TheTextEdit filetypes]
+    set filename [tk_getOpenFile -initialdir $dir -filetypes $FILETYPES \
             -title "[tk appname] — Open" -parent .]
     if {$filename ne ""} {
         set Filename $filename
         my file_open
+    }
+}
+
+oo::define App method on_file_import_text {} {
+    my on_file_save
+    set dir [expr {$Filename eq "" ? [file home] \
+                                   : [file dirname $Filename]}]
+    const FILETYPES {{{text files} {.txt}}}
+    set filename [tk_getOpenFile -initialdir $dir -filetypes $FILETYPES \
+            -title "[tk appname] — Open" -parent .]
+    if {$filename ne ""} {
+        my file_import_text $filename
     }
 }
 
@@ -37,8 +49,8 @@ oo::define App method on_file_save {} {
 oo::define App method on_file_save_as {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    set filetypes [$TheTextEdit filetypes]
-    set filename [tk_getSaveFile -initialdir $dir -filetypes $filetypes \
+    const FILETYPES [$TheTextEdit filetypes]
+    set filename [tk_getSaveFile -initialdir $dir -filetypes $FILETYPES \
             -title "[tk appname] — Save As" -parent .]
     if {$filename ne ""} {
         set Filename $filename
@@ -102,8 +114,8 @@ oo::define App method on_edit_cut {} { $TheTextEdit cut }
 
 oo::define App method on_edit_paste {} { $TheTextEdit paste }
 
-oo::define App method on_edit_ins_char {} {
-    set ch [InsCharForm show]
+oo::define App method on_edit_ins_chr {} {
+    set ch [InsChrForm show]
     if {$ch ne ""} { $TheTextEdit insert_chr $ch }
 }
 

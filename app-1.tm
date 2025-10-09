@@ -34,9 +34,11 @@ oo::define App method show {} {
     }
 }
 
-oo::define App method show_message msg {
+oo::define App method show_message {msg {timeout short}} {
     $StatusLabel configure -text $msg -foreground navy
-    after $::SHORT_TIMEOUT [callback clear_status]
+    set timeout [expr {$timeout eq "short" ? $::SHORT_TIMEOUT \
+                                           : $::LONG_TIMEOUT}]
+    after $timeout [callback clear_status]
 }
 
 oo::define App method show_error err {

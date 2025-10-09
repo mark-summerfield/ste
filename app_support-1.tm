@@ -1,16 +1,18 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 oo::define App method file_open {} {
-    $TheTextEdit clear
     $TheTextEdit deserialize [readFile $Filename binary]
-    set textEdit [$TheTextEdit textedit]
-    $textEdit edit modified false
-    $textEdit edit reset
-    $textEdit mark set insert end
-    $textEdit see insert
-    focus $textEdit
+    focus [$TheTextEdit textedit]
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Opened '$Filename'."
+}
+
+oo::define App method file_import_text filename {
+    $TheTextEdit load [readFile $filename]
+    focus [$TheTextEdit textedit]
+    set Filename [regsub {\.txt$} $filename .ste]
+    wm title . "[tk appname] — [file tail $Filename]"
+    my show_message "Opened '$filename' (will save as '$Filename')." long
 }
 
 oo::define App method file_save {} {
@@ -19,5 +21,6 @@ oo::define App method file_save {} {
     } else {
         writeFile $Filename binary [$TheTextEdit serialize]
     }
+    wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Saved '$Filename'."
 }

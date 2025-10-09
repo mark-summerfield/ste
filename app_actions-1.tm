@@ -116,7 +116,15 @@ oo::define App method on_edit_paste {} { $TheTextEdit paste }
 
 oo::define App method on_edit_ins_chr {} {
     set ch [InsChrForm show]
-    if {$ch ne ""} { $TheTextEdit insert_chr $ch }
+    if {$ch ne ""} {
+        set textEdit [$TheTextEdit textedit]
+        if {$ch eq "Q"} {
+            $textEdit insert insert “”
+            $textEdit mark set insert "insert -1 char"
+        } else {
+            $textEdit insert insert $ch
+        }
+    }
 }
 
 oo::define App method on_style_bold {} { $TheTextEdit apply_style bold }

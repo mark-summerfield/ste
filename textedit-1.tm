@@ -100,8 +100,6 @@ oo::define TextEdit method cut {} { tk_textCut $Text }
 
 oo::define TextEdit method paste {} { tk_textPaste $Text }
 
-oo::define TextEdit method insert_chr ch { $Text insert insert $ch }
-
 oo::define TextEdit method selected {} {
     set indexes [$Text tag ranges sel]
     if {$indexes eq ""} {

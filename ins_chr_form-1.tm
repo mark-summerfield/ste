@@ -46,9 +46,12 @@ oo::define InsChrForm method make_widgets {} {
         -underline 2 -value ✔ -variable [my varname CharRadio]
     ttk::radiobutton .inschar_form.mf.cross_radio -text "✘ Cross" \
         -underline 3 -value ✘ -variable [my varname CharRadio]
-    ttk::radiobutton .inschar_form.mf.unicode_radio -text "Unicode U+" \
+    ttk::radiobutton .inschar_form.mf.quote_radio -text "“” Quotes" \
+        -underline 3 -value Q -variable [my varname CharRadio]
+    ttk::frame .inschar_form.mf.uf
+    ttk::radiobutton .inschar_form.mf.uf.unicode_radio -text "Unicode U+" \
         -underline 0 -value U -variable [my varname CharRadio]
-    ttk::entry .inschar_form.mf.unicode_entry -width 10
+    ttk::entry .inschar_form.mf.uf.unicode_entry -width 10
     ttk::button .inschar_form.mf.ok_button -text OK \
         -underline 0 -command [callback on_ok] -compound left \
         -image [ui::icon ok.svg $::ICON_SIZE]
@@ -60,24 +63,21 @@ oo::define InsChrForm method make_widgets {} {
 
 oo::define InsChrForm method make_layout {} {
     set opts "-padx 3 -pady 3"
-    grid .inschar_form.mf.arrow_radio -row 0 -column 0 -columnspan 2 \
-        -sticky w {*}$opts
-    grid .inschar_form.mf.bullet_radio -row 1 -column 0 -columnspan 2 \
-        -sticky w {*}$opts
-    grid .inschar_form.mf.cross_radio -row 2 -column 0 -columnspan 2 \
-        -sticky w {*}$opts
-    grid .inschar_form.mf.ellipsis_radio -row 3 -column 0 -columnspan 2 \
-        -sticky w {*}$opts
-    grid .inschar_form.mf.emdash_radio -row 4 -column 0 -columnspan 2 \
-        -sticky w {*}$opts
-    grid .inschar_form.mf.pound_radio -row 5 -column 0 -columnspan 2 \
-        -sticky w {*}$opts
-    grid .inschar_form.mf.tick_radio -row 6 -column 0 -columnspan 2 \
-        -sticky w {*}$opts
-    grid .inschar_form.mf.unicode_radio -row 7 -column 0 -sticky w {*}$opts
-    grid .inschar_form.mf.unicode_entry -row 7 -column 1 -sticky we {*}$opts
-    grid .inschar_form.mf.ok_button -row 8 -column 0 -sticky e {*}$opts
-    grid .inschar_form.mf.cancel_button -row 8 -column 1 -sticky w {*}$opts
+    grid .inschar_form.mf.arrow_radio -row 0 -column 0 -sticky w {*}$opts
+    grid .inschar_form.mf.bullet_radio -row 1 -column 0 -sticky w {*}$opts
+    grid .inschar_form.mf.cross_radio -row 2 -column 0 -sticky w {*}$opts
+    grid .inschar_form.mf.ellipsis_radio -row 3 -column 0 -sticky w {*}$opts
+    grid .inschar_form.mf.emdash_radio -row 0 -column 1 -sticky w {*}$opts
+    grid .inschar_form.mf.pound_radio -row 1 -column 1 -sticky w {*}$opts
+    grid .inschar_form.mf.tick_radio -row 2 -column 1 -sticky w {*}$opts
+    grid .inschar_form.mf.quote_radio -row 3 -column 1 -sticky w {*}$opts
+    grid .inschar_form.mf.uf -row 5 -column 0 -columnspan 2 -sticky we \
+        {*}$opts
+    pack .inschar_form.mf.uf.unicode_radio -side left {*}$opts
+    pack .inschar_form.mf.uf.unicode_entry -side left -fill x \
+        -expand true {*}$opts
+    grid .inschar_form.mf.ok_button -row 6 -column 0 -sticky e {*}$opts
+    grid .inschar_form.mf.cancel_button -row 6 -column 1 -sticky w {*}$opts
     pack .inschar_form.mf -fill both -expand true
 }
 
@@ -91,17 +91,18 @@ oo::define InsChrForm method make_bindings {} {
     bind .inschar_form <Alt-l> {.inschar_form.mf.ellipsis_radio invoke}
     bind .inschar_form <Alt-o> [callback on_ok]
     bind .inschar_form <Alt-p> {.inschar_form.mf.pound_radio invoke}
+    bind .inschar_form <Alt-q> {.inschar_form.mf.quote_radio invoke}
     bind .inschar_form <Alt-r> {.inschar_form.mf.cross_radio invoke}
     bind .inschar_form <Alt-t> {.inschar_form.mf.tick_radio invoke}
     bind .inschar_form <Alt-u> {
-        .inschar_form.mf.unicode_radio invoke
-        focus .inschar_form.mf.unicode_entry
+        .inschar_form.mf.uf.unicode_radio invoke
+        focus .inschar_form.mf.uf.unicode_entry
     }
 }
 
 oo::define InsChrForm method on_ok {} {
     if {$CharRadio eq "U"} {
-        set ch [.inschar_form.mf.unicode_entry get]
+        set ch [.inschar_form.mf.uf.unicode_entry get]
         if {[string is xdigit $ch]} {
             $Ch set [format %c 0x$ch]
         }

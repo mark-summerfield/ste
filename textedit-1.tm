@@ -23,7 +23,7 @@ oo::define TextEdit initialize {
         black "#000000" \
         apricot "#FFD8B1" \
         beige "#FFFAC8" \
-        blue "#4363D8" \
+        blue "#0000FF" \
         brown "#9A6324" \
         cyan "#42D4F4" \
         green "#3CB44B" \
@@ -59,19 +59,19 @@ oo::define TextEdit constructor parent {
     ui::scrollize $parent.$FrameName txt vertical
 }
 
-oo::define TextEdit method framename {} { return $FrameName }
-
-oo::define TextEdit method textedit {} { return $Text }
-
-oo::define TextEdit method filetypes {} {
-    classvariable FILETYPES
+oo::define TextEdit classmethod filetypes {} {
+    variable FILETYPES
     return $FILETYPES
 }
 
-oo::define TextEdit method colors {} {
-    classvariable COLOR_FOR_TAG
-    return $COLOR_FOR_TAG
+oo::define TextEdit classmethod colornames {} {
+    variable COLOR_FOR_TAG
+    dict keys $COLOR_FOR_TAG
 }
+
+oo::define TextEdit method framename {} { return $FrameName }
+
+oo::define TextEdit method textedit {} { return $Text }
 
 oo::define TextEdit method clear {} {
     $Text delete 1.0 end

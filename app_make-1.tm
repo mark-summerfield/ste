@@ -34,82 +34,88 @@ oo::define App method make_file_menu {} {
     menu .menu.file
     .menu add cascade -menu .menu.file -label File -underline 0
     .menu.file add command -command [callback on_file_new] -label New \
-            -underline 0 -accelerator Ctrl+N -compound left \
-            -image [ui::icon document-new.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+N -compound left \
+        -image [ui::icon document-new.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_open] -label Open… \
-            -underline 0 -accelerator Ctrl+O -compound left \
-            -image [ui::icon document-open.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+O -compound left \
+        -image [ui::icon document-open.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_import_text] \
-            -label "Import Text…" -underline 0 -compound left \
-            -image [ui::icon import.svg $::MENU_ICON_SIZE]
+        -label "Import Text…" -underline 0 -compound left \
+        -image [ui::icon import.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_save] -label Save \
-            -underline 0 -accelerator Ctrl+S -compound left \
-            -image [ui::icon document-save.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+S -compound left \
+        -image [ui::icon document-save.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_save_as] \
-            -label "Save As…" -underline 5 -compound left \
-            -image [ui::icon document-save-as.svg $::MENU_ICON_SIZE]
+        -label "Save As…" -underline 5 -compound left \
+        -image [ui::icon document-save-as.svg $::MENU_ICON_SIZE]
     .menu.file add separator
     .menu.file add command -command [callback on_file_export_html] \
-            -label "Export as HTML" -underline 10 -compound left \
-            -image [ui::icon export-html.svg $::MENU_ICON_SIZE]
+        -label "Export as HTML" -underline 10 -compound left \
+        -image [ui::icon export-html.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_export_text] \
-            -label "Export as Text" -underline 10 -compound left \
-            -image [ui::icon export-text.svg $::MENU_ICON_SIZE]
+        -label "Export as Text" -underline 10 -compound left \
+        -image [ui::icon export-text.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_print] -label Print… \
-            -underline 0 -compound left \
-            -image [ui::icon document-print.svg $::MENU_ICON_SIZE]
+        -underline 0 -compound left \
+        -image [ui::icon document-print.svg $::MENU_ICON_SIZE]
     .menu.file add separator
     .menu.file add command -command [callback on_config] -label Config… \
-            -underline 0 -compound left \
-            -image [ui::icon preferences-system.svg $::MENU_ICON_SIZE]
+        -underline 0 -compound left \
+        -image [ui::icon preferences-system.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_about] -label About \
-            -underline 1 -compound left \
-            -image [ui::icon about.svg $::MENU_ICON_SIZE]
+        -underline 1 -compound left \
+        -image [ui::icon about.svg $::MENU_ICON_SIZE]
     .menu.file add separator
     .menu.file add command -command [callback on_quit] -label Quit \
-            -underline 0 -accelerator Ctrl+Q -compound left \
-            -image [ui::icon quit.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+Q -compound left \
+        -image [ui::icon quit.svg $::MENU_ICON_SIZE]
 }
 
 oo::define App method make_edit_menu {} {
     menu .menu.edit
     .menu add cascade -menu .menu.edit -label Edit -underline 0
     .menu.edit add command -command [callback on_edit_undo] -label Undo \
-            -underline 0 -accelerator Ctrl+Z -compound left \
-            -image [ui::icon edit-undo.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+Z -compound left \
+        -image [ui::icon edit-undo.svg $::MENU_ICON_SIZE]
     .menu.edit add command -command [callback on_edit_redo] -label Redo \
-            -underline 0 -accelerator Ctrl+Shift+Z -compound left \
-            -image [ui::icon edit-redo.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+Shift+Z -compound left \
+        -image [ui::icon edit-redo.svg $::MENU_ICON_SIZE]
     .menu.edit add separator
     .menu.edit add command -command [callback on_edit_copy] -label Copy \
-            -underline 0 -accelerator Ctrl+C -compound left \
-            -image [ui::icon edit-copy.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+C -compound left \
+        -image [ui::icon edit-copy.svg $::MENU_ICON_SIZE]
     .menu.edit add command -command [callback on_edit_cut] -label Cut \
-            -underline 2 -accelerator Ctrl+X -compound left \
-            -image [ui::icon edit-cut.svg $::MENU_ICON_SIZE]
+        -underline 2 -accelerator Ctrl+X -compound left \
+        -image [ui::icon edit-cut.svg $::MENU_ICON_SIZE]
     .menu.edit add command -command [callback on_edit_paste] -label Paste \
-            -underline 0 -accelerator Ctrl+V -compound left \
-            -image [ui::icon edit-paste.svg $::MENU_ICON_SIZE]
+        -underline 0 -accelerator Ctrl+V -compound left \
+        -image [ui::icon edit-paste.svg $::MENU_ICON_SIZE]
     .menu.edit add separator
     .menu.edit add command -command [callback on_edit_ins_chr] \
-            -label "Insert Character…" -underline 0 -compound left \
-            -image [ui::icon ins-char.svg $::MENU_ICON_SIZE]
+        -label "Insert Character…" -underline 0 -compound left \
+        -image [ui::icon ins-char.svg $::MENU_ICON_SIZE]
 }
 
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
     .menu.style add command -command [callback on_style_bold] \
-            -label Bold -underline 0 -compound left -accelerator Ctrl+B \
-            -image [ui::icon format-text-bold.svg $::MENU_ICON_SIZE]
+        -label Bold -underline 0 -compound left -accelerator Ctrl+B \
+        -image [ui::icon format-text-bold.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_italic] \
-            -label Italic -underline 0 -compound left -accelerator Ctrl+I \
-            -image [ui::icon format-text-italic.svg $::MENU_ICON_SIZE]
+        -label Italic -underline 0 -compound left -accelerator Ctrl+I \
+        -image [ui::icon format-text-italic.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_highlight] \
-            -label Highlight -underline 0 -compound left \
-            -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
+        -label Highlight -underline 0 -compound left \
+        -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
+    menu .menu.style.colors
+    .menu.style add cascade -menu .menu.style.colors -label Color \
+        -underline 0
+    foreach name [TextEdit colornames] {
+        .menu.style.colors add command -label [string totitle $name] \
+            -command [callback on_style_color $name]
+    }
     # TODO 
-    #   Color→(title-cased ColorTag names)
     #   Indent→Level 1 | Level 2 | Level 3
 }
 

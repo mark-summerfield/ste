@@ -17,7 +17,7 @@ oo::define App method on_file_open {} {
     my on_file_save
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    const FILETYPES [$TheTextEdit filetypes]
+    const FILETYPES [TextEdit filetypes]
     set filename [tk_getOpenFile -initialdir $dir -filetypes $FILETYPES \
             -title "[tk appname] — Open" -parent .]
     if {$filename ne ""} {
@@ -49,7 +49,7 @@ oo::define App method on_file_save {} {
 oo::define App method on_file_save_as {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    const FILETYPES [$TheTextEdit filetypes]
+    const FILETYPES [TextEdit filetypes]
     set filename [tk_getSaveFile -initialdir $dir -filetypes $FILETYPES \
             -title "[tk appname] — Save As" -parent .]
     if {$filename ne ""} {
@@ -133,4 +133,8 @@ oo::define App method on_style_italic {} { $TheTextEdit apply_style italic }
 
 oo::define App method on_style_highlight {} {
     $TheTextEdit apply_style highlight
+}
+
+oo::define App method on_style_color color {
+    $TheTextEdit apply_style $color
 }

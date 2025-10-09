@@ -15,9 +15,9 @@ oo::class create TextEdit {
 oo::define TextEdit initialize {
     variable HIGHLIGHT_COLOR
     variable COLOR_FOR_TAG
-    variable STE_FILES
+    variable FILETYPES
 
-    const STE_FILES {{{ste files} {.ste}} {{tkt files} {.tkt}}}
+    const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}}}
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
@@ -64,8 +64,8 @@ oo::define TextEdit method framename {} { return $FrameName }
 oo::define TextEdit method textedit {} { return $Text }
 
 oo::define TextEdit method filetypes {} {
-    classvariable STE_FILES
-    return $STE_FILES
+    classvariable FILETYPES
+    return $FILETYPES
 }
 
 oo::define TextEdit method colors {} {

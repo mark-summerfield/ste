@@ -69,6 +69,12 @@ oo::define TextEdit classmethod colornames {} {
     dict keys $COLOR_FOR_TAG
 }
 
+oo::define TextEdit method unknown {method_name args} {
+    $Text $method_name {*}$args
+}
+
+oo::define TextEdit method focus {} { focus $Text }
+
 oo::define TextEdit method framename {} { return $FrameName }
 
 oo::define TextEdit method textedit {} { return $Text }

@@ -5,7 +5,7 @@ package require ui
 
 oo::class create App {
     variable Filename
-    variable TheTextEdit
+    variable ATextEdit
     variable StatusLabel
 }
 
@@ -27,11 +27,10 @@ oo::define App method show {} {
     if {$Filename ne ""} {
         my file_open
     } else {
-        $TheTextEdit clear
-        set textEdit [$TheTextEdit textedit]
-        $textEdit mark set insert end
-        $textEdit see insert
-        focus $textEdit
+        $ATextEdit clear
+        $ATextEdit mark set insert end
+        $ATextEdit see insert
+        $ATextEdit focus
     }
 }
 

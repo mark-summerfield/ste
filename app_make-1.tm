@@ -189,7 +189,7 @@ oo::define App method make_style_toolbar {} {
 
 oo::define App method make_widgets {} {
     set config [Config new]
-    set TheTextEdit [TextEdit make .mf [$config family] [$config size]]
+    set ATextEdit [TextEdit make .mf [$config family] [$config size]]
     set StatusLabel [ttk::label .mf.statusLabel]
 }
 
@@ -200,7 +200,7 @@ oo::define App method make_layout {} {
     pack .mf.statusLabel -side bottom -fill x  {*}$opts
     pack [ttk::sizegrip .mf.statusLabel.sizer] -side right -anchor se \
         {*}$opts
-    pack .mf.[$TheTextEdit framename] -fill both -expand true {*}$opts
+    pack .mf.[$ATextEdit framename] -fill both -expand true {*}$opts
     pack .mf -fill both -expand true
 }
 

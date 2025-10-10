@@ -9,8 +9,8 @@ package require ref
 oo::define App method on_file_new {} {
     my on_file_save
     set Filename ""
-    $TheTextEdit clear
-    focus [$TheTextEdit textedit]
+    $ATextEdit clear
+    $ATextEdit focus
 }
 
 oo::define App method on_file_open {} {
@@ -41,7 +41,7 @@ oo::define App method on_file_import_text {} {
 oo::define App method on_file_save {} {
     if {$Filename ne ""} {
         my file_save
-    } elseif {![$TheTextEdit isempty]} {
+    } elseif {![$ATextEdit isempty]} {
         my on_file_save_as
     }
 }
@@ -61,19 +61,19 @@ oo::define App method on_file_save_as {} {
 oo::define App method on_file_export_html {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .html]
-    writeFile $filename [$TheTextEdit as_html $filename]
+    writeFile $filename [$ATextEdit as_html $filename]
     my show_message "Exported '$filename'"
 }
 
 oo::define App method on_file_export_text {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .txt]
-    writeFile $filename [$TheTextEdit as_text]
+    writeFile $filename [$ATextEdit as_text]
     my show_message "Exported '$filename'"
 }
 
 oo::define App method on_file_print {} {
-    if {[catch {tk print [$TheTextEdit textedit]} err]} {
+    if {[catch {tk print [$ATextEdit textedit]} err]} {
         my show_error $err
     }
 }
@@ -87,7 +87,7 @@ oo::define App method on_config {} {
     tkwait window [$form form]
     if {[$ok get]} {
         if {$family ne [$config family] || $size != [$config size]} {
-            $TheTextEdit make_fonts [$config family] [$config size]
+            $ATextEdit make_fonts [$config family] [$config size]
         }
     }
 }
@@ -98,43 +98,42 @@ oo::define App method on_about {} {
 }
 
 oo::define App method on_quit {} {
-    if {[[$TheTextEdit textedit] edit modified]} { my on_file_save }
+    if {[[$ATextEdit textedit] edit modified]} { my on_file_save }
     set config [Config new]
     $config save $Filename
     exit
 }
 
-oo::define App method on_edit_undo {} { $TheTextEdit maybe_undo }
+oo::define App method on_edit_undo {} { $ATextEdit maybe_undo }
 
-oo::define App method on_edit_redo {} { $TheTextEdit maybe_redo }
+oo::define App method on_edit_redo {} { $ATextEdit maybe_redo }
 
-oo::define App method on_edit_copy {} { $TheTextEdit copy }
+oo::define App method on_edit_copy {} { $ATextEdit copy }
 
-oo::define App method on_edit_cut {} { $TheTextEdit cut }
+oo::define App method on_edit_cut {} { $ATextEdit cut }
 
-oo::define App method on_edit_paste {} { $TheTextEdit paste }
+oo::define App method on_edit_paste {} { $ATextEdit paste }
 
 oo::define App method on_edit_ins_chr {} {
     set ch [InsChrForm show]
     if {$ch ne ""} {
-        set textEdit [$TheTextEdit textedit]
         if {$ch eq "Q"} {
-            $textEdit insert insert “”
-            $textEdit mark set insert "insert -1 char"
+            $ATextEdit insert insert “”
+            $ATextEdit mark set insert "insert -1 char"
         } else {
-            $textEdit insert insert $ch
+            $ATextEdit insert insert $ch
         }
     }
 }
 
-oo::define App method on_style_bold {} { $TheTextEdit apply_style bold }
+oo::define App method on_style_bold {} { $ATextEdit apply_style bold }
 
-oo::define App method on_style_italic {} { $TheTextEdit apply_style italic }
+oo::define App method on_style_italic {} { $ATextEdit apply_style italic }
 
 oo::define App method on_style_highlight {} {
-    $TheTextEdit apply_style highlight
+    $ATextEdit apply_style highlight
 }
 
 oo::define App method on_style_color color {
-    $TheTextEdit apply_color $color
+    $ATextEdit apply_color $color
 }

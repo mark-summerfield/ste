@@ -21,12 +21,20 @@ oo::define InsChrForm classmethod show {} {
 }
 
 oo::define InsChrForm constructor ch {
+    classvariable ChrList
     set Ch $ch
     my make_widgets
     my make_layout
     my make_bindings
     next .ins_chr_form [callback on_cancel]
-    my show_modal
+    if {[llength $ChrList]} {
+        .ins_chr_form.mf.unicode_radio invoke
+        set widget .ins_chr_form.mf.unicode_combo
+    } else {
+        .ins_chr_form.mf.bullet_radio invoke
+        set widget .ins_chr_form.mf.bullet_radio
+    }
+    my show_modal $widget
 }
 
 oo::define InsChrForm method make_widgets {} {
@@ -53,15 +61,16 @@ oo::define InsChrForm method make_widgets {} {
         -underline 3 -value Q -variable [my varname ChrRadio]
     ttk::radiobutton .ins_chr_form.mf.unicode_radio -text "Unicode U+" \
         -underline 0 -value U -variable [my varname ChrRadio]
-    ttk::combobox .ins_chr_form.mf.unicode_combo -width 6 \
-        -values $ChrList
+    set combo [ttk::combobox .ins_chr_form.mf.unicode_combo -width 6 \
+            -values [lreverse $ChrList]]
+    $combo set [lindex $ChrList end]
+    $combo selection range 0 end
     ttk::button .ins_chr_form.mf.ok_button -text OK \
         -underline 0 -command [callback on_ok] -compound left \
         -image [ui::icon ok.svg $::ICON_SIZE]
     ttk::button .ins_chr_form.mf.cancel_button -text Cancel \
         -underline 0 -command [callback on_cancel] -compound left \
         -image [ui::icon close.svg $::ICON_SIZE]
-    .ins_chr_form.mf.bullet_radio invoke
 }
 
 oo::define InsChrForm method make_layout {} {

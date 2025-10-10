@@ -1,15 +1,15 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 oo::define App method file_open {} {
-    $TheTextEdit deserialize [readFile $Filename binary]
-    focus [$TheTextEdit textedit]
+    $ATextEdit deserialize [readFile $Filename binary]
+    $ATextEdit focus
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Opened '$Filename'."
 }
 
 oo::define App method file_import_text filename {
-    $TheTextEdit load [readFile $filename]
-    focus [$TheTextEdit textedit]
+    $ATextEdit load [readFile $filename]
+    $ATextEdit focus
     set Filename [regsub {\.txt$} $filename .ste]
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Opened '$filename' (will save as '$Filename')." long
@@ -17,9 +17,9 @@ oo::define App method file_import_text filename {
 
 oo::define App method file_save {} {
     if {[string match *.tkt $Filename]} {
-        writeFile $Filename [$TheTextEdit serialize false]
+        writeFile $Filename [$ATextEdit serialize false]
     } else {
-        writeFile $Filename binary [$TheTextEdit serialize]
+        writeFile $Filename binary [$ATextEdit serialize]
     }
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Saved '$Filename'."

@@ -86,7 +86,6 @@ oo::define TextEdit method clear {} {
 oo::define TextEdit method after_load {} {
     $Text edit modified false
     $Text edit reset
-    $Text mark set insert end
     $Text see insert
 }
 
@@ -184,12 +183,10 @@ oo::define TextEdit method make_tags {} {
     }
     const WIDTH [font measure Sans "•. "]
     set indent [font measure Sans "nnnn"]
-    $Text tag configure listindent1 -lmargin1 $indent \
-        -lmargin2 [expr {$indent + $WIDTH}]
-    set indent [expr {$indent * 2}]
+    $Text tag configure listindent1 -lmargin1 0 -lmargin2 $WIDTH
     $Text tag configure listindent2 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
-    set indent [expr {$indent * 3}]
+    set indent [expr {$indent * 2}]
     $Text tag configure listindent3 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]
 }
@@ -220,7 +217,6 @@ oo::define TextEdit method deserialize txt_dumpz {
         set txt_dump [encoding convertfrom utf-8 $txt_dumpz]
     }
     array set tags {}
-    set current_index end
     set insert_index end
     set pending [list]
     foreach {key value index} $txt_dump {
@@ -228,7 +224,7 @@ oo::define TextEdit method deserialize txt_dumpz {
             text { $Text insert $index $value }
             mark { 
                 switch $value {
-                    current { set current_index $index }
+                    current {}
                     insert { set insert_index $index}
                     default { $Text mark set $value $index }
                 }
@@ -247,7 +243,6 @@ oo::define TextEdit method deserialize txt_dumpz {
         set value [lpop pending]
         $Text tag add $value $tags($value) end
     }
-    $Text mark set current $current_index
     $Text mark set insert $insert_index 
     my after_load
 }

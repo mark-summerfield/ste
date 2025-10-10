@@ -19,7 +19,7 @@ oo::define TextEdit initialize {
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}}}
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
-    # Any changes to COLOR_FOR_TAG must be reflected in App make_color_menu
+    ;# Any changes to COLOR_FOR_TAG must be reflected in App make_color_menu
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
         grey "#555555" \

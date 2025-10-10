@@ -24,7 +24,7 @@ oo::define App method show {} {
     wm geometry . [$config geometry]
     raise .
     update
-    if {$Filename ne ""} {
+    if {$Filename ne "" && [file isfile $Filename]} {
         my file_open
     } else {
         $ATextEdit clear

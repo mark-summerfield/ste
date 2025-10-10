@@ -1,8 +1,5 @@
-# TODO Style|Colors icon
-# TODO darken colors that are too light (most of them)
-# TODO For Color menu use: 0. Black | 1. Apricot | …
-#	& add color swatch icons
 # TODO Ctrl+Backspace → delete word left
+# on_ctrl_bs
 
 ste.tk
 app-1.tm
@@ -11,6 +8,7 @@ app-1.tm
 app_make-1.tm # TODO style menu | style toolbar
 app_actions-1.tm
 app_support-1.tm
+misc-1.tm
 textedit-1.tm # TODO {de}serialize
 textedit_export-1.tm # TODO as_html
 ins_chr_form-1.tm

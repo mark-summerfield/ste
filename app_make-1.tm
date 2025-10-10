@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require config
+package require misc
 package require textedit
 package require textedit_export
 package require tooltip 2
@@ -110,16 +111,22 @@ oo::define App method make_style_menu {} {
         -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
     menu .menu.style.colors
     .menu.style add cascade -menu .menu.style.colors -label Color \
-        -underline 0
-    #              K B W C D G E L I M A N V O P U R T
-    const INDEXES {4 0 3 0 3 0 2 0 1 0 1 0 3 0 0 1 0 0}
-    foreach index $INDEXES name [TextEdit colornames] {
-        .menu.style.colors add command -underline $index \
-            -label [string totitle $name] \
-            -command [callback on_style_color $name]
-    }
+        -underline 0 -compound left \
+        -image [ui::icon color.svg $::MENU_ICON_SIZE]
+    my make_color_menu .menu.style.colors
     # TODO 
     #   Indent→Level 1 | Level 2 | Level 3
+}
+
+oo::define App method make_color_menu menu_name {
+    #              K E N B L C T V G I A W D O R P U M
+    const INDEXES {4 2 0 0 0 0 0 3 0 1 1 3 3 0 0 0 1 0}
+    foreach index $INDEXES {name color} [TextEdit colors] {
+        $menu_name add command -underline $index \
+            -image [misc::swatch $color $::MENU_ICON_SIZE] \
+            -compound left -label [string totitle $name] \
+            -command [callback on_style_color $name]
+    }
 }
 
 oo::define App method make_toolbars {} {
@@ -187,7 +194,12 @@ oo::define App method make_style_toolbar {} {
         -command [callback on_style_highlight] \
         -image [ui::icon draw-highlight.svg $::ICON_SIZE]
     $tip .mf.tb.style_highlight "Style Highlight"
-    # TODO
+    menu .mf.tb.colors_menu
+    ttk::menubutton .mf.tb.style_colors -style Toolbutton -takefocus 0 \
+        -menu .mf.tb.colors_menu \
+        -image [ui::icon color-menu.svg $::ICON_SIZE]
+    $tip .mf.tb.style_colors "Style Color"
+    my make_color_menu .mf.tb.colors_menu
 }
 
 oo::define App method make_widgets {} {
@@ -234,6 +246,7 @@ oo::define App method make_toolbars_layout {} {
     pack .mf.tb.style_highlight -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
+    pack .mf.tb.style_colors -side left
 }
 
 oo::define App method make_bindings {} {

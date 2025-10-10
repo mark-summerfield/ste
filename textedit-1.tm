@@ -19,25 +19,26 @@ oo::define TextEdit initialize {
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}}}
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
+    # Any changes to COLOR_FOR_TAG must be reflected in App make_color_menu
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
-        blue "#0000FF" \
-        brown "#9A6324" \
-        cyan "#008B8B" \
-        gold "#9A8100" \
-        green "#008000" \
         grey "#555555" \
-        lavender "#6767E0" \
-        lime "#608000" \
-        magenta "#F032E6" \
-        maroon "#800000" \
         navy "#000075" \
+        blue "#0000FF" \
+        lavender "#6767E0" \
+        cyan "#008B8B" \
+        teal "#469990" \
         olive "#676700" \
+        green "#004D00" \
+        lime "#608000" \
+        maroon "#800000" \
+        brown "#9A6324" \
+        gold "#9A8100" \
         orange "#CD8400" \
+        red "#FF0000" \
         pink "#FF5B77" \
         purple "#911EB4" \
-        red "#FF0000" \
-        teal "#469990" \
+        magenta "#F032E6" \
         ]
 }
 
@@ -54,6 +55,7 @@ oo::define TextEdit constructor parent {
     ttk::frame $parent.$FrameName
     set Text [text $parent.$FrameName.txt -undo true -wrap word]
     bindtags $Text {$Text Ntext . all}
+    bind . <Control-BackSpace> [callback on_ctrl_bs]
     ui::scrollize $parent.$FrameName txt vertical
 }
 
@@ -62,9 +64,9 @@ oo::define TextEdit classmethod filetypes {} {
     return $FILETYPES
 }
 
-oo::define TextEdit classmethod colornames {} {
+oo::define TextEdit classmethod colors {} {
     variable COLOR_FOR_TAG
-    dict keys $COLOR_FOR_TAG
+    return $COLOR_FOR_TAG
 }
 
 oo::define TextEdit method unknown {method_name args} {
@@ -249,4 +251,28 @@ oo::define TextEdit method deserialize txt_dumpz {
     }
     $Text mark set insert $insert_index 
     my after_load
+}
+
+oo::define TextEdit method on_ctrl_bs {} {
+    if {[focus] eq $Text} {
+        set a [$Text get "insert -1 char"]
+        set b [$Text get insert]
+        puts "X a='$a' b='$b'"
+        set x [$Text index "insert wordstart"]
+        set y [$Text index "insert wordend"]
+        puts "A $x $y '[$Text get $x $y]'"
+        if {[$Text get $x $y] eq " "} {
+            set y $x
+            set x [$Text index "$y wordstart -1 char"]
+        }
+        puts "B $x $y '[$Text get $x $y]'"
+        set z [$Text index "$x -1 char"]
+        if {[$Text get $z $x] eq " "} {
+            set x $z
+        }
+        puts "C $x $y '[$Text get $x $y]'"
+        if {[$Text get $x $y] ne "\n"} {
+            #$Text delete $x $y
+        }
+    }
 }

@@ -55,7 +55,7 @@ oo::define TextEdit constructor parent {
     ttk::frame $parent.$FrameName
     set Text [text $parent.$FrameName.txt -undo true -wrap word]
     bindtags $Text {$Text Ntext . all}
-    bind . <Control-BackSpace> [callback on_ctrl_bs]
+    bind . <BackSpace> [callback on_bs %s]
     ui::scrollize $parent.$FrameName txt vertical
 }
 
@@ -253,26 +253,21 @@ oo::define TextEdit method deserialize txt_dumpz {
     my after_load
 }
 
-oo::define TextEdit method on_ctrl_bs {} {
-    if {[focus] eq $Text} {
-        set a [$Text get "insert -1 char"]
-        set b [$Text get insert]
-        puts "X a='$a' b='$b'"
-        set x [$Text index "insert wordstart"]
-        set y [$Text index "insert wordend"]
-        puts "A $x $y '[$Text get $x $y]'"
-        if {[$Text get $x $y] eq " "} {
-            set y $x
-            set x [$Text index "$y wordstart -1 char"]
-        }
-        puts "B $x $y '[$Text get $x $y]'"
-        set z [$Text index "$x -1 char"]
-        if {[$Text get $z $x] eq " "} {
-            set x $z
-        }
-        puts "C $x $y '[$Text get $x $y]'"
-        if {[$Text get $x $y] ne "\n"} {
-            #$Text delete $x $y
+oo::define TextEdit method on_bs state {
+    if {[focus] eq $Text && $state == 20} {
+        $Text edit undo ;# undoes the BackSpace delete that just happened
+        # TODO
+        set x [$Text index "insert -1 char"]
+        set y [$Text index insert]
+        set w [$Text get $x $y]
+        puts "A $x $y w='$w'"
+        if {$w eq " "} {
+            $Text delete $x $y
+        } else {
+            set x [$Text index "$x wordstart"]
+            set y [$Text index "$x wordend"]
+            set w [$Text get $x $y]
+            puts "B $x $y w='$w'"
         }
     }
 }

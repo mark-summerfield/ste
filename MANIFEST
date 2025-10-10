@@ -2,6 +2,7 @@
 # TODO darken colors that are too light (most of them)
 # TODO For Color menu use: 0. Black | 1. Apricot | …
 #	& add color swatch icons
+# TODO Ctrl+Backspace → delete word left
 
 ste.tk
 app-1.tm

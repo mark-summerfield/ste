@@ -21,24 +21,22 @@ oo::define TextEdit initialize {
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
-        apricot "#FFD8B1" \
-        beige "#FFFAC8" \
         blue "#0000FF" \
         brown "#9A6324" \
-        cyan "#42D4F4" \
-        green "#3CB44B" \
-        grey "#A9A9A9" \
-        lavender "#DCB3FF" \
-        lime "#BFEF45" \
+        cyan "#008B8B" \
+        gold "#9A8100" \
+        green "#008000" \
+        grey "#555555" \
+        lavender "#6767E0" \
+        lime "#608000" \
         magenta "#F032E6" \
         maroon "#800000" \
-        mint "#AAFFC3" \
         navy "#000075" \
-        olive "#808000" \
-        orange "#F58231" \
-        pink "#FABEB4" \
+        olive "#676700" \
+        orange "#CD8400" \
+        pink "#FF5B77" \
         purple "#911EB4" \
-        red "#E6194B" \
+        red "#FF0000" \
         teal "#469990" \
         ]
 }

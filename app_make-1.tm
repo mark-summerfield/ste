@@ -111,8 +111,11 @@ oo::define App method make_style_menu {} {
     menu .menu.style.colors
     .menu.style add cascade -menu .menu.style.colors -label Color \
         -underline 0
-    foreach name [TextEdit colornames] {
-        .menu.style.colors add command -label [string totitle $name] \
+    #              K B W C D G E L I M A N V O P U R T
+    const INDEXES {4 0 3 0 3 0 2 0 1 0 1 0 3 0 0 1 0 0}
+    foreach index $INDEXES name [TextEdit colornames] {
+        .menu.style.colors add command -underline $index \
+            -label [string totitle $name] \
             -command [callback on_style_color $name]
     }
     # TODO 

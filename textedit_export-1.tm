@@ -60,12 +60,13 @@ oo::define TextEdit method HtmlOn tag {
         bolditalic { return <b><i> }
         highlight { return "<span style=\"background-color:\
             $HIGHLIGHT_COLOR;\">" }
-        indent1 { return "<div style=\"text-indent: 2em;\">" }
-        indent2 { return "<div style=\"text-indent: 4em;\">" }
-        indent3 { return "<div style=\"text-indent: 6em;\">" }
-        sel {}
+        listindent1 { return "<div style=\"text-indent: 2em;\">" }
+        listindent2 { return "<div style=\"text-indent: 4em;\">" }
+        listindent3 { return "<div style=\"text-indent: 6em;\">" }
+        NtextTab { return "<div style=\"margin-left: 4em;\">" }
         default {
-            return "<span style=\"color: [dict get $COLOR_FOR_TAG $tag];\">"
+            set color [dict getdef $COLOR_FOR_TAG $tag ""]
+            if {$color ne ""} { return "<span style=\"color: $color;\">" }
         }
     }
 }
@@ -76,10 +77,10 @@ oo::define TextEdit method HtmlOff tag {
         italic { return </i> }
         bolditalic { return </i></b> }
         highlight { return </span> }
-        indent1 { return </div> }
-        indent2 { return </div> }
-        indent3 { return </div> }
-        sel {}
+        listlistindent1 { return </div> }
+        listindent2 { return </div> }
+        listindent3 { return </div> }
+        NtextTab { return </div> }
         default { return </span> }
     }
 }

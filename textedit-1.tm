@@ -43,10 +43,12 @@ oo::define TextEdit initialize {
 }
 
 oo::define TextEdit classmethod make {parent family size} {
-    set theTextEdit [TextEdit new $parent]
-    $theTextEdit make_fonts $family $size
-    $theTextEdit make_tags
-    return $theTextEdit
+    set aTextEdit [TextEdit new $parent]
+    $aTextEdit make_fonts $family $size
+    $aTextEdit make_tags
+    set tab [expr {4 * [font measure Sans n]}]
+    $aTextEdit configure -tabstyle wordprocessor -tabs "$tab left"
+    return $aTextEdit
 }
 
 # Use make (above)
@@ -203,25 +205,18 @@ oo::define TextEdit method load txt {
     my after_load
 }
 
-oo::define TextEdit method serialize {{compress true}} {
+oo::define TextEdit method serialize {{compress true} {prefix ""}} {
     set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
     if {$compress} {
-        return STE1\n[zlib deflate [encoding convertto utf-8 $txt_dump] 9]
+        return $prefix[zlib deflate [encoding convertto utf-8 $txt_dump] 9]
     } else {
         return $txt_dump
     }
 }
 
-oo::define TextEdit method deserialize txt_dumpz {
+oo::define TextEdit method deserialize {txt_dumpz compressed {prefix ""}} {
     my clear
-    set i [string first \n $txt_dumpz]
-    set prefix [string range $txt_dumpz 0 $i]
-    set raw [string range $txt_dumpz [incr i] end]
-    if {[string match STE* $prefix]} {
-        set txt_dump [encoding convertfrom utf-8 [zlib inflate $raw]]
-    } else {
-        set txt_dump [encoding convertfrom utf-8 $txt_dumpz]
-    }
+    set txt_dump [my GetDeserialized $txt_dumpz $compressed $prefix]
     array set tags {}
     set insert_index end
     set pending [list]
@@ -251,6 +246,22 @@ oo::define TextEdit method deserialize txt_dumpz {
     }
     $Text mark set insert $insert_index 
     my after_load
+}
+
+oo::define TextEdit method GetDeserialized {txt_dumpz compressed prefix} {
+    if {$prefix ne ""} {
+        set i [string first \n $txt_dumpz]
+        set start [string range $txt_dumpz 0 $i]
+        set raw [string range $txt_dumpz [incr i] end]
+    } else {
+        set start ""
+        set raw $txt_dumpz
+    }
+    if {$compressed || ($prefix ne "" && [string match $prefix* $start])} {
+        return [encoding convertfrom utf-8 [zlib inflate $raw]]
+    } else {
+        return [encoding convertfrom utf-8 $txt_dumpz]
+    }
 }
 
 oo::define TextEdit method on_ctrl_bs {} {

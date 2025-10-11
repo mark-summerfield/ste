@@ -1,13 +1,17 @@
+# TODO test_textedit-1.tm: round-trip {de}serialize with compress true &
+# prefix ""
+
+# TODO bullet item (listindent1 + • ) | listindent[1-3] (incl. HTML export)
+# TODO preserve indent on Enter
+
 ste.tk
 app-1.tm
-# TODO color toggle | bullet item (listindent1 + • ) | listindent[1-3] |
-# preserve indent on Enter
-app_make-1.tm # TODO style menu | style toolbar
+app_make-1.tm
 app_actions-1.tm
 app_support-1.tm
 misc-1.tm
-textedit-1.tm # TODO {de}serialize
-textedit_export-1.tm # TODO as_html
+textedit-1.tm
+textedit_export-1.tm
 ins_chr_form-1.tm
 globals-1.tm # VERSION
 config-1.tm

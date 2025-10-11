@@ -1,5 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+package require lambda 1
+
 oo::define TextEdit method as_text {} {
     set lines [list]
     foreach line [split [$Text get 1.0 end] \n] {
@@ -14,6 +16,8 @@ oo::define TextEdit method as_html filename {
     set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
     set pending [list]
     set flip true
+    set tabize [lambda x {string repeat "&nbsp;" \
+        [expr {4 * [string length $x]}]}]
     foreach {key value index} $txt_dump {
         switch $key {
             text {
@@ -25,7 +29,8 @@ oo::define TextEdit method as_html filename {
                         lappend out \n<p>\n
                         set flip false
                     }
-                    lappend out [html::html_entities $value]
+                    lappend out [regsub -command {^\s+} \
+                        [html::html_entities $value] $tabize]
                     
                 }
             }
@@ -63,7 +68,7 @@ oo::define TextEdit method HtmlOn tag {
         listindent1 { return "<div style=\"text-indent: 2em;\">" }
         listindent2 { return "<div style=\"text-indent: 4em;\">" }
         listindent3 { return "<div style=\"text-indent: 6em;\">" }
-        NtextTab { return "<div style=\"margin-left: 4em;\">" }
+        NtextTab { return "<br>" }
         default {
             set color [dict getdef $COLOR_FOR_TAG $tag ""]
             if {$color ne ""} { return "<span style=\"color: $color;\">" }
@@ -80,7 +85,7 @@ oo::define TextEdit method HtmlOff tag {
         listlistindent1 { return </div> }
         listindent2 { return </div> }
         listindent3 { return </div> }
-        NtextTab { return </div> }
+        NtextTab { return "" }
         default { return </span> }
     }
 }

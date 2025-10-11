@@ -82,7 +82,7 @@ oo::define TextEdit method HtmlOff tag {
         italic { return </i> }
         bolditalic { return </i></b> }
         highlight { return </span> }
-        listlistindent1 { return </div> }
+        listindent1 { return </div> }
         listindent2 { return </div> }
         listindent3 { return </div> }
         NtextTab { return "" }

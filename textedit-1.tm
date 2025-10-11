@@ -260,7 +260,7 @@ oo::define TextEdit method GetDeserialized {txt_dumpz compressed prefix} {
     if {$compressed || ($prefix ne "" && [string match $prefix* $start])} {
         return [encoding convertfrom utf-8 [zlib inflate $raw]]
     } else {
-        return [encoding convertfrom utf-8 $txt_dumpz]
+        return [encoding convertfrom utf-8 $raw]
     }
 }
 

@@ -17,7 +17,8 @@ oo::define TextEdit initialize {
     variable HIGHLIGHT_COLOR
     variable COLOR_FOR_TAG
 
-    const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}}}
+    const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
+        {{compressed tkt files} {.tktz}}}
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
     ;# Any changes to COLOR_FOR_TAG must be reflected in App make_color_menu
     const COLOR_FOR_TAG [dict create \
@@ -42,22 +43,22 @@ oo::define TextEdit initialize {
         ]
 }
 
-oo::define TextEdit classmethod make {parent family size} {
-    set aTextEdit [TextEdit new $parent]
-    $aTextEdit make_fonts $family $size
-    $aTextEdit make_tags
-    set tab [expr {4 * [font measure Sans n]}]
-    $aTextEdit configure -tabstyle wordprocessor -tabs "$tab left"
-    return $aTextEdit
-}
-
-# Use make (above)
-oo::define TextEdit constructor parent {
+oo::define TextEdit constructor {parent {family ""} {size 0}} {
     set FrameName tf#[string range [clock clicks] end-8 end] ;# unique
     ttk::frame $parent.$FrameName
     set Text [text $parent.$FrameName.txt -undo true -wrap word]
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
+    if {$family eq ""} {
+        set family [font configure TkDefaultFont -family]
+    }
+    if {!$size} {
+        set size [expr {1 + [font configure TkDefaultFont -size]}]
+    }
+    set tab [expr {4 * [font measure Sans n]}]
+    my configure -tabstyle wordprocessor -tabs "$tab left"
+    my make_fonts $family $size
+    my make_tags
     ui::scrollize $parent.$FrameName txt vertical
 }
 
@@ -176,7 +177,6 @@ oo::define TextEdit method make_fonts {family size} {
     font create Italic -family $family -size $size -slant italic
     font create BoldItalic -family $family -size $size -weight bold \
         -slant italic
-    $Text configure -font Sans -foreground [dict get $COLOR_FOR_TAG black]
 }
 
 oo::define TextEdit method make_tags {} {
@@ -191,6 +191,7 @@ oo::define TextEdit method make_tags {} {
     }
     const WIDTH [font measure Sans "•. "]
     set indent [font measure Sans "nnnn"]
+    # TODO redo
     $Text tag configure listindent1 -lmargin1 0 -lmargin2 $WIDTH
     $Text tag configure listindent2 -lmargin1 $indent \
         -lmargin2 [expr {$indent + $WIDTH}]

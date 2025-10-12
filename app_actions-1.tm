@@ -98,7 +98,10 @@ oo::define App method on_about {} {
 }
 
 oo::define App method on_quit {} {
-    if {[[$ATextEdit textedit] edit modified]} { my on_file_save }
+    if {[[$ATextEdit textedit] edit modified]} {
+        # TODO prompt [Save] [Don't Save] [Cancel]
+        my on_file_save
+    }
     set config [Config new]
     $config save [file normalize $Filename]
     exit

@@ -3,8 +3,13 @@
 oo::define App method file_open {} {
     if {[string match *.ste $Filename]} {
         lassign {true $::STE_PREFIX} compressed prefix
-    } else {
+    } elseif {[string match *.tkt $Filename]} {
         lassign {false ""} compressed prefix
+    } elseif {[string match *.tktz $Filename]} {
+        lassign {true ""} compressed prefix
+    } else {
+        my show_error "unrecognized format for '$Filename'"
+        return
     }
     $ATextEdit deserialize [readFile $Filename binary] $compressed $prefix
     $ATextEdit focus
@@ -26,8 +31,11 @@ oo::define App method file_save {} {
     } else {
         if {[string match *.ste $Filename]} {
             set raw [$ATextEdit serialize true $::STE_PREFIX]
-        } else {
+        } elseif {[string match *.tktz $Filename]} {
             set raw [$ATextEdit serialize]
+        } else {
+            my show_error "unrecognized format for '$Filename'"
+            return
         }
         writeFile $Filename binary $raw
     }

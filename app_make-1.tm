@@ -115,7 +115,11 @@ oo::define App method make_style_menu {} {
         -image [ui::icon color.svg $::MENU_ICON_SIZE]
     my make_color_menu .menu.style.colors
     # TODO 
-    #   Indent→Level 1 | Level 2 | Level 3
+    # List
+    #   Bulleted 1
+    #   Bulleted 2
+    #   Numbered 1
+    #   Numbered 2
 }
 
 oo::define App method make_color_menu menu_name {
@@ -204,7 +208,7 @@ oo::define App method make_style_toolbar {} {
 
 oo::define App method make_widgets {} {
     set config [Config new]
-    set ATextEdit [TextEdit make .mf [$config family] [$config size]]
+    set ATextEdit [TextEdit new .mf [$config family] [$config size]]
     set StatusLabel [ttk::label .mf.statusLabel]
 }
 

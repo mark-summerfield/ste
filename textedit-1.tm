@@ -14,10 +14,12 @@ oo::class create TextEdit {
 
 oo::define TextEdit initialize {
     variable N 0
+    variable STE_PREFIX
     variable FILETYPES
     variable HIGHLIGHT_COLOR
     variable COLOR_FOR_TAG
 
+    const STE_PREFIX STE1\n
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
         {{compressed tkt files} {.tktz}}}
     const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
@@ -208,18 +210,22 @@ oo::define TextEdit method load txt {
     my after_load
 }
 
-oo::define TextEdit method serialize {{compress true} {prefix ""}} {
+oo::define TextEdit method serialize {{file_format .ste}} {
+    classvariable STE_PREFIX
     set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
-    if {$compress} {
-        return $prefix[zlib deflate [encoding convertto utf-8 $txt_dump] 9]
-    } else {
+    if {$file_format eq ".tkt"} {
         return $txt_dump
     }
+    set txt_dumpz [zlib deflate [encoding convertto utf-8 $txt_dump] 9]
+    if {$file_format eq ".tktz"} {
+        return $txt_dumpz
+    }
+    return $STE_PREFIX$txt_dumpz ;# .ste
 }
 
-oo::define TextEdit method deserialize {txt_dumpz compressed {prefix ""}} {
+oo::define TextEdit method deserialize {raw file_format} {
     my clear
-    set txt_dump [my GetDeserialized $txt_dumpz $compressed $prefix]
+    set txt_dump [my GetTxtDump $raw $file_format]
     array set tags {}
     set insert_index end
     set pending [list]
@@ -251,20 +257,17 @@ oo::define TextEdit method deserialize {txt_dumpz compressed {prefix ""}} {
     my after_load
 }
 
-oo::define TextEdit method GetDeserialized {txt_dumpz compressed prefix} {
-    if {$prefix ne ""} {
-        set i [string first \n $txt_dumpz]
-        set start [string range $txt_dumpz 0 $i]
-        set raw [string range $txt_dumpz [incr i] end]
-    } else {
-        set start ""
-        set raw $txt_dumpz
-    }
-    if {$compressed || ($prefix ne "" && [string match $prefix* $start])} {
-        return [encoding convertfrom utf-8 [zlib inflate $raw]]
-    } else {
+oo::define TextEdit method GetTxtDump {raw file_format} {
+    if {$file_format eq ".tkt"} {
         return [encoding convertfrom utf-8 $raw]
     }
+    if {$file_format eq ".ste"} {
+        set i [string first \n $raw]
+        # check here for STE_PREFIX if required
+        set raw [string range $raw [incr i] end]
+    }
+    # elseif $file_format eq ".tktz" then use $raw direct
+    encoding convertfrom utf-8 [zlib inflate $raw]
 }
 
 oo::define TextEdit method on_ctrl_bs {} {

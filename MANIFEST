@@ -1,5 +1,4 @@
-# TODO test_textedit-1.tm: round-trip {de}serialize with compress true &
-# prefix ""
+# TODO test_textedit-1.tm: round-trip {de}serialize using .tktz
 # TODO copy yes_no_form-1.tm to maybe_save-form-1.tm
 #   [Save] [Don't Save] [Cancel]
 #   <Enter>

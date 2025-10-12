@@ -1,17 +1,8 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 oo::define App method file_open {} {
-    if {[string match *.ste $Filename]} {
-        lassign {true $::STE_PREFIX} compressed prefix
-    } elseif {[string match *.tkt $Filename]} {
-        lassign {false ""} compressed prefix
-    } elseif {[string match *.tktz $Filename]} {
-        lassign {true ""} compressed prefix
-    } else {
-        my show_error "unrecognized format for '$Filename'"
-        return
-    }
-    $ATextEdit deserialize [readFile $Filename binary] $compressed $prefix
+    $ATextEdit deserialize [readFile $Filename binary] \
+        [file extension $Filename]
     $ATextEdit focus
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Opened '$Filename'."
@@ -26,18 +17,12 @@ oo::define App method file_import_text filename {
 }
 
 oo::define App method file_save {} {
-    if {[string match *.tkt $Filename]} {
-        writeFile $Filename [$ATextEdit serialize false]
+    set ext [file extension $Filename]
+    set out [$ATextEdit serialize $ext]
+    if {$ext eq ".tkt"} {
+        writeFile $Filename $out
     } else {
-        if {[string match *.ste $Filename]} {
-            set raw [$ATextEdit serialize true $::STE_PREFIX]
-        } elseif {[string match *.tktz $Filename]} {
-            set raw [$ATextEdit serialize]
-        } else {
-            my show_error "unrecognized format for '$Filename'"
-            return
-        }
-        writeFile $Filename binary $raw
+        writeFile $Filename binary $out
     }
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Saved '$Filename'."

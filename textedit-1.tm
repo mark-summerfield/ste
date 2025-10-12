@@ -13,6 +13,7 @@ oo::class create TextEdit {
 }
 
 oo::define TextEdit initialize {
+    variable N 0
     variable FILETYPES
     variable HIGHLIGHT_COLOR
     variable COLOR_FOR_TAG
@@ -44,7 +45,8 @@ oo::define TextEdit initialize {
 }
 
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
-    set FrameName tf#[string range [clock clicks] end-8 end] ;# unique
+    classvariable N
+    set FrameName tf#[incr N] ;# unique
     ttk::frame $parent.$FrameName
     set Text [text $parent.$FrameName.txt -undo true -wrap word]
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
@@ -168,7 +170,6 @@ oo::define TextEdit method apply_color_to {indexes color} {
 }
 
 oo::define TextEdit method make_fonts {family size} {
-    classvariable COLOR_FOR_TAG
     foreach name {Sans Bold Italic BoldItalic} {
         catch { font delete $name }
     }
@@ -177,6 +178,7 @@ oo::define TextEdit method make_fonts {family size} {
     font create Italic -family $family -size $size -slant italic
     font create BoldItalic -family $family -size $size -weight bold \
         -slant italic
+    $Text configure -font Sans
 }
 
 oo::define TextEdit method make_tags {} {

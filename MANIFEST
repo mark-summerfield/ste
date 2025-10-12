@@ -1,6 +1,5 @@
 # TODO test_textedit-1.tm: round-trip {de}serialize with compress true &
 # prefix ""
-# TODO switch off ntext indent (& remove from html export)
 # TODO copy yes_no_form-1.tm to maybe_save-form-1.tm
 #   [Save] [Don't Save] [Cancel]
 #   <Enter>
@@ -11,7 +10,9 @@
 #   Tklib
 # TODO bullet item (bindent[12] + • ) | (nindent[1-2] + 1.) & HTML export
 # - Add support for (including for exports where possible):
-#   . {sub,super}scripts, underline, strikethrough
+#   . {sub,super}script
+#   . underline
+#   . strikethrough
 #   . alignment (left, center, right)
 # TODO preserve indent on Enter
 
@@ -39,6 +40,5 @@ st.sh
 
 # NOTE ideas:
 # - Add status indicators: [nnn Lines][MOD]
-
 
 # vim: syn=yaml

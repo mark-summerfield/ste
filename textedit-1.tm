@@ -29,7 +29,7 @@ oo::define TextEdit initialize {
         cyan "#007272" \
         teal "#469990" \
         olive "#676700" \
-        green "#004D00" \
+        green "#009C00" \
         lime "#608000" \
         maroon "#800000" \
         brown "#9A6324" \

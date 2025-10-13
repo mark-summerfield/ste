@@ -1,4 +1,4 @@
-# TODO Add support for (including for exports where possible):
+# TODO export html:
 #   . {sub,super}script
 #   . underline
 #   . strikethrough

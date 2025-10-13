@@ -100,18 +100,39 @@ oo::define App method make_edit_menu {} {
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
-    .menu.style add command -command [callback on_style_bold] \
+    .menu.style add command -command [callback on_style bold] \
         -label Bold -underline 0 -compound left -accelerator Ctrl+B \
         -image [ui::icon format-text-bold.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_style_italic] \
+    .menu.style add command -command [callback on_style italic] \
         -label Italic -underline 0 -compound left -accelerator Ctrl+I \
         -image [ui::icon format-text-italic.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_style_highlight] \
+    .menu.style add command -command [callback on_style ul] \
+        -label Underline -underline 0 -compound left \
+        -image [ui::icon format-text-underline.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style highlight] \
         -label Highlight -underline 0 -compound left \
         -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style strike] \
+        -label Strikeout -underline 1 -compound left \
+        -image [ui::icon format-text-strikethrough.svg $::MENU_ICON_SIZE]
+    .menu.style add separator
+    .menu.style add command -command [callback on_style sub] \
+        -label Subscript -underline 0 -compound left \
+        -image [ui::icon subscript.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style sup] \
+        -label Superscript -underline 2 -compound left \
+        -image [ui::icon superscript.svg $::MENU_ICON_SIZE]
+    .menu.style add separator
+    .menu.style add command -command [callback on_align center] \
+        -label "Center Align" -underline 0 -compound left \
+        -image [ui::icon format-justify-center.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_align right] \
+        -label "Right Align" -underline 0 -compound left \
+        -image [ui::icon format-justify-right.svg $::MENU_ICON_SIZE]
+    .menu.style add separator
     menu .menu.style.colors
     .menu.style add cascade -menu .menu.style.colors -label Color \
-        -underline 0 -compound left \
+        -underline 1 -compound left \
         -image [ui::icon color.svg $::MENU_ICON_SIZE]
     my make_color_menu .menu.style.colors
     # TODO 
@@ -187,17 +208,41 @@ oo::define App method make_edit_toolbar {} {
 oo::define App method make_style_toolbar {} {
     set tip tooltip::tooltip
     ttk::button .mf.tb.style_bold -style Toolbutton -takefocus 0 \
-        -command [callback on_style_bold] \
+        -command [callback on_style bold] \
         -image [ui::icon format-text-bold.svg $::ICON_SIZE]
     $tip .mf.tb.style_bold "Style Bold"
     ttk::button .mf.tb.style_italic -style Toolbutton -takefocus 0 \
-        -command [callback on_style_italic] \
+        -command [callback on_style italic] \
         -image [ui::icon format-text-italic.svg $::ICON_SIZE]
     $tip .mf.tb.style_italic "Style Italic"
+    ttk::button .mf.tb.style_underline -style Toolbutton -takefocus 0 \
+        -command [callback on_style ul] \
+        -image [ui::icon format-text-underline.svg $::ICON_SIZE]
+    $tip .mf.tb.style_underline "Style Underline"
     ttk::button .mf.tb.style_highlight -style Toolbutton -takefocus 0 \
-        -command [callback on_style_highlight] \
+        -command [callback on_style highlight] \
         -image [ui::icon draw-highlight.svg $::ICON_SIZE]
     $tip .mf.tb.style_highlight "Style Highlight"
+    ttk::button .mf.tb.style_strike -style Toolbutton -takefocus 0 \
+        -command [callback on_style strike] \
+        -image [ui::icon format-text-strikethrough.svg $::ICON_SIZE]
+    $tip .mf.tb.style_strike "Style Strikeout"
+    ttk::button .mf.tb.style_sub -style Toolbutton -takefocus 0 \
+        -command [callback on_style sub] \
+        -image [ui::icon subscript.svg $::ICON_SIZE]
+    $tip .mf.tb.style_bold "Style Subscript"
+    ttk::button .mf.tb.style_sup -style Toolbutton -takefocus 0 \
+        -command [callback on_style sup] \
+        -image [ui::icon superscript.svg $::ICON_SIZE]
+    $tip .mf.tb.style_bold "Style Superscript"
+    ttk::button .mf.tb.style_center -style Toolbutton -takefocus 0 \
+        -command [callback on_align center] \
+        -image [ui::icon format-justify-center.svg $::ICON_SIZE]
+    $tip .mf.tb.style_center "Center Align"
+    ttk::button .mf.tb.style_right -style Toolbutton -takefocus 0 \
+        -command [callback on_align right] \
+        -image [ui::icon format-justify-right.svg $::ICON_SIZE]
+    $tip .mf.tb.style_right "Right Align"
     menu .mf.tb.colors_menu
     ttk::menubutton .mf.tb.style_colors -style Toolbutton -takefocus 0 \
         -menu .mf.tb.colors_menu \
@@ -245,22 +290,32 @@ oo::define App method make_toolbars_layout {} {
         -fill y {*}$opts
     pack .mf.tb.style_bold -side left
     pack .mf.tb.style_italic -side left
+    pack .mf.tb.style_underline -side left
+    pack .mf.tb.style_highlight -side left
+    pack .mf.tb.style_strike -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
-    pack .mf.tb.style_highlight -side left
+    pack .mf.tb.style_sub -side left
+    pack .mf.tb.style_sup -side left
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
+        -fill y {*}$opts
+    pack .mf.tb.style_center -side left
+    pack .mf.tb.style_right -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
     pack .mf.tb.style_colors -side left
 }
 
 oo::define App method make_bindings {} {
-    bind . <Control-b> [callback on_style_bold]
+    bind . <Control-b> [callback on_style bold]
     # Auto: Control-c Copy
-    bind . <Control-i> [callback on_style_italic]
+    bind . <Control-e> [callback on_align center]
+    bind . <Control-i> [callback on_style italic]
     bind . <Control-n> [callback on_file_new]
     bind . <Control-o> [callback on_file_open]
     bind . <Control-p> [callback on_file_print]
     bind . <Control-q> [callback on_quit]
+    bind . <Control-r> [callback on_align right]
     bind . <Control-s> [callback on_file_save]
     # Auto: Control-v Paste
     # Auto: Control-x Cut

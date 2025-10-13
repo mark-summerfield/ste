@@ -52,21 +52,17 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
     set FrameName tf#[incr N] ;# unique
     ttk::frame $parent.$FrameName
     set Text [text $parent.$FrameName.txt -undo true -wrap word]
+    my MakeBindings
+    my make_fonts $family $size
+    my make_tags
+    ui::scrollize $parent.$FrameName txt vertical
+}
+
+oo::define TextEdit method MakeBindings {} {
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
     bind $Text <Double-1> [callback on_double_click]
     bind $Text <Return> [callback on_return]
-    if {$family eq ""} {
-        set family [font configure TkDefaultFont -family]
-    }
-    if {!$size} {
-        set size [expr {1 + [font configure TkDefaultFont -size]}]
-    }
-    set tab [expr {4 * [font measure Sans n]}]
-    my configure -tabstyle wordprocessor -tabs "$tab left"
-    my make_fonts $family $size
-    my make_tags
-    ui::scrollize $parent.$FrameName txt vertical
 }
 
 oo::define TextEdit classmethod filetypes {} {
@@ -171,8 +167,36 @@ oo::define TextEdit method apply_style_to {indexes style} {
             $Text tag remove italic {*}$indexes
         } elseif {$style eq "highlight" && "highlight" in $styles} {
             $Text tag remove highlight {*}$indexes
+        } elseif {$style eq "sub" && "sub" in $styles} {
+            $Text tag remove sub {*}$indexes
+        } elseif {$style eq "sup" && "sup" in $styles} {
+            $Text tag remove sup {*}$indexes
+        } elseif {$style eq "ul" && "ul" in $styles} {
+            $Text tag remove ul {*}$indexes
+        } elseif {$style eq "strike" && "strike" in $styles} {
+            $Text tag remove strike {*}$indexes
         } else {
             $Text tag add $style {*}$indexes
+        }
+        $Text edit modified true
+    }
+}
+
+oo::define TextEdit method apply_align align {
+    set i [$Text index "insert linestart"]
+    set j [$Text index "insert lineend"]
+    my apply_align_to [list $i $j] $align
+}
+
+oo::define TextEdit method apply_align_to {indexes align} {
+    if {$indexes ne ""} {
+        set styles [$Text tag names [lindex $indexes 0]]
+        if {$align eq "center" && "center" in $styles} {
+            $Text tag remove center {*}$indexes
+        } elseif {$align eq "right" && "right" in $styles} {
+            $Text tag remove right {*}$indexes
+        } else {
+            $Text tag add $align {*}$indexes
         }
         $Text edit modified true
     }
@@ -198,16 +222,25 @@ oo::define TextEdit method make_fonts {family size} {
         catch { font delete $name }
     }
     font create Sans -family $family -size $size
+    font create Small -family $family \
+        -size [expr {int(round($size * 0.75))}]
     font create Bold -family $family -size $size -weight bold
     font create Italic -family $family -size $size -slant italic
     font create BoldItalic -family $family -size $size -weight bold \
         -slant italic
-    $Text configure -font Sans
+    set tab [expr {4 * [font measure Sans n]}]
+    $Text configure -font Sans -tabstyle wordprocessor -tabs "$tab left"
 }
 
 oo::define TextEdit method make_tags {} {
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
+    $Text tag configure sub -font Small -offset -3p
+    $Text tag configure sup -font Small -offset 3p
+    $Text tag configure ul -underline true
+    $Text tag configure strike -overstrike true -overstrikefg #FF1A1A
+    $Text tag configure center -justify center
+    $Text tag configure right -justify right
     $Text tag configure url -underline true -underlinefg #FF8C00 ;# orange
     $Text tag configure bold -font Bold
     $Text tag configure italic -font Italic

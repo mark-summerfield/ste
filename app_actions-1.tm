@@ -134,14 +134,10 @@ oo::define App method on_edit_ins_chr {} {
     }
 }
 
-oo::define App method on_style_bold {} { $ATextEdit apply_style bold }
-
-oo::define App method on_style_italic {} { $ATextEdit apply_style italic }
-
-oo::define App method on_style_highlight {} {
-    $ATextEdit apply_style highlight
-}
+oo::define App method on_style style { $ATextEdit apply_style $style }
 
 oo::define App method on_style_color color {
     $ATextEdit apply_color $color
 }
+
+oo::define App method on_align align { $ATextEdit apply_align $align }

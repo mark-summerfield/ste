@@ -109,6 +109,11 @@ oo::define App method make_style_menu {} {
     .menu.style add command -command [callback on_style ul] \
         -label Underline -underline 0 -compound left \
         -image [ui::icon format-text-underline.svg $::MENU_ICON_SIZE]
+    menu .menu.style.colors
+    .menu.style add cascade -menu .menu.style.colors -label Color \
+        -underline 1 -compound left \
+        -image [ui::icon color.svg $::MENU_ICON_SIZE]
+    my make_color_menu .menu.style.colors
     .menu.style add command -command [callback on_style highlight] \
         -label Highlight -underline 0 -compound left \
         -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
@@ -130,11 +135,6 @@ oo::define App method make_style_menu {} {
         -label "Right Align" -underline 0 -compound left \
         -image [ui::icon format-justify-right.svg $::MENU_ICON_SIZE]
     .menu.style add separator
-    menu .menu.style.colors
-    .menu.style add cascade -menu .menu.style.colors -label Color \
-        -underline 1 -compound left \
-        -image [ui::icon color.svg $::MENU_ICON_SIZE]
-    my make_color_menu .menu.style.colors
     # TODO 
     # List
     #   Bulleted 1
@@ -222,6 +222,12 @@ oo::define App method make_style_toolbar {} {
     ttk::button .mf.tb.style_highlight -style Toolbutton -takefocus 0 \
         -command [callback on_style highlight] \
         -image [ui::icon draw-highlight.svg $::ICON_SIZE]
+    menu .mf.tb.colors_menu
+    ttk::menubutton .mf.tb.style_colors -style Toolbutton -takefocus 0 \
+        -menu .mf.tb.colors_menu \
+        -image [ui::icon color-menu.svg $::ICON_SIZE]
+    $tip .mf.tb.style_colors "Style Color"
+    my make_color_menu .mf.tb.colors_menu
     $tip .mf.tb.style_highlight "Style Highlight"
     ttk::button .mf.tb.style_strike -style Toolbutton -takefocus 0 \
         -command [callback on_style strike] \
@@ -243,12 +249,6 @@ oo::define App method make_style_toolbar {} {
         -command [callback on_align right] \
         -image [ui::icon format-justify-right.svg $::ICON_SIZE]
     $tip .mf.tb.style_right "Right Align"
-    menu .mf.tb.colors_menu
-    ttk::menubutton .mf.tb.style_colors -style Toolbutton -takefocus 0 \
-        -menu .mf.tb.colors_menu \
-        -image [ui::icon color-menu.svg $::ICON_SIZE]
-    $tip .mf.tb.style_colors "Style Color"
-    my make_color_menu .mf.tb.colors_menu
 }
 
 oo::define App method make_widgets {} {
@@ -292,6 +292,7 @@ oo::define App method make_toolbars_layout {} {
     pack .mf.tb.style_italic -side left
     pack .mf.tb.style_underline -side left
     pack .mf.tb.style_highlight -side left
+    pack .mf.tb.style_colors -side left
     pack .mf.tb.style_strike -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
@@ -301,9 +302,6 @@ oo::define App method make_toolbars_layout {} {
         -fill y {*}$opts
     pack .mf.tb.style_center -side left
     pack .mf.tb.style_right -side left
-    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
-        -fill y {*}$opts
-    pack .mf.tb.style_colors -side left
 }
 
 oo::define App method make_bindings {} {

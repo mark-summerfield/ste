@@ -23,7 +23,7 @@ oo::define MaybeSaveForm constructor {reply title body_text} {
     my make_widgets $title $body_text
     my make_layout
     my make_bindings
-    next .maybe_save_form [callback on_cancel]
+    next .maybe_save_form [callback on_done cancel]
     my show_modal .maybe_save_form.frame.save_button
 }
 

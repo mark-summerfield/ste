@@ -6,6 +6,7 @@
 package require html 1
 package require ntext 1
 package require textutil
+package require util
 
 oo::class create TextEdit {
     variable FrameName
@@ -53,6 +54,7 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
     set Text [text $parent.$FrameName.txt -undo true -wrap word]
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
+    bind $Text <Double-1> [callback on_double_click]
     if {$family eq ""} {
         set family [font configure TkDefaultFont -family]
     }
@@ -123,6 +125,17 @@ oo::define TextEdit method selected {} {
                      [$Text index "insert wordend"]"
     }
     return $indexes
+}
+
+oo::define TextEdit method get_whole_word {} {
+    set a [$Text index "insert linestart"]
+    set b [$Text index "insert lineend"]
+    set c [$Text index "insert wordstart"]
+    set i [$Text search -backwards -exact " " $c "$a -1 char"]
+    if {$i eq ""} { set i $c }
+    set j [$Text search -exact " " insert "$b +1 char"]
+    if {$j eq ""} { set j [$Text index "insert wordend"] }
+    string trim [$Text get $i $j]
 }
 
 oo::define TextEdit method apply_style style {
@@ -275,4 +288,14 @@ oo::define TextEdit method on_ctrl_bs {} {
     set x [$Text index "$i wordstart"]
     set y [$Text index "$x wordend"]
     $Text delete $x $y
+}
+
+oo::define TextEdit method on_double_click {} {
+    set url [my get_whole_word]
+    if {[string match ~* $url]} {
+        set url file://[file home][string range $url 1 end]
+    }
+    if {[regexp {^(?:file|https?)://} $url]} {
+        util::open_url $url
+    }
 }

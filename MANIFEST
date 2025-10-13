@@ -1,6 +1,3 @@
-# TODO make links (incl. local files) work: autoexec_ok xopen...?
-#   look in manpager & docs/search for webbrowser launch Tcl, Tk, Tcllib,
-#   Tklib
 # TODO bullet item (bindent[12] + • ) | (nindent[1-2] + 1.) & HTML export
 # - Add support for (including for exports where possible):
 #   . {sub,super}script
@@ -22,8 +19,6 @@ globals-1.tm # VERSION
 config-1.tm
 config_form-1.tm
 
-test_textedit.tcl
-
 ref-1.tm
 util-1.tm
 about_form-1.tm
@@ -31,6 +26,8 @@ abstract_form-1.tm
 message_form-1.tm
 maybe_save_form-1.tm
 ui-1.tm
+
+README.md
 
 st.sh
 

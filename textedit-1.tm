@@ -300,6 +300,19 @@ oo::define TextEdit method on_ctrl_bs {} {
     $Text delete $x $y
 }
 
+oo::define TextEdit method on_return {} {
+    set i [$Text index "insert -1 char"]
+    set i [$Text index "$i linestart"]
+    set line [$Text get $i "$i lineend"]
+    regexp {^\s+} $line ws
+    if {[info exists ws] && $ws ne ""} {
+        $Text insert insert \n${ws}
+    } else {
+        $Text insert insert \n
+    }
+    return -code break
+}
+
 oo::define TextEdit method on_double_click {} {
     set url [my get_whole_word]
     if {[string match ~* $url]} {
@@ -309,11 +322,4 @@ oo::define TextEdit method on_double_click {} {
         my highlight_urls
         util::open_url $url
     }
-}
-
-oo::define TextEdit method on_return {} {
-    set i [$Text index "insert -1 char"]
-    set i [$Text index "$i linestart"]
-    set line [$Text get $i "$i lineend"]
-    puts "on_return='$line'"
 }

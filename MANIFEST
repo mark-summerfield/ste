@@ -1,4 +1,3 @@
-# TODO preserve indent on Enter
 # TODO Add support for (including for exports where possible):
 #   . {sub,super}script
 #   . underline

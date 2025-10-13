@@ -1,5 +1,4 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
-################################################################
 
 package require abstract_form
 package require ui
@@ -8,15 +7,14 @@ oo::class create MessageForm { superclass AbstractForm }
 
 # kind must be one of: info warning error
 
-oo::define MessageForm classmethod show {title body_text \
-        {button_text OK} {kind info}} {
+oo::define MessageForm classmethod show {title body_text {button_text OK} \
+        {kind info}} {
     set form [MessageForm new $title $body_text $button_text \
                 $kind]
     tkwait window .message_form
 }
 
-oo::define MessageForm constructor {title body_text \
-        button_text kind} {
+oo::define MessageForm constructor {title body_text button_text kind} {
     my make_widgets $title $body_text $button_text $kind
     my make_layout
     my make_bindings $button_text
@@ -24,8 +22,8 @@ oo::define MessageForm constructor {title body_text \
     my show_modal .message_form.the_button
 }
 
-oo::define MessageForm method make_widgets {title body_text \
-        button_text kind} {
+oo::define MessageForm method make_widgets {title body_text button_text \
+        kind} {
     if {[info exists ::ICON_SIZE]} {
         set size $::ICON_SIZE
     } else {
@@ -43,9 +41,8 @@ oo::define MessageForm method make_widgets {title body_text \
     ttk::label .message_form.frame.label -text $body_text \
         -background $color -compound left \
         -image [ui::icon dialog-$kind.svg [expr {2 * $size}]]
-    ttk::button .message_form.frame.the_button \
-        -text $button_text -underline 0 -compound left \
-        -command [callback on_done] \
+    ttk::button .message_form.frame.the_button -text $button_text \
+        -underline 0 -compound left -command [callback on_done] \
         -image [ui::icon close.svg $size]
 }
 
@@ -60,8 +57,7 @@ oo::define MessageForm method make_bindings kind {
     bind .message_form <Escape> [callback on_done]
     bind .message_form <Return> [callback on_done]
     bind .message_form \
-        <Alt-[string tolower [string index $kind 0]]> \
-        [callback on_done]
+        <Alt-[string tolower [string index $kind 0]]> [callback on_done]
 }
 
 oo::define MessageForm method on_done {} { my delete }

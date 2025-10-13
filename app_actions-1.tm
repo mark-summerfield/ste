@@ -4,6 +4,7 @@ package require about_form
 package require config
 package require config_form
 package require ins_chr_form
+package require maybe_save_form
 package require ref
 
 oo::define App method on_file_new {} {
@@ -99,8 +100,12 @@ oo::define App method on_about {} {
 
 oo::define App method on_quit {} {
     if {[[$ATextEdit textedit] edit modified]} {
-        # TODO prompt [Save] [Don't Save] [Cancel]
-        my on_file_save
+        set reply [MaybeSaveForm show "[tk appname] — Unsaved Changes" \
+            "Save unsaved changes?"]
+        switch $reply {
+            cancel { return }
+            save { my on_file_save }
+        }
     }
     set config [Config new]
     $config save [file normalize $Filename]

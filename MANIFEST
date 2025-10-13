@@ -1,9 +1,3 @@
-# TODO test_textedit-1.tm: round-trip {de}serialize using .tktz
-# TODO copy yes_no_form-1.tm to maybe_save-form-1.tm
-#   [Save] [Don't Save] [Cancel]
-#   <Enter>
-#   <Alt-s> <Alt-d>     <Escape>
-# TODO use the yes_no_form in on_quit if {[$ATextEdit modified]} ...
 # TODO make links (incl. local files) work: autoexec_ok xopen...?
 #   look in manpager & docs/search for webbrowser launch Tcl, Tk, Tcllib,
 #   Tklib
@@ -28,11 +22,14 @@ globals-1.tm # VERSION
 config-1.tm
 config_form-1.tm
 
+test_textedit.tcl
+
 ref-1.tm
 util-1.tm
 about_form-1.tm
 abstract_form-1.tm
 message_form-1.tm
+maybe_save_form-1.tm
 ui-1.tm
 
 st.sh

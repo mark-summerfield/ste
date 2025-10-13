@@ -1,5 +1,4 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
-################################################################
 
 package require autoscroll 1
 
@@ -9,8 +8,7 @@ proc ui::wishinit {} {
     wm withdraw .
     option add *tearOff 0
     ttk::style theme use clam
-    set ::LINEHEIGHT [expr {[font metrics TkDefaultFont \
-                        -linespace] * 1.5}]
+    set ::LINEHEIGHT [expr {[font metrics TkDefaultFont -linespace] * 1.5}]
     ttk::style configure Treeview -rowheight $::LINEHEIGHT
     ttk::style configure Treeview.Heading -font TkDefaultFont
     ttk::style configure TCheckbutton -indicatorsize \
@@ -37,16 +35,14 @@ proc ui::icon {svg {width 0}} {
 proc ui::scrollize {frame name which} {
     grid $frame.$name -row 0 -column 0 -sticky news
     if {$which eq "vertical" || $which eq "both"} {
-        $frame.$name configure \
-            -yscrollcommand "$frame.scrolly set"
+        $frame.$name configure -yscrollcommand "$frame.scrolly set"
         ttk::scrollbar $frame.scrolly -orient vertical \
             -command "$frame.${name} yview"
         grid $frame.scrolly -row 0 -column 1 -sticky ns
         autoscroll::autoscroll $frame.scrolly
     }
     if {$which eq "horizontal" || $which eq "both"} {
-        $frame.$name configure \
-            -xscrollcommand "$frame.scrollx set"
+        $frame.$name configure -xscrollcommand "$frame.scrollx set"
         ttk::scrollbar $frame.scrollx -orient horizontal \
             -command "$frame.${name} xview"
         grid $frame.scrollx -row 1 -column 0 -sticky we

@@ -196,6 +196,11 @@ oo::define TextEdit method apply_align_to {indexes align} {
         } elseif {$align eq "right" && "right" in $styles} {
             $Text tag remove right {*}$indexes
         } else {
+            if {$align eq "center" && "right" in $styles} {
+                $Text tag remove right {*}$indexes
+            } elseif {$align eq "right" && "center" in $styles} {
+                $Text tag remove center {*}$indexes
+            }
             $Text tag add $align {*}$indexes
         }
         $Text edit modified true

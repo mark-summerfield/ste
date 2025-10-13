@@ -53,7 +53,22 @@ oo::define TextEdit method as_html filename {
         lappend out [my HtmlOff $value]
     }
     lappend out "\n</p>\n</body>\n</html>\n"
+    set out [my EnableUrls $out]
     join $out ""
+}
+
+oo::define TextEdit method EnableUrls out {
+    for {set i 0} {$i < [llength $out]} {incr i} {
+        set item [lindex $out $i]
+        if {[string match ~* $item]} {
+            set item file://[file home][string range $item 1 end]
+        }
+        if {[regexp {^(?:file|https?)://} $item]} {
+            set item "<a href=\"$item\">$item</a>"
+            ledit out $i $i $item
+        }
+    }
+    return $out
 }
 
 oo::define TextEdit method HtmlOn tag {
@@ -69,9 +84,17 @@ oo::define TextEdit method HtmlOn tag {
         listindent2 { return "<div style=\"text-indent: 4em;\">" }
         listindent3 { return "<div style=\"text-indent: 6em;\">" }
         NtextTab { return "<br>" }
+        url {
+            return "<span style=\"text-decoration: underline;\
+                text-decoration-color: #FF8C00\">"
+        }
         default {
             set color [dict getdef $COLOR_FOR_TAG $tag ""]
-            if {$color ne ""} { return "<span style=\"color: $color;\">" }
+            if {$color ne ""} {
+                return "<span style=\"color: $color;\">"
+            } else {
+                puts "unhandled tag '$tag'"
+            }
         }
     }
 }
@@ -86,6 +109,7 @@ oo::define TextEdit method HtmlOff tag {
         listindent2 { return </div> }
         listindent3 { return </div> }
         NtextTab { return "" }
+        url { return </span> }
         default { return </span> }
     }
 }

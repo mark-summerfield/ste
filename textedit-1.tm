@@ -55,6 +55,7 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
     bind $Text <Double-1> [callback on_double_click]
+    bind $Text <Return> [callback on_return]
     if {$family eq ""} {
         set family [font configure TkDefaultFont -family]
     }
@@ -98,7 +99,15 @@ oo::define TextEdit method clear {} {
     $Text edit reset
 }
 
+oo::define TextEdit method highlight_urls {} {
+    foreach i [$Text search -all -regexp {(?:https?://|~/)} 1.0] {
+        set j [$Text search -regexp {[\s>]} $i]
+        $Text tag add url $i $j
+    }
+}
+
 oo::define TextEdit method after_load {} {
+    my highlight_urls
     $Text edit modified false
     $Text edit reset
     $Text see insert
@@ -199,6 +208,7 @@ oo::define TextEdit method make_fonts {family size} {
 oo::define TextEdit method make_tags {} {
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
+    $Text tag configure url -underline true -underlinefg #FF8C00 ;# orange
     $Text tag configure bold -font Bold
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
@@ -296,6 +306,14 @@ oo::define TextEdit method on_double_click {} {
         set url file://[file home][string range $url 1 end]
     }
     if {[regexp {^(?:file|https?)://} $url]} {
+        my highlight_urls
         util::open_url $url
     }
+}
+
+oo::define TextEdit method on_return {} {
+    set i [$Text index "insert -1 char"]
+    set i [$Text index "$i linestart"]
+    set line [$Text get $i "$i lineend"]
+    puts "on_return='$line'"
 }

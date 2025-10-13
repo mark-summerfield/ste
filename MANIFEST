@@ -1,10 +1,10 @@
-# TODO bullet item (bindent[12] + • ) | (nindent[1-2] + 1.) & HTML export
-# - Add support for (including for exports where possible):
+# TODO preserve indent on Enter
+# TODO Add support for (including for exports where possible):
 #   . {sub,super}script
 #   . underline
 #   . strikethrough
 #   . alignment (left, center, right)
-# TODO preserve indent on Enter
+# TODO bullet item (bindent[12] + • ) | (nindent[1-2] + 1.) & HTML export
 
 ste.tk
 app-1.tm

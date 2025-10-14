@@ -50,12 +50,13 @@ oo::define TextEdit initialize {
 
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
     set FrameName tf#[regsub -all :+ [self] _] ;# unique
-    ttk::frame $parent.$FrameName
-    set Text [text $parent.$FrameName.txt -undo true -wrap word]
+    if {![string match *. $parent]} { set parent $parent. }
+    ttk::frame $parent$FrameName
+    set Text [text $parent$FrameName.txt -undo true -wrap word]
     my MakeBindings
     my make_fonts $family $size
     my make_tags
-    ui::scrollize $parent.$FrameName txt vertical
+    ui::scrollize $parent$FrameName txt vertical
 }
 
 oo::define TextEdit method MakeBindings {} {

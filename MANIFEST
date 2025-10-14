@@ -1,5 +1,3 @@
-# TODO bullet item (bindent[12] + • ) | (nindent[1-2] + 1.) & HTML export
-
 ste.tk
 app-1.tm
 app_make-1.tm
@@ -26,6 +24,8 @@ README.md
 st.sh
 
 # NOTE ideas:
+# - Create 3 separate toolbars: File Edit Style so users can move/show/hide
+#   them
 # - Add status indicators: [nnn Lines][MOD]
 
 # vim: syn=yaml

@@ -128,19 +128,15 @@ oo::define App method make_style_menu {} {
         -label Superscript -underline 2 -compound left \
         -image [ui::icon superscript.svg $::MENU_ICON_SIZE]
     .menu.style add separator
+    .menu.style add command -command [callback on_align left] \
+        -label "Left Align" -underline 0 -compound left \
+        -image [ui::icon format-justify-left.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_align center] \
         -label "Center Align" -underline 0 -compound left \
         -image [ui::icon format-justify-center.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_align right] \
         -label "Right Align" -underline 0 -compound left \
         -image [ui::icon format-justify-right.svg $::MENU_ICON_SIZE]
-    .menu.style add separator
-    # TODO 
-    # List
-    #   Bulleted 1
-    #   Bulleted 2
-    #   Numbered 1
-    #   Numbered 2
 }
 
 oo::define App method make_color_menu menu_name {
@@ -236,11 +232,15 @@ oo::define App method make_style_toolbar {} {
     ttk::button .mf.tb.style_sub -style Toolbutton -takefocus 0 \
         -command [callback on_style sub] \
         -image [ui::icon subscript.svg $::ICON_SIZE]
-    $tip .mf.tb.style_bold "Style Subscript"
+    $tip .mf.tb.style_sub "Style Subscript"
     ttk::button .mf.tb.style_sup -style Toolbutton -takefocus 0 \
         -command [callback on_style sup] \
         -image [ui::icon superscript.svg $::ICON_SIZE]
-    $tip .mf.tb.style_bold "Style Superscript"
+    $tip .mf.tb.style_sup "Style Superscript"
+    ttk::button .mf.tb.style_left -style Toolbutton -takefocus 0 \
+        -command [callback on_align left] \
+        -image [ui::icon format-justify-left.svg $::ICON_SIZE]
+    $tip .mf.tb.style_left "Left Align"
     ttk::button .mf.tb.style_center -style Toolbutton -takefocus 0 \
         -command [callback on_align center] \
         -image [ui::icon format-justify-center.svg $::ICON_SIZE]
@@ -300,6 +300,7 @@ oo::define App method make_toolbars_layout {} {
     pack .mf.tb.style_sup -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
+    pack .mf.tb.style_left -side left
     pack .mf.tb.style_center -side left
     pack .mf.tb.style_right -side left
 }
@@ -309,6 +310,7 @@ oo::define App method make_bindings {} {
     # Auto: Control-c Copy
     bind . <Control-e> [callback on_align center]
     bind . <Control-i> [callback on_style italic]
+    bind . <Control-l> [callback on_align left]
     bind . <Control-n> [callback on_file_new]
     bind . <Control-o> [callback on_file_open]
     bind . <Control-p> [callback on_file_print]

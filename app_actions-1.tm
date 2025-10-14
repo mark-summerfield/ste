@@ -128,6 +128,8 @@ oo::define App method on_edit_ins_chr {} {
         if {$ch eq "Q"} {
             $ATextEdit insert insert “”
             $ATextEdit mark set insert "insert -1 char"
+        } elseif {$ch eq "•"} {
+            $ATextEdit insert insert "• "
         } else {
             $ATextEdit insert insert $ch
         }

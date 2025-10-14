@@ -192,18 +192,23 @@ oo::define TextEdit method apply_align align {
 
 oo::define TextEdit method apply_align_to {indexes align} {
     if {$indexes ne ""} {
-        set styles [$Text tag names [lindex $indexes 0]]
-        if {$align eq "center" && "center" in $styles} {
+        if {$align eq "left"} {
             $Text tag remove center {*}$indexes
-        } elseif {$align eq "right" && "right" in $styles} {
             $Text tag remove right {*}$indexes
         } else {
-            if {$align eq "center" && "right" in $styles} {
-                $Text tag remove right {*}$indexes
-            } elseif {$align eq "right" && "center" in $styles} {
+            set styles [$Text tag names [lindex $indexes 0]]
+            if {$align eq "center" && "center" in $styles} {
                 $Text tag remove center {*}$indexes
+            } elseif {$align eq "right" && "right" in $styles} {
+                $Text tag remove right {*}$indexes
+            } else {
+                if {$align eq "center" && "right" in $styles} {
+                    $Text tag remove right {*}$indexes
+                } elseif {$align eq "right" && "center" in $styles} {
+                    $Text tag remove center {*}$indexes
+                }
+                $Text tag add $align {*}$indexes
             }
-            $Text tag add $align {*}$indexes
         }
         $Text edit modified true
     }
@@ -257,14 +262,6 @@ oo::define TextEdit method make_tags {} {
     dict for {key value} $COLOR_FOR_TAG {
         $Text tag configure $key -foreground $value
     }
-    const BWIDTH [font measure Sans "• "]
-    const BWIDTH2 [expr {$BWIDTH * 2}]
-    const NWIDTH [font measure Sans "9. "]
-    const NWIDTH2 [expr {$NWIDTH * 2}]
-    $Text tag configure bindent1 -lmargin1 0 -lmargin2 $BWIDTH
-    $Text tag configure bindent2 -lmargin1 $BWIDTH -lmargin2 $BWIDTH2
-    $Text tag configure nindent1 -lmargin1 0 -lmargin2 $NWIDTH
-    $Text tag configure nindent2 -lmargin1 $NWIDTH -lmargin2 $NWIDTH2
 }
 
 oo::define TextEdit method load txt {
@@ -343,12 +340,16 @@ oo::define TextEdit method on_ctrl_bs {} {
 oo::define TextEdit method on_return {} {
     set i [$Text index "insert -1 char"]
     set i [$Text index "$i linestart"]
+    set tab [expr {"NtextTab" in [$Text tag names $i] ? "NtextTab" : ""}]
     set line [$Text get $i "$i lineend"]
+    regexp {^\s*•\s+} $line bullet
     regexp {^\s+} $line ws
-    if {[info exists ws] && $ws ne ""} {
+    if {[info exists bullet] && $bullet ne ""} {
+        $Text insert insert \n$bullet $tab
+    } elseif {[info exists ws] && $ws ne ""} {
         $Text insert insert \n${ws}
     } else {
-        $Text insert insert \n
+        $Text insert insert \n $tab
     }
     return -code break
 }

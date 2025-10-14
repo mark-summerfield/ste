@@ -14,7 +14,6 @@ oo::class create TextEdit {
 }
 
 oo::define TextEdit initialize {
-    variable N 0
     variable STE_PREFIX
     variable FILETYPES
     variable HIGHLIGHT_COLOR
@@ -50,8 +49,7 @@ oo::define TextEdit initialize {
 }
 
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
-    classvariable N
-    set FrameName tf#[incr N] ;# unique
+    set FrameName tf#[regsub -all :+ [self] _] ;# unique
     ttk::frame $parent.$FrameName
     set Text [text $parent.$FrameName.txt -undo true -wrap word]
     my MakeBindings

@@ -53,11 +53,13 @@ oo::define TextEdit method as_html filename {
         lappend out [my HtmlOff $value]
     }
     lappend out "\n</p>\n</body>\n</html>\n"
-    my EnableUrls out
-    join $out ""
+    my FixupItems out
+    set lines [split [join $out ""] \n]
+    my FixupLines lines
+    join $lines \n
 }
 
-oo::define TextEdit method EnableUrls out {
+oo::define TextEdit method FixupItems out {
     upvar 1 $out out_
     for {set i 0} {$i < [llength $out_]} {incr i} {
         set item [lindex $out_ $i]
@@ -65,8 +67,23 @@ oo::define TextEdit method EnableUrls out {
             set item file://[file home][string range $item 1 end]
         }
         if {[regexp {^(?:file|https?)://} $item]} {
-            set item "<a href=\"$item\">$item</a>"
-            ledit out_ $i $i $item
+            ledit out_ $i $i "<a href=\"$item\">$item</a>"
+        }
+        if {[regexp {^(?:&bull;|•|\d+[.]) } $item]} {
+            ledit out_ $i $i "<br>$item"
+        }
+        if {[regexp {^<br>(?:&nbsp;)+<br>&bull;} $item]} {
+            ledit out_ $i $i [regsub "<br>&bull;" $item "\\&bull;"]
+        }
+    }
+}
+
+oo::define TextEdit method FixupLines lines {
+    upvar 1 $lines lines_
+    for {set i 0} {$i < [llength $lines_]} {incr i} {
+        set line [lindex $lines_ $i]
+        if {[regexp {^<br>(?:&nbsp;)+<br>&bull;} $line]} {
+            ledit lines_ $i $i [regsub "<br>&bull;" $line "\\&bull;"]
         }
     }
 }
@@ -82,6 +99,7 @@ oo::define TextEdit method HtmlOn tag {
         italic { return <i> }
         highlight { return "<span style=\"background-color:\
             $HIGHLIGHT_COLOR;\">" }
+        left { return "" }
         NtextTab { return "<br>" }
         right { return "<div style=\"text-align: right;\">" }
         strike { return "<span style=\"text-decoration-line: line-through;\
@@ -111,6 +129,7 @@ oo::define TextEdit method HtmlOff tag {
         center { return </div> }
         italic { return </i> }
         highlight { return </span> }
+        left { return "" }
         NtextTab { return "" }
         right { return </div> }
         strike { return </span> }

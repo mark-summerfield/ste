@@ -12,6 +12,8 @@ oo::define App method on_file_new {} {
     set Filename ""
     $ATextEdit clear
     $ATextEdit focus
+    wm title . [tk appname]
+    my show_message "New file."
 }
 
 oo::define App method on_file_open {} {

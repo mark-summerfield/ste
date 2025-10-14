@@ -82,8 +82,10 @@ oo::define TextEdit method HtmlOn tag {
         italic { return <i> }
         highlight { return "<span style=\"background-color:\
             $HIGHLIGHT_COLOR;\">" }
-        listindent1 { return "<div style=\"text-indent: 2em;\">" }
-        listindent2 { return "<div style=\"text-indent: 4em;\">" }
+        bindent1 { return "<div style=\"text-indent: 2em;\">" }
+        bindent2 { return "<div style=\"text-indent: 4em;\">" }
+        nindent1 { return "<div style=\"text-indent: 3em;\">" }
+        nindent2 { return "<div style=\"text-indent: 6em;\">" }
         NtextTab { return "<br>" }
         right { return "<div style=\"text-align: right;\">" }
         strike { return "<span style=\"text-decoration-line: line-through;\
@@ -113,8 +115,8 @@ oo::define TextEdit method HtmlOff tag {
         center { return </div> }
         italic { return </i> }
         highlight { return </span> }
-        listindent1 { return </div> }
-        listindent2 { return </div> }
+        bindent1 - bindent2 { return </div> }
+        nindent1 - nindent2 { return </div> }
         NtextTab { return "" }
         right { return </div> }
         strike { return </span> }

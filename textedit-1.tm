@@ -257,15 +257,14 @@ oo::define TextEdit method make_tags {} {
     dict for {key value} $COLOR_FOR_TAG {
         $Text tag configure $key -foreground $value
     }
-    const WIDTH [font measure Sans "•. "]
-    set indent [font measure Sans "nnnn"]
-    # TODO redo
-    $Text tag configure listindent1 -lmargin1 0 -lmargin2 $WIDTH
-    $Text tag configure listindent2 -lmargin1 $indent \
-        -lmargin2 [expr {$indent + $WIDTH}]
-    set indent [expr {$indent * 2}]
-    $Text tag configure listindent3 -lmargin1 $indent \
-        -lmargin2 [expr {$indent + $WIDTH}]
+    const BWIDTH [font measure Sans "• "]
+    const BWIDTH2 [expr {$BWIDTH * 2}]
+    const NWIDTH [font measure Sans "9. "]
+    const NWIDTH2 [expr {$NWIDTH * 2}]
+    $Text tag configure bindent1 -lmargin1 0 -lmargin2 $BWIDTH
+    $Text tag configure bindent2 -lmargin1 $BWIDTH -lmargin2 $BWIDTH2
+    $Text tag configure nindent1 -lmargin1 0 -lmargin2 $NWIDTH
+    $Text tag configure nindent2 -lmargin1 $NWIDTH -lmargin2 $NWIDTH2
 }
 
 oo::define TextEdit method load txt {

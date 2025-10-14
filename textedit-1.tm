@@ -18,12 +18,14 @@ oo::define TextEdit initialize {
     variable STE_PREFIX
     variable FILETYPES
     variable HIGHLIGHT_COLOR
+    variable STRIKE_COLOR
     variable COLOR_FOR_TAG
 
     const STE_PREFIX STE1\n
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
         {{compressed tkt files} {.tktz}}}
-    const HIGHLIGHT_COLOR yellow ;# use "#FFE119" ?
+    const STRIKE_COLOR #FF8C00 ;# orange
+    const HIGHLIGHT_COLOR yellow
     ;# Any changes to COLOR_FOR_TAG must be reflected in App make_color_menu
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
@@ -238,6 +240,7 @@ oo::define TextEdit method make_fonts {family size} {
 }
 
 oo::define TextEdit method make_tags {} {
+    classvariable STRIKE_COLOR
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
     $Text tag configure sub -font Small -offset -3p
@@ -246,7 +249,7 @@ oo::define TextEdit method make_tags {} {
     $Text tag configure strike -overstrike true -overstrikefg #FF1A1A
     $Text tag configure center -justify center
     $Text tag configure right -justify right
-    $Text tag configure url -underline true -underlinefg #FF8C00 ;# orange
+    $Text tag configure url -underline true -underlinefg $STRIKE_COLOR
     $Text tag configure bold -font Bold
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic

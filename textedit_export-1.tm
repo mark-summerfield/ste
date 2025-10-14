@@ -53,37 +53,44 @@ oo::define TextEdit method as_html filename {
         lappend out [my HtmlOff $value]
     }
     lappend out "\n</p>\n</body>\n</html>\n"
-    set out [my EnableUrls $out]
+    my EnableUrls out
     join $out ""
 }
 
 oo::define TextEdit method EnableUrls out {
-    for {set i 0} {$i < [llength $out]} {incr i} {
-        set item [lindex $out $i]
+    upvar 1 $out out_
+    for {set i 0} {$i < [llength $out_]} {incr i} {
+        set item [lindex $out_ $i]
         if {[string match ~* $item]} {
             set item file://[file home][string range $item 1 end]
         }
         if {[regexp {^(?:file|https?)://} $item]} {
             set item "<a href=\"$item\">$item</a>"
-            ledit out $i $i $item
+            ledit out_ $i $i $item
         }
     }
-    return $out
 }
 
 oo::define TextEdit method HtmlOn tag {
+    classvariable STRIKE_COLOR
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
     switch $tag {
         bold { return <b> }
-        italic { return <i> }
         bolditalic { return <b><i> }
+        center { return "<div style=\"text-align: center;\">" }
+        italic { return <i> }
         highlight { return "<span style=\"background-color:\
             $HIGHLIGHT_COLOR;\">" }
         listindent1 { return "<div style=\"text-indent: 2em;\">" }
         listindent2 { return "<div style=\"text-indent: 4em;\">" }
-        listindent3 { return "<div style=\"text-indent: 6em;\">" }
         NtextTab { return "<br>" }
+        right { return "<div style=\"text-align: right;\">" }
+        strike { return "<span style=\"text-decoration-line: line-through;\
+            text-decoration-color: $STRIKE_COLOR\">" }
+        sub { return <sub> }
+        sup { return <sup> }
+        ul - underline { return <u> }
         url {
             return "<span style=\"text-decoration: underline;\
                 text-decoration-color: #FF8C00\">"
@@ -102,13 +109,18 @@ oo::define TextEdit method HtmlOn tag {
 oo::define TextEdit method HtmlOff tag {
     switch $tag {
         bold { return </b> }
-        italic { return </i> }
         bolditalic { return </i></b> }
+        center { return </div> }
+        italic { return </i> }
         highlight { return </span> }
         listindent1 { return </div> }
         listindent2 { return </div> }
-        listindent3 { return </div> }
         NtextTab { return "" }
+        right { return </div> }
+        strike { return </span> }
+        sub { return </sub> }
+        sup { return </sup> }
+        ul - underline { return </u> }
         url { return </span> }
         default { return </span> }
     }

@@ -2,7 +2,7 @@ ste.tk
 app-1.tm
 app_make-1.tm
 app_actions-1.tm
-app_support-1.tm
+app_support-1.tm # TODO import html
 misc-1.tm
 textedit-1.tm
 textedit_export-1.tm

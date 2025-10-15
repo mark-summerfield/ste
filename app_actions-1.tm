@@ -29,6 +29,18 @@ oo::define App method on_file_open {} {
     }
 }
 
+oo::define App method on_file_import_html {} {
+    my on_file_save
+    set dir [expr {$Filename eq "" ? [file home] \
+                                   : [file dirname $Filename]}]
+    const FILETYPES {{{HTML files} {.html}}}
+    set filename [tk_getOpenFile -initialdir $dir -filetypes $FILETYPES \
+            -title "[tk appname] — Open" -parent .]
+    if {$filename ne ""} {
+        my file_import_html $filename
+    }
+}
+
 oo::define App method on_file_import_text {} {
     my on_file_save
     set dir [expr {$Filename eq "" ? [file home] \

@@ -19,6 +19,7 @@ oo::define TextEdit initialize {
     variable HIGHLIGHT_COLOR
     variable STRIKE_COLOR
     variable COLOR_FOR_TAG
+    variable TAG_FOR_HTML_COLOR
 
     const STE_PREFIX STE1\n
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
@@ -46,6 +47,29 @@ oo::define TextEdit initialize {
         purple "#911EB4" \
         magenta "#F032E6" \
         ]
+    const TAG_FOR_HTML_COLOR [dict create \
+        "#000000" black \
+        "#800000" maroon \
+        "#AA6E28" brown \
+        "#808000" olive \
+        "#008080" teal \
+        "#000080" navy \
+        "#F58230" orange \
+        "#8A8A00" gold \
+        "#728420" lime \
+        "#008000" green \
+        "#268282" cyan \
+        "#0000FF" blue \
+        "#911EB4" purple \
+        "#800080" magenta \
+        "#808080" grey \
+        "#876773" pink \
+        "#665877" lavender \
+        "#5C8A69" lime \
+        "#77745D" brown \
+        "#8A7461" pink \
+        ]
+
 }
 
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
@@ -74,6 +98,11 @@ oo::define TextEdit classmethod filetypes {} {
 oo::define TextEdit classmethod colors {} {
     variable COLOR_FOR_TAG
     return $COLOR_FOR_TAG
+}
+
+oo::define TextEdit classmethod html_colors {} {
+    variable TAG_FOR_HTML_COLOR
+    return $TAG_FOR_HTML_COLOR
 }
 
 oo::define TextEdit method unknown {method_name args} {
@@ -138,7 +167,7 @@ oo::define TextEdit method get_whole_word {} {
     set b [$Text index "insert lineend"]
     set c [$Text index "insert wordstart"]
     set i [$Text search -backwards -exact " " $c "$a -1 char"]
-    if {$i eq ""} { set i $c }
+    if {$i eq ""} { set i $a }
     set j [$Text search -exact " " insert "$b +1 char"]
     if {$j eq ""} { set j [$Text index "insert wordend"] }
     string trim [$Text get $i $j]

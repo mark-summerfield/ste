@@ -40,9 +40,12 @@ oo::define App method make_file_menu {} {
     .menu.file add command -command [callback on_file_open] -label Open… \
         -underline 0 -accelerator Ctrl+O -compound left \
         -image [ui::icon document-open.svg $::MENU_ICON_SIZE]
+    .menu.file add command -command [callback on_file_import_html] \
+        -label "Import Html…" -underline 0 -compound left \
+        -image [ui::icon import-html.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_import_text] \
-        -label "Import Text…" -underline 0 -compound left \
-        -image [ui::icon import.svg $::MENU_ICON_SIZE]
+        -label "Import Text…" -underline 1 -compound left \
+        -image [ui::icon import-txt.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_save] -label Save \
         -underline 0 -accelerator Ctrl+S -compound left \
         -image [ui::icon document-save.svg $::MENU_ICON_SIZE]

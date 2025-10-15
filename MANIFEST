@@ -2,10 +2,11 @@ ste.tk
 app-1.tm
 app_make-1.tm
 app_actions-1.tm # TODO bindent1
-app_support-1.tm # TODO ...
+app_support-1.tm
 misc-1.tm
 textedit-1.tm # TODO bindent1
 textedit_export-1.tm
+textedit_import-1.tm # TODO ...
 ins_chr_form-1.tm
 globals-1.tm # VERSION
 config-1.tm

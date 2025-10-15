@@ -133,11 +133,12 @@ oo::define TextEdit method highlight_urls {} {
     }
 }
 
-oo::define TextEdit method after_load {} {
+oo::define TextEdit method after_load {{index insert}} {
     my highlight_urls
     $Text edit modified false
     $Text edit reset
-    $Text see insert
+    if {$index ne "insert"} { $Text mark set insert $index }
+    $Text see $index
 }
 
 oo::define TextEdit method maybe_undo {} {
@@ -294,12 +295,6 @@ oo::define TextEdit method make_tags {} {
     }
 }
 
-oo::define TextEdit method load txt {
-    my clear
-    $Text insert end $txt
-    my after_load
-}
-
 oo::define TextEdit method serialize {{file_format .ste}} {
     classvariable STE_PREFIX
     set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
@@ -343,8 +338,7 @@ oo::define TextEdit method deserialize {raw file_format} {
         set value [lpop pending]
         $Text tag add $value $tags($value) end
     }
-    $Text mark set insert $insert_index 
-    my after_load
+    my after_load $insert_index
 }
 
 oo::define TextEdit method GetTxtDump {raw file_format} {

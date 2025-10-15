@@ -143,6 +143,7 @@ oo::define App method on_edit_ins_chr {} {
             $ATextEdit insert insert “”
             $ATextEdit mark set insert "insert -1 char"
         } elseif {$ch eq "•"} {
+            # TODO apply bindent1
             $ATextEdit insert insert "• "
         } else {
             $ATextEdit insert insert $ch

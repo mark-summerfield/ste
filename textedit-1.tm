@@ -273,6 +273,7 @@ oo::define TextEdit method make_fonts {family size} {
     $Text configure -font Sans -tabstyle wordprocessor -tabs "$tab left"
 }
 
+# TODO bindent1 -lmargin2 measure "• "
 oo::define TextEdit method make_tags {} {
     classvariable STRIKE_COLOR
     classvariable HIGHLIGHT_COLOR

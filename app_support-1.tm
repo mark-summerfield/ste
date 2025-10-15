@@ -43,6 +43,7 @@ oo::define App method file_import_html filename {
 }
 
 # TODO: colors aren't working!
+# TODO: for li use bindent1
 # strike sub sup u center right + fix bold & italic → bolditalic
 oo::define App method HandleHtmlTag {tag slash param txt} {
     const TAG_FOR_HTML_COLOR [$ATextEdit html_colors]

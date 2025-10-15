@@ -42,7 +42,8 @@ oo::define App method file_import_html filename {
     my show_message "Opened '$filename' (will save as '$Filename')." long
 }
 
-# TODO: strike sub sup u center right + fix bold & italic → bolditalic
+# TODO: colors aren't working!
+# strike sub sup u center right + fix bold & italic → bolditalic
 oo::define App method HandleHtmlTag {tag slash param txt} {
     const TAG_FOR_HTML_COLOR [$ATextEdit html_colors]
     set txt [string trimright [htmlparse::mapEscapes $txt] \n]
@@ -71,20 +72,21 @@ oo::define App method HandleHtmlTag {tag slash param txt} {
                 if {[regexp {background-color:\s*yellow} $param]} {
                     if {$txt ne ""} { $ATextEdit insert end $txt highlight }
                     set highlight_index [$ATextEdit index end]
-                }
-                regexp {color:\s*(#[A-Fa-f0-9]+)} $param _ color
-                if {[info exists color]} {
-                    set color_tag [dict getdef $TAG_FOR_HTML_COLOR $color \
-                                   ""]
-                    if {$color_tag ne ""} {
-                        if {$txt ne ""} {
-                            $ATextEdit insert end $txt $color_tag
-                            set txt ""
+                } else {
+                    regexp {color:\s*(#[A-Fa-f0-9]+)} $param _ color
+                    if {[info exists color]} {
+                        set color_tag [dict getdef $TAG_FOR_HTML_COLOR \
+                                        [string toupper $color] ""]
+                        if {$color_tag ne ""} {
+                            if {$txt ne ""} {
+                                $ATextEdit insert end $txt $color_tag
+                                set txt ""
+                            }
+                            set color_index [$ATextEdit index end]
                         }
-                        set color_index [$ATextEdit index end]
                     }
+                    if {$txt ne ""} { $ATextEdit insert end $txt }
                 }
-                if {$txt ne ""} { $ATextEdit insert end $txt }
             }
             hmstart - html - head - title - body - meta - ul - ol - style {}
             default {

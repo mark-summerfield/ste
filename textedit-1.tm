@@ -88,6 +88,7 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
     bind $Text <Double-1> [callback on_double_click]
     bind $Text <Return> [callback on_return]
+    bind $Text <'> [callback on_single_quote]
 }
 
 oo::define TextEdit classmethod filetypes {} {
@@ -379,6 +380,11 @@ oo::define TextEdit method on_return {} {
     } else {
         $Text insert insert \n $tab
     }
+    return -code break
+}
+
+oo::define TextEdit method on_single_quote {} {
+    $Text insert insert ’
     return -code break
 }
 

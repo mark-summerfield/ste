@@ -143,8 +143,7 @@ oo::define App method on_edit_ins_chr {} {
             $ATextEdit insert insert “”
             $ATextEdit mark set insert "insert -1 char"
         } elseif {$ch eq "•"} {
-            # TODO apply bindent1
-            $ATextEdit insert insert "• "
+            my on_style_bullet_list
         } else {
             $ATextEdit insert insert $ch
         }
@@ -157,4 +156,19 @@ oo::define App method on_style_color color {
     $ATextEdit apply_color $color
 }
 
-oo::define App method on_align align { $ATextEdit apply_align $align }
+oo::define App method on_style_align align { $ATextEdit apply_align $align }
+
+oo::define App method on_style_bullet_list {} {
+    set start [$ATextEdit get "insert linestart" insert]
+    if {[regexp {^\S+} $start]} {
+        $ATextEdit insert insert "• "
+    } else {
+        # TODO
+        # get styles at insert
+        # set tag bindent1
+        # if bindent1 in styles set tag bindent2
+        # if bindent2 in styles return
+        # $ATextEdit insert insert "• " $tag
+        puts on_style_bullet_list
+    }
+}

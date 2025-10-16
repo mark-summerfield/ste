@@ -47,6 +47,7 @@ oo::define TextEdit initialize {
         purple "#911EB4" \
         magenta "#F032E6" \
         ]
+    # From most recent .nb2 format
     const TAG_FOR_HTML_COLOR [dict create \
         "#000000" black \
         "#800000" maroon \
@@ -274,7 +275,6 @@ oo::define TextEdit method make_fonts {family size} {
     $Text configure -font Sans -tabstyle wordprocessor -tabs "$tab left"
 }
 
-# TODO bindent1 -lmargin2 measure "• "
 oo::define TextEdit method make_tags {} {
     classvariable STRIKE_COLOR
     classvariable HIGHLIGHT_COLOR
@@ -290,6 +290,11 @@ oo::define TextEdit method make_tags {} {
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
     $Text tag configure highlight -background $HIGHLIGHT_COLOR
+    set width1 [font measure Sans "• "]
+    set width2 [font measure Sans "nnnn"]
+    $Text tag configure bindent1 -lmargin2 $width1
+    $Text tag configure bindent2 -lmargin1 $width2 \
+        -lmargin2 [expr {$width1 + $width2}]
     dict for {key value} $COLOR_FOR_TAG {
         $Text tag configure $key -foreground $value
     }

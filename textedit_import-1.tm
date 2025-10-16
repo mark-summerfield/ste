@@ -9,12 +9,16 @@ oo::define TextEdit method import_text txt {
 }
 
 oo::define TextEdit method import_html html {
+    set html [regsub -all {<b><i>|<i><b>} $html <bi>]
+    set html [regsub -all {</b></i>|</i></b>} $html </bi>]
     my clear
     htmlparse::parse -cmd [callback HandleHtmlTag] $html
     my after_load 1.0
 }
 
-# TODO: for li use bindent1
+# TODO:
+# bi
+# for li use bindent1
 # strike sub sup u center right + fix bold & italic → bolditalic
 oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
     classvariable COLOR_FOR_TAG

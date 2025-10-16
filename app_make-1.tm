@@ -132,13 +132,17 @@ oo::define App method make_style_menu {} {
         -label Superscript -underline 2 -compound left \
         -image [ui::icon superscript.svg $::MENU_ICON_SIZE]
     .menu.style add separator
-    .menu.style add command -command [callback on_align left] \
+    .menu.style add command -command [callback on_style_bullet_list] \
+        -label "Bullet List" -underline 4 -compound left \
+        -image [ui::icon bullet-list.svg $::MENU_ICON_SIZE]
+    .menu.style add separator
+    .menu.style add command -command [callback on_style_align left] \
         -label "Left Align" -underline 0 -compound left \
         -image [ui::icon format-justify-left.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_align center] \
+    .menu.style add command -command [callback on_style_align center] \
         -label "Center Align" -underline 0 -compound left \
         -image [ui::icon format-justify-center.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_align right] \
+    .menu.style add command -command [callback on_style_align right] \
         -label "Right Align" -underline 0 -compound left \
         -image [ui::icon format-justify-right.svg $::MENU_ICON_SIZE]
 }
@@ -241,16 +245,20 @@ oo::define App method make_style_toolbar {} {
         -command [callback on_style sup] \
         -image [ui::icon superscript.svg $::ICON_SIZE]
     $tip .mf.tb.style_sup "Style Superscript"
+    ttk::button .mf.tb.style_bullet -style Toolbutton -takefocus 0 \
+        -command [callback on_style_bullet_list] \
+        -image [ui::icon bullet-list.svg $::ICON_SIZE]
+    $tip .mf.tb.style_bullet "Bullet List"
     ttk::button .mf.tb.style_left -style Toolbutton -takefocus 0 \
-        -command [callback on_align left] \
+        -command [callback on_style_align left] \
         -image [ui::icon format-justify-left.svg $::ICON_SIZE]
     $tip .mf.tb.style_left "Left Align"
     ttk::button .mf.tb.style_center -style Toolbutton -takefocus 0 \
-        -command [callback on_align center] \
+        -command [callback on_style_align center] \
         -image [ui::icon format-justify-center.svg $::ICON_SIZE]
     $tip .mf.tb.style_center "Center Align"
     ttk::button .mf.tb.style_right -style Toolbutton -takefocus 0 \
-        -command [callback on_align right] \
+        -command [callback on_style_align right] \
         -image [ui::icon format-justify-right.svg $::ICON_SIZE]
     $tip .mf.tb.style_right "Right Align"
 }
@@ -304,6 +312,9 @@ oo::define App method make_toolbars_layout {} {
     pack .mf.tb.style_sup -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
+    pack .mf.tb.style_bullet -side left
+    pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
+        -fill y {*}$opts
     pack .mf.tb.style_left -side left
     pack .mf.tb.style_center -side left
     pack .mf.tb.style_right -side left
@@ -312,14 +323,14 @@ oo::define App method make_toolbars_layout {} {
 oo::define App method make_bindings {} {
     bind . <Control-b> [callback on_style bold]
     # Auto: Control-c Copy
-    bind . <Control-e> [callback on_align center]
+    bind . <Control-e> [callback on_style_align center]
     bind . <Control-i> [callback on_style italic]
-    bind . <Control-l> [callback on_align left]
+    bind . <Control-l> [callback on_style_align left]
     bind . <Control-n> [callback on_file_new]
     bind . <Control-o> [callback on_file_open]
     bind . <Control-p> [callback on_file_print]
     bind . <Control-q> [callback on_quit]
-    bind . <Control-r> [callback on_align right]
+    bind . <Control-r> [callback on_style_align right]
     bind . <Control-s> [callback on_file_save]
     # Auto: Control-v Paste
     # Auto: Control-x Cut

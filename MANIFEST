@@ -4,7 +4,7 @@ app_make-1.tm
 app_actions-1.tm # TODO on_style_bullet_list
 app_support-1.tm
 misc-1.tm
-textedit-1.tm
+textedit-1.tm # TODO bindent[12] on_return
 textedit_export-1.tm # TODO bindent[12] → <li>...</li>
 textedit_import-1.tm # TODO ...
 ins_chr_form-1.tm

@@ -182,31 +182,31 @@ oo::define TextEdit method apply_style style {
 
 oo::define TextEdit method apply_style_to {indexes style} {
     if {$indexes ne ""} {
-        set styles [$Text tag names [lindex $indexes 0]]
-        if {$style eq "bold" && "bolditalic" in $styles} {
+        set tags [$Text tag names [lindex $indexes 0]]
+        if {$style eq "bold" && "bolditalic" in $tags} {
             $Text tag remove bolditalic {*}$indexes
             $Text tag add italic {*}$indexes
-        } elseif {$style eq "italic" && "bolditalic" in $styles} {
+        } elseif {$style eq "italic" && "bolditalic" in $tags} {
             $Text tag remove bolditalic {*}$indexes
             $Text tag add bold {*}$indexes
-        } elseif {($style eq "bold" && "italic" in $styles) ||
-                  ($style eq "italic" && "bold" in $styles)} {
+        } elseif {($style eq "bold" && "italic" in $tags) ||
+                  ($style eq "italic" && "bold" in $tags)} {
             $Text tag remove bold {*}$indexes
             $Text tag remove italic {*}$indexes
             $Text tag add bolditalic {*}$indexes
-        } elseif {$style eq "bold" && "bold" in $styles} {
+        } elseif {$style eq "bold" && "bold" in $tags} {
             $Text tag remove bold {*}$indexes
-        } elseif {$style eq "italic" && "italic" in $styles} {
+        } elseif {$style eq "italic" && "italic" in $tags} {
             $Text tag remove italic {*}$indexes
-        } elseif {$style eq "highlight" && "highlight" in $styles} {
+        } elseif {$style eq "highlight" && "highlight" in $tags} {
             $Text tag remove highlight {*}$indexes
-        } elseif {$style eq "sub" && "sub" in $styles} {
+        } elseif {$style eq "sub" && "sub" in $tags} {
             $Text tag remove sub {*}$indexes
-        } elseif {$style eq "sup" && "sup" in $styles} {
+        } elseif {$style eq "sup" && "sup" in $tags} {
             $Text tag remove sup {*}$indexes
-        } elseif {$style eq "ul" && "ul" in $styles} {
+        } elseif {$style eq "ul" && "ul" in $tags} {
             $Text tag remove ul {*}$indexes
-        } elseif {$style eq "strike" && "strike" in $styles} {
+        } elseif {$style eq "strike" && "strike" in $tags} {
             $Text tag remove strike {*}$indexes
         } else {
             $Text tag add $style {*}$indexes
@@ -227,15 +227,15 @@ oo::define TextEdit method apply_align_to {indexes align} {
             $Text tag remove center {*}$indexes
             $Text tag remove right {*}$indexes
         } else {
-            set styles [$Text tag names [lindex $indexes 0]]
-            if {$align eq "center" && "center" in $styles} {
+            set tags [$Text tag names [lindex $indexes 0]]
+            if {$align eq "center" && "center" in $tags} {
                 $Text tag remove center {*}$indexes
-            } elseif {$align eq "right" && "right" in $styles} {
+            } elseif {$align eq "right" && "right" in $tags} {
                 $Text tag remove right {*}$indexes
             } else {
-                if {$align eq "center" && "right" in $styles} {
+                if {$align eq "center" && "right" in $tags} {
                     $Text tag remove right {*}$indexes
-                } elseif {$align eq "right" && "center" in $styles} {
+                } elseif {$align eq "right" && "center" in $tags} {
                     $Text tag remove center {*}$indexes
                 }
                 $Text tag add $align {*}$indexes

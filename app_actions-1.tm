@@ -163,12 +163,18 @@ oo::define App method on_style_bullet_list {} {
     if {[regexp {^\S+} $start]} {
         $ATextEdit insert insert "• "
     } else {
-        # TODO
-        # get styles at insert
-        # set tag bindent1
-        # if bindent1 in styles set tag bindent2
-        # if bindent2 in styles return
-        # $ATextEdit insert insert "• " $tag
-        puts on_style_bullet_list
+        set tags [$ATextEdit tag names insert]
+        puts -nonewline "tags=$tags → "
+        if {"NtextTab" in $tags} {
+            $ATextEdit tag remove bindent1 insert
+            lappend tags bindent2
+        } elseif {"bindent1" ni $tags} {
+            lappend tags bindent1
+        }
+        $ATextEdit insert insert "• "
+        foreach tag $tags {
+            $ATextEdit tag add $tag "insert linestart" "insert lineend"
+        }
+        puts "tags=$tags"
     }
 }

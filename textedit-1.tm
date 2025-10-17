@@ -47,7 +47,7 @@ oo::define TextEdit initialize {
         purple "#911EB4" \
         magenta "#F032E6" \
         ]
-    # From most recent .nb2 format
+    ;# From most recent .nb2 format
     const TAG_FOR_HTML_COLOR [dict create \
         "#000000" black \
         "#800000" maroon \

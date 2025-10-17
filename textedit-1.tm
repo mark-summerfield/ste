@@ -86,9 +86,11 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
 
 oo::define TextEdit method MakeBindings {} {
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
+    bind $Text <BackSpace> [callback on_bs]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
     bind $Text <Double-1> [callback on_double_click]
     bind $Text <Return> [callback on_return]
+    bind $Text <Tab> [callback on_tab]
     bind $Text <'> [callback on_single_quote]
 }
 
@@ -290,11 +292,13 @@ oo::define TextEdit method make_tags {} {
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
     $Text tag configure highlight -background $HIGHLIGHT_COLOR
-    set width1 [font measure Sans "• "]
-    set width2 [font measure Sans "nnnn"]
-    $Text tag configure bindent1 -lmargin2 $width1
-    $Text tag configure bindent2 -lmargin1 $width2 \
-        -lmargin2 [expr {$width1 + $width2}]
+    set bwidth [font measure Sans "• "]
+    set twidth [font measure Sans "nnnn"]
+    # DEBUG: -background #E0FFFF
+    $Text tag configure bindent0 -lmargin2 $bwidth
+    # DEBUG: -background #ADFFFF
+    $Text tag configure bindent1 -lmargin1 $twidth \
+        -lmargin2 [expr {$twidth + $bwidth}]
     dict for {key value} $COLOR_FOR_TAG {
         $Text tag configure $key -foreground $value
     }
@@ -359,6 +363,17 @@ oo::define TextEdit method GetTxtDump {raw file_format} {
     encoding convertfrom utf-8 [zlib inflate $raw]
 }
 
+oo::define TextEdit method on_bs {} {
+    set i [$Text index "insert linestart"]
+    set j [$Text index "insert lineend"]
+    if {[$Text compare $i == $j]} {
+        set i [$Text index "$i -1 char"]
+        set j [$Text index "$j +1 char"]
+        $Text tag remove bindent0 $i $j
+        $Text tag remove bindent1 $i $j
+    }
+}
+
 oo::define TextEdit method on_ctrl_bs {} {
     set i [$Text index "insert -1 char"]
     set x [$Text index "$i wordstart"]
@@ -369,18 +384,36 @@ oo::define TextEdit method on_ctrl_bs {} {
 oo::define TextEdit method on_return {} {
     set i [$Text index "insert -1 char"]
     set i [$Text index "$i linestart"]
-    set tab [expr {"NtextTab" in [$Text tag names $i] ? "NtextTab" : ""}]
     set line [$Text get $i "$i lineend"]
     regexp {^\s*•\s+} $line bullet
     regexp {^\s+} $line ws
     if {[info exists bullet] && $bullet ne ""} {
-        $Text insert insert \n$bullet $tab
+        if {"bindent1" in [$Text tag names insert] || \
+                ([info exists ws] && $ws ne "")} {
+            $Text insert insert \n
+            $Text insert insert "• " bindent1
+        } else {
+            $Text insert insert \n
+            $Text insert insert "• " bindent0
+        }
     } elseif {[info exists ws] && $ws ne ""} {
-        $Text insert insert \n${ws}
+        $Text insert insert \n
+        $Text insert insert ${ws} NtextTab
     } else {
-        $Text insert insert \n $tab
+        $Text insert insert \n
     }
     return -code break
+}
+
+oo::define TextEdit method on_tab {} {
+    set i [$Text index "insert -1 char"]
+    set i [$Text index "$i linestart"]
+    set j [$Text index "$i lineend"]
+    set line [$Text get $i $j]
+    if {[string match "• " $line]} {
+        $Text tag add bindent1 $i "$j +1 char"
+        return -code break
+    }
 }
 
 oo::define TextEdit method on_single_quote {} {

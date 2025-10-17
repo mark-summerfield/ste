@@ -158,23 +158,24 @@ oo::define App method on_style_color color {
 
 oo::define App method on_style_align align { $ATextEdit apply_align $align }
 
+
 oo::define App method on_style_bullet_list {} {
-    set start [$ATextEdit get "insert linestart" insert]
+    set i [$ATextEdit index "insert linestart"]
+    set j [$ATextEdit index "insert lineend"]
+    set start [$ATextEdit get $i insert]
     if {[regexp {^\S+} $start]} {
         $ATextEdit insert insert "• "
     } else {
+        set tag ""
         set tags [$ATextEdit tag names insert]
-        puts -nonewline "tags=$tags → "
-        if {"NtextTab" in $tags} {
-            $ATextEdit tag remove bindent1 insert
-            lappend tags bindent2
-        } elseif {"bindent1" ni $tags} {
-            lappend tags bindent1
+        if {"bindent0" in $tags} {
+            $ATextEdit tag remove bindent0 $i $j
+            set tag bindent1
+        } else {
+            set tag bindent0
         }
-        $ATextEdit insert insert "• "
-        foreach tag $tags {
-            $ATextEdit tag add $tag "insert linestart" "insert lineend"
-        }
-        puts "tags=$tags"
+        $ATextEdit tag remove NtextTab $i $j
+        $ATextEdit insert insert "• " $tag
+        $ATextEdit tag add $tag insert "insert +1 line"
     }
 }

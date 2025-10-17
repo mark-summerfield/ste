@@ -17,15 +17,17 @@ oo::define TextEdit method import_html html {
 }
 
 # TODO:
-# bi
-# for li use bindent1
-# strike sub sup u center right + fix bold & italic → bolditalic
+# sub sup u
+# strike
+# center right
+# li (use bindent0)
 oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
     classvariable COLOR_FOR_TAG
     classvariable TAG_FOR_HTML_COLOR
     const COLOR_TAGS [dict keys $COLOR_FOR_TAG]
     set txt [string trimright [htmlparse::mapEscapes $txt] \n]
     set bold_index ""
+    set bolditalic_index ""
     set color_index ""
     set color_tag ""
     set italic_index ""
@@ -35,6 +37,10 @@ oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
             b {
                 if {$txt ne ""} { $Text insert end $txt bold }
                 set bold_index [$Text index end]
+            }
+            bi {
+                if {$txt ne ""} { $Text insert end $txt bolditalic }
+                set bolditalic [$Text index end]
             }
             br {
                 $Text insert end [expr {[string trim $txt] eq ""\
@@ -78,6 +84,13 @@ oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
                 if {$bold_index ne ""} {
                     $Text tag add bold $bold_index end
                     set bold_index ""
+                }
+                if {$txt ne ""} { $Text insert end $txt }
+            }
+            bi {
+                if {$bolditalic_index ne ""} {
+                    $Text tag add bolditalic $bolditalic_index end
+                    set bolditalic_index ""
                 }
                 if {$txt ne ""} { $Text insert end $txt }
             }

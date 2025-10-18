@@ -5,6 +5,8 @@ app_actions-1.tm
 app_support-1.tm
 misc-1.tm
 textedit-1.tm
+textedit_actions-1.tm
+textedit_serialize-1.tm
 textedit_export-1.tm # TODO bindent[01] → <li>...</li>
 textedit_import-1.tm # TODO ...
 ins_chr_form-1.tm

@@ -3,8 +3,6 @@
 package require config
 package require misc
 package require textedit
-package require textedit_export
-package require textedit_import
 package require tooltip 2
 package require ui
 

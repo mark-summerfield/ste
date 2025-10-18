@@ -9,6 +9,10 @@ oo::class create App {
     variable StatusLabel
 }
 
+package require app_actions
+package require app_make
+package require app_support
+
 oo::define App constructor {} {
     ui::wishinit
     tk appname ste

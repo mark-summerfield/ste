@@ -126,15 +126,15 @@ oo::define App method on_quit {} {
     exit
 }
 
-oo::define App method on_edit_undo {} { $ATextEdit maybe_undo }
+oo::define App method on_edit_undo {} { $ATextEdit on_undo }
 
-oo::define App method on_edit_redo {} { $ATextEdit maybe_redo }
+oo::define App method on_edit_redo {} { $ATextEdit on_redo }
 
-oo::define App method on_edit_copy {} { $ATextEdit copy }
+oo::define App method on_edit_copy {} { $ATextEdit on_copy }
 
-oo::define App method on_edit_cut {} { $ATextEdit cut }
+oo::define App method on_edit_cut {} { $ATextEdit on_cut }
 
-oo::define App method on_edit_paste {} { $ATextEdit paste }
+oo::define App method on_edit_paste {} { $ATextEdit on_paste }
 
 oo::define App method on_edit_ins_chr {} {
     set ch [InsChrForm show]
@@ -157,7 +157,6 @@ oo::define App method on_style_color color {
 }
 
 oo::define App method on_style_align align { $ATextEdit apply_align $align }
-
 
 oo::define App method on_style_bullet_list {} {
     set i [$ATextEdit index "insert linestart"]

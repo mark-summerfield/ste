@@ -14,9 +14,9 @@ oo::class create TextEdit {
 }
 
 package require textedit_actions
-package require textedit_serialize
 package require textedit_export
 package require textedit_import
+package require textedit_serialize
 
 oo::define TextEdit initialize {
     variable STE_PREFIX
@@ -99,6 +99,48 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <'> [callback on_single_quote]
 }
 
+oo::define TextEdit method make_fonts {family size} {
+    foreach name {Sans Bold Italic BoldItalic} {
+        catch { font delete $name }
+    }
+    font create Sans -family $family -size $size
+    font create Small -family $family \
+        -size [expr {int(round($size * 0.75))}]
+    font create Bold -family $family -size $size -weight bold
+    font create Italic -family $family -size $size -slant italic
+    font create BoldItalic -family $family -size $size -weight bold \
+        -slant italic
+    set tab [expr {4 * [font measure Sans n]}]
+    $Text configure -font Sans -tabstyle wordprocessor -tabs "$tab left"
+}
+
+oo::define TextEdit method make_tags {} {
+    classvariable STRIKE_COLOR
+    classvariable HIGHLIGHT_COLOR
+    classvariable COLOR_FOR_TAG
+    $Text tag configure sub -font Small -offset -3p
+    $Text tag configure sup -font Small -offset 3p
+    $Text tag configure ul -underline true
+    $Text tag configure strike -overstrike true -overstrikefg #FF1A1A
+    $Text tag configure center -justify center
+    $Text tag configure right -justify right
+    $Text tag configure url -underline true -underlinefg $STRIKE_COLOR
+    $Text tag configure bold -font Bold
+    $Text tag configure italic -font Italic
+    $Text tag configure bolditalic -font BoldItalic
+    $Text tag configure highlight -background $HIGHLIGHT_COLOR
+    set bwidth [font measure Sans "• "]
+    set twidth [font measure Sans "nnnn"]
+    # DEBUG: -background #E0FFFF
+    $Text tag configure bindent0 -lmargin2 $bwidth
+    # DEBUG: -background #ADFFFF
+    $Text tag configure bindent1 -lmargin1 $twidth \
+        -lmargin2 [expr {$twidth + $bwidth}]
+    dict for {key value} $COLOR_FOR_TAG {
+        $Text tag configure $key -foreground $value
+    }
+}
+
 oo::define TextEdit classmethod filetypes {} {
     variable FILETYPES
     return $FILETYPES
@@ -148,20 +190,6 @@ oo::define TextEdit method after_load {{index insert}} {
     if {$index ne "insert"} { $Text mark set insert $index }
     $Text see $index
 }
-
-oo::define TextEdit method maybe_undo {} {
-    if {[$Text edit canundo]} { $Text edit undo }
-}
-
-oo::define TextEdit method maybe_redo {} {
-    if {[$Text edit canredo]} { $Text edit redo }
-}
-
-oo::define TextEdit method copy {} { tk_textCopy $Text }
-
-oo::define TextEdit method cut {} { tk_textCut $Text }
-
-oo::define TextEdit method paste {} { tk_textPaste $Text }
 
 oo::define TextEdit method selected {} {
     set indexes [$Text tag ranges sel]
@@ -265,105 +293,4 @@ oo::define TextEdit method apply_color_to {indexes color} {
         $Text tag add $color {*}$indexes
     }
     $Text edit modified true
-}
-
-oo::define TextEdit method make_fonts {family size} {
-    foreach name {Sans Bold Italic BoldItalic} {
-        catch { font delete $name }
-    }
-    font create Sans -family $family -size $size
-    font create Small -family $family \
-        -size [expr {int(round($size * 0.75))}]
-    font create Bold -family $family -size $size -weight bold
-    font create Italic -family $family -size $size -slant italic
-    font create BoldItalic -family $family -size $size -weight bold \
-        -slant italic
-    set tab [expr {4 * [font measure Sans n]}]
-    $Text configure -font Sans -tabstyle wordprocessor -tabs "$tab left"
-}
-
-oo::define TextEdit method make_tags {} {
-    classvariable STRIKE_COLOR
-    classvariable HIGHLIGHT_COLOR
-    classvariable COLOR_FOR_TAG
-    $Text tag configure sub -font Small -offset -3p
-    $Text tag configure sup -font Small -offset 3p
-    $Text tag configure ul -underline true
-    $Text tag configure strike -overstrike true -overstrikefg #FF1A1A
-    $Text tag configure center -justify center
-    $Text tag configure right -justify right
-    $Text tag configure url -underline true -underlinefg $STRIKE_COLOR
-    $Text tag configure bold -font Bold
-    $Text tag configure italic -font Italic
-    $Text tag configure bolditalic -font BoldItalic
-    $Text tag configure highlight -background $HIGHLIGHT_COLOR
-    set bwidth [font measure Sans "• "]
-    set twidth [font measure Sans "nnnn"]
-    # DEBUG: -background #E0FFFF
-    $Text tag configure bindent0 -lmargin2 $bwidth
-    # DEBUG: -background #ADFFFF
-    $Text tag configure bindent1 -lmargin1 $twidth \
-        -lmargin2 [expr {$twidth + $bwidth}]
-    dict for {key value} $COLOR_FOR_TAG {
-        $Text tag configure $key -foreground $value
-    }
-}
-
-oo::define TextEdit method serialize {{file_format .ste}} {
-    classvariable STE_PREFIX
-    set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
-    if {$file_format eq ".tkt"} {
-        return $txt_dump
-    }
-    set txt_dumpz [zlib deflate [encoding convertto utf-8 $txt_dump] 9]
-    if {$file_format eq ".tktz"} {
-        return $txt_dumpz
-    }
-    return $STE_PREFIX$txt_dumpz ;# .ste
-}
-
-oo::define TextEdit method deserialize {raw file_format} {
-    my clear
-    set txt_dump [my GetTxtDump $raw $file_format]
-    array set tags {}
-    set insert_index end
-    set pending [list]
-    foreach {key value index} $txt_dump {
-        switch $key {
-            text { $Text insert $index $value }
-            mark { 
-                switch $value {
-                    current {}
-                    insert { set insert_index $index}
-                    default { $Text mark set $value $index }
-                }
-            }
-            tagon {
-                set tags($value) $index
-                lappend pending $value
-            }
-            tagoff {
-                $Text tag add $value $tags($value) $index
-                lpop pending
-            }
-        }
-    }
-    while {[llength $pending]} {
-        set value [lpop pending]
-        $Text tag add $value $tags($value) end
-    }
-    my after_load $insert_index
-}
-
-oo::define TextEdit method GetTxtDump {raw file_format} {
-    if {$file_format eq ".tkt"} {
-        return [encoding convertfrom utf-8 $raw]
-    }
-    if {$file_format eq ".ste"} {
-        set i [string first \n $raw]
-        # check here for STE_PREFIX if required
-        set raw [string range $raw [incr i] end]
-    }
-    # elseif $file_format eq ".tktz" then use $raw direct
-    encoding convertfrom utf-8 [zlib inflate $raw]
 }

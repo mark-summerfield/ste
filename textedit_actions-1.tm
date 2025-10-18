@@ -2,6 +2,20 @@
 
 package require util
 
+oo::define TextEdit method on_undo {} {
+    if {[$Text edit canundo]} { $Text edit undo }
+}
+
+oo::define TextEdit method on_redo {} {
+    if {[$Text edit canredo]} { $Text edit redo }
+}
+
+oo::define TextEdit method on_copy {} { tk_textCopy $Text }
+
+oo::define TextEdit method on_cut {} { tk_textCut $Text }
+
+oo::define TextEdit method on_paste {} { tk_textPaste $Text }
+
 oo::define TextEdit method on_bs {} {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend"]

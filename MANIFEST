@@ -1,16 +1,3 @@
-# TODO
-# - SansH[1-3]
-# - on_return {} { ...
-#	...
-#	$Text tag remove h1
-#	$Text tag remove h2
-#	$Text tag remove h3
-#	...
-# - Export → Convert to a submenu with:
-#   - &HTML
-#   - &PDF (try with tclMuPDF; fall back to lout)
-#   - &Text
-
 ste.tk
 app-1.tm
 app_make-1.tm

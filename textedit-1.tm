@@ -102,6 +102,12 @@ oo::define TextEdit method MakeBindings {} {
 }
 
 oo::define TextEdit method make_fonts {family size} {
+    if {$family eq ""} {
+        set family [font configure TkDefaultFont -family]
+    }
+    if {!$size} {
+        set size [expr {1 + [font configure TkDefaultFont -size]}]
+    }
     foreach name {Sans Bold Italic BoldItalic} {
         catch { font delete $name }
     }

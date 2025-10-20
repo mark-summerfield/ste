@@ -55,15 +55,71 @@ oo::define TextEdit method on_return {} {
 }
 
 oo::define TextEdit method on_tab {} {
-    set i [$Text index "insert -1 char"]
-    set i [$Text index "$i linestart"]
+    set p [$Text index "insert -1 char"]
+    set i [$Text index "$p linestart"]
     set j [$Text index "$i lineend"]
     set line [$Text get $i $j]
     if {[string match "• " $line]} {
         $Text tag add bindent1 $i "$j +1 char"
         return -code break
     }
+    if {[my TryCompletion $p]} { return -code break }
 }
+
+oo::define TextEdit method TryCompletion p {
+    set i $p
+    set i [$Text index "$p wordstart"]
+    set j [$Text index "$i wordend"]
+    set prefix [$Text get $i $j]
+    if {[string trim $prefix] eq ""} { return false }
+    set candidates [dict create]
+    set words {about after because could first other people their there \
+               these think which would}
+    foreach word [list {*}$words {*}[split [$Text get 1.0 end]]] {
+        set word [regsub {^\W+} [regsub {\W+$} $word ""] ""]
+        if {$word ne "" && $prefix ne $word && \
+                [string match -nocase $prefix* $word]} {
+            dict set candidates [string tolower $word] ""
+        }
+    }
+    set candidates [lsort [dict keys $candidates]]
+    switch [llength $candidates] {
+        0 {}
+        1 {
+            set word [lindex $candidates 0]
+            $Text insert insert \
+                [string range $word [string length $prefix] end]
+        }
+        default {
+            set size [string length $prefix]
+            set candidates [lsort -command [callback ByLength] $candidates]
+            $ContextMenu delete 0 end 
+            set n 0
+            foreach word $candidates {
+                if {$n > 9 || [string length $word] <= $size} { break }
+                if {$word eq ""} { continue }
+                $ContextMenu add command -label "$n $word" -underline 0 \
+                    -command [callback Complete \
+                        [string range $word [string length $prefix] end]]
+                incr n
+            }
+            lassign [$Text bbox insert] x y
+            tk_popup $ContextMenu [incr x 5] $y
+        }
+    }
+    return true
+}
+
+# longest to shortest or compare strings for tie-break
+oo::define TextEdit classmethod ByLength {a b} {
+    set asize [string length $a]
+    set bsize [string length $b]
+    if {$asize < $bsize} { return 1 }
+    if {$asize > $bsize} { return -1 }
+    string compare $a $b
+}
+
+oo::define TextEdit method Complete word { $Text insert insert $word }
 
 oo::define TextEdit method on_single_quote {} {
     $Text insert insert ’

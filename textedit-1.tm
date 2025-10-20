@@ -11,6 +11,7 @@ package require util
 oo::class create TextEdit {
     variable FrameName
     variable Text
+    variable ContextMenu
 }
 
 package require textedit_actions
@@ -82,6 +83,7 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
     set FrameName tf#[regsub -all :+ [self] _] ;# unique
     if {![string match *. $parent]} { set parent $parent. }
     ttk::frame $parent$FrameName
+    set ContextMenu [menu ${parent}contextmenu]
     set Text [text $parent$FrameName.txt -undo true -wrap word]
     my MakeBindings
     my make_fonts $family $size

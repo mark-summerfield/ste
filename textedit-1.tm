@@ -207,8 +207,8 @@ oo::define TextEdit method get_whole_word {} {
     set i [$Text search -backwards -exact " " $c "$a -1 char"]
     if {$i eq ""} { set i $a }
     set j [$Text search -exact " " insert "$b +1 char"]
-    if {$j eq ""} { set j [$Text index "insert wordend"] }
-    string trim [$Text get $i $j]
+    if {$j eq ""} { set j [$Text index $b] }
+    string trim [string trimright [$Text get $i $j] ",;:!?."]
 }
 
 oo::define TextEdit method apply_style style {

@@ -7,8 +7,8 @@ misc-1.tm
 textedit-1.tm
 textedit_actions-1.tm
 textedit_serialize-1.tm
-textedit_export-1.tm # TODO bindent[01] → <li>...</li>
-textedit_import-1.tm # TODO ...
+textedit_export-1.tm
+textedit_import-1.tm
 ins_chr_form-1.tm
 globals-1.tm # VERSION
 config-1.tm

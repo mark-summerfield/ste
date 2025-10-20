@@ -181,6 +181,9 @@ oo::define TextEdit method clear {} {
 oo::define TextEdit method highlight_urls {} {
     foreach i [$Text search -all -regexp {(?:https?://|~/)} 1.0] {
         set j [$Text search -regexp {[\s>]} $i]
+        if {[$Text get "$j -1 char"] eq "."} {
+            set j [$Text index "$j -1 char"]
+        }
         $Text tag add url $i $j
     }
 }

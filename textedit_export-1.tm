@@ -67,13 +67,11 @@ oo::define TextEdit method FixupItems out {
             set item file://[file home][string range $item 1 end]
         }
         if {[regexp {^(?:file|https?)://} $item]} {
-            ledit out_ $i $i "<a href=\"$item\">$item</a>"
-        }
-        if {[regexp {^(?:&bull;|•|\d+[.]) } $item]} {
-            ledit out_ $i $i "<br>$item"
-        }
-        if {[regexp {^<br>(?:&nbsp;)+<br>&bull;} $item]} {
-            ledit out_ $i $i [regsub "<br>&bull;" $item "\\&bull;"]
+            set url $item
+            if {[string index $url end] eq "."} {
+                set url [string range $url 0 end-1]
+            }
+            ledit out_ $i $i "<a href=\"$url\">$item</a>"
         }
     }
 }
@@ -82,8 +80,9 @@ oo::define TextEdit method FixupLines lines {
     upvar 1 $lines lines_
     for {set i 0} {$i < [llength $lines_]} {incr i} {
         set line [lindex $lines_ $i]
-        if {[regexp {^<br>(?:&nbsp;)+<br>&bull;} $line]} {
-            ledit lines_ $i $i [regsub "<br>&bull;" $line "\\&bull;"]
+        if {[regexp {^(</?li>)?(&bull;|•)\s} $line]} {
+            ledit lines_ $i $i [regsub {^(</?li>)?(&bull;|•)\s} $line \
+                "<li>"]
         }
     }
 }
@@ -93,6 +92,7 @@ oo::define TextEdit method HtmlOn tag {
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
     switch $tag {
+        bindent0 - bindent1 { return <li> }
         bold { return <b> }
         bolditalic { return <b><i> }
         center { return "<div style=\"text-align: center;\">" }
@@ -100,10 +100,10 @@ oo::define TextEdit method HtmlOn tag {
         highlight { return "<span style=\"background-color:\
             $HIGHLIGHT_COLOR;\">" }
         left { return "" }
-        NtextTab { return "<br>" }
+        NtextTab { return <br> }
         right { return "<div style=\"text-align: right;\">" }
-        strike { return "<span style=\"text-decoration-line: line-through;\
-            text-decoration-color: $STRIKE_COLOR\">" }
+        sel {}
+        strike { return <del> }
         sub { return <sub> }
         sup { return <sup> }
         ul - underline { return <u> }
@@ -124,6 +124,7 @@ oo::define TextEdit method HtmlOn tag {
 
 oo::define TextEdit method HtmlOff tag {
     switch $tag {
+        bindent0 - bindent1 { return </li> }
         bold { return </b> }
         bolditalic { return </i></b> }
         center { return </div> }
@@ -132,7 +133,8 @@ oo::define TextEdit method HtmlOff tag {
         left { return "" }
         NtextTab { return "" }
         right { return </div> }
-        strike { return </span> }
+        sel {}
+        strike { return </del> }
         sub { return </sub> }
         sup { return </sup> }
         ul - underline { return </u> }

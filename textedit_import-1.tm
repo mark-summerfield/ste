@@ -163,7 +163,7 @@ oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
                     $Text tag add bindent0 $li_index end
                     set li_index ""
                 }
-                if {$txt ne ""} { $Text insert end $txt }
+                if {$txt ne ""} { $Text insert end \n$txt }
             }
             p { $Text insert end $txt\n }
             span {

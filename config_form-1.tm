@@ -120,7 +120,6 @@ oo::define ConfigForm method on_font_chosen args {
     focus .configForm
 }
 
-
 oo::define ConfigForm method on_ok {} {
     set config [Config new]
     tk scaling [.configForm.frame.scaleSpinbox get]

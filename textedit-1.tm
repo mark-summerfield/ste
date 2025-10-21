@@ -47,7 +47,7 @@ oo::define TextEdit method make_fonts {family size} {
     if {!$size} {
         set size [expr {1 + [font configure TkDefaultFont -size]}]
     }
-    foreach name {Sans Bold Italic BoldItalic} {
+    foreach name {Sans Small Bold Italic BoldItalic} {
         catch { font delete $name }
     }
     font create Sans -family $family -size $size

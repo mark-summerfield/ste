@@ -274,7 +274,7 @@ oo::define App method make_layout {} {
     pack .mf.statusLabel -side bottom -fill x  {*}$opts
     pack [ttk::sizegrip .mf.statusLabel.sizer] -side right -anchor se \
         {*}$opts
-    pack .mf.[$ATextEdit framename] -fill both -expand true {*}$opts
+    pack [$ATextEdit framename] -fill both -expand true {*}$opts
     pack .mf -fill both -expand true
 }
 

@@ -19,15 +19,15 @@ package require textedit_serialize
 
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
     classvariable N
-    set FrameName tf#[incr N] ;# unique
     if {![string match *. $parent]} { set parent $parent. }
-    ttk::frame $parent$FrameName
+    set FrameName ${parent}tf#[incr N] ;# unique
+    ttk::frame $FrameName
     set ContextMenu [menu ${parent}contextmenu]
-    set Text [text $parent$FrameName.txt -undo true -wrap word]
+    set Text [text $FrameName.txt -undo true -wrap word]
     my MakeBindings
     my make_fonts $family $size
     my make_tags
-    ui::scrollize $parent$FrameName txt vertical
+    ui::scrollize $FrameName txt vertical
 }
 
 oo::define TextEdit method MakeBindings {} {

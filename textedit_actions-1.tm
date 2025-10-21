@@ -67,19 +67,19 @@ oo::define TextEdit method on_tab {} {
 }
 
 oo::define TextEdit method TryCompletion p {
+    classvariable COMMON_WORDS
     set i $p
     set i [$Text index "$p wordstart"]
     set j [$Text index "$i wordend"]
-    set prefix [$Text get $i $j]
+    set prefix [string tolower [$Text get $i $j]]
     if {[string trim $prefix] eq ""} { return false }
     set candidates [dict create]
-    set words {about after because could first other people their there \
-               these think which would}
-    foreach word [list {*}$words {*}[split [$Text get 1.0 end]]] {
-        set word [regsub {^\W+} [regsub {\W+$} $word ""] ""]
+    foreach word [list {*}$COMMON_WORDS {*}[split [$Text get 1.0 end]]] {
+        set word [string tolower \
+            [regsub {^\W+} [regsub {\W+$} $word ""] ""]]
         if {$word ne "" && $prefix ne $word && \
-                [string match -nocase $prefix* $word]} {
-            dict set candidates [string tolower $word] ""
+                [string match $prefix* $word]} {
+            dict set candidates $word ""
         }
     }
     set candidates [lsort [dict keys $candidates]]

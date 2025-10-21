@@ -1,8 +1,5 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-# Unique Styles: bold italic bolditalic
-# Mixable Styles: highlight COLOR_FOR_TAG listindent[1-3]
-
 package require html 1
 package require ntext 1
 package require textutil
@@ -17,70 +14,12 @@ oo::class create TextEdit {
 package require textedit_actions
 package require textedit_export
 package require textedit_import
+package require textedit_initialize
 package require textedit_serialize
 
-oo::define TextEdit initialize {
-    variable STE_PREFIX
-    variable FILETYPES
-    variable HIGHLIGHT_COLOR
-    variable STRIKE_COLOR
-    variable COLOR_FOR_TAG
-    variable TAG_FOR_HTML_COLOR
-
-    const STE_PREFIX STE1\n
-    const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
-        {{compressed tkt files} {.tktz}}}
-    const STRIKE_COLOR #FF8C00 ;# orange
-    const HIGHLIGHT_COLOR yellow
-    ;# Any changes to COLOR_FOR_TAG must be reflected in App make_color_menu
-    const COLOR_FOR_TAG [dict create \
-        black "#000000" \
-        grey "#555555" \
-        navy "#000075" \
-        blue "#0000FF" \
-        lavender "#6767E0" \
-        cyan "#007272" \
-        teal "#469990" \
-        olive "#676700" \
-        green "#009C00" \
-        lime "#608000" \
-        maroon "#800000" \
-        brown "#9A6324" \
-        gold "#9A8100" \
-        orange "#CD8400" \
-        red "#FF0000" \
-        pink "#FF5B77" \
-        purple "#911EB4" \
-        magenta "#F032E6" \
-        ]
-    ;# From most recent .nb2 format
-    const TAG_FOR_HTML_COLOR [dict create \
-        "#000000" black \
-        "#800000" maroon \
-        "#AA6E28" brown \
-        "#808000" olive \
-        "#008080" teal \
-        "#000080" navy \
-        "#F58230" orange \
-        "#8A8A00" gold \
-        "#728420" lime \
-        "#008000" green \
-        "#268282" cyan \
-        "#0000FF" blue \
-        "#911EB4" purple \
-        "#800080" magenta \
-        "#808080" grey \
-        "#876773" pink \
-        "#665877" lavender \
-        "#5C8A69" lime \
-        "#77745D" brown \
-        "#8A7461" pink \
-        ]
-
-}
-
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
-    set FrameName tf#[regsub -all :+ [self] _] ;# unique
+    classvariable N
+    set FrameName tf#[incr N] ;# unique
     if {![string match *. $parent]} { set parent $parent. }
     ttk::frame $parent$FrameName
     set ContextMenu [menu ${parent}contextmenu]

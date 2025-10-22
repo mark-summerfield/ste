@@ -142,21 +142,22 @@ oo::define TextEdit method after_load {{index insert}} {
 }
 
 oo::define TextEdit method selected {} {
-    iff! {set indexes [$Text tag ranges sel]} {
+    set indexes [$Text tag ranges sel]
+    if {$indexes eq ""} {
         return "[$Text index "insert wordstart"]\
-                [$Text index "insert wordend"]" } { return $indexes }
+                [$Text index "insert wordend"]"
+    }
+    return $indexes
 }
 
 oo::define TextEdit method get_whole_word {} {
     set a [$Text index "insert linestart"]
     set b [$Text index "insert lineend"]
     set c [$Text index "insert wordstart"]
-    iff! {set i [$Text search -backwards -exact " " $c "$a -1 char"]} {
-        set i $a
-    }
-    iff! {set j [$Text search -exact " " insert "$b +1 char"]} {
-        set j [$Text index $b]
-    }
+    set i [$Text search -backwards -exact " " $c "$a -1 char"]
+    if {$i eq ""} { set i $a }
+    set j [$Text search -exact " " insert "$b +1 char"]
+    if {$j eq ""} { set j [$Text index $b] }
     string trim [string trimright [$Text get $i $j] ",;:!?."]
 }
 

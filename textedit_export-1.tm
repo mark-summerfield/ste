@@ -113,9 +113,11 @@ oo::define TextEdit method HtmlOn tag {
                 text-decoration-color: #FF8C00\">"
         }
         default {
-            iff {set color [dict getdef $COLOR_FOR_TAG $tag ""]} {
+            set color [dict getdef $COLOR_FOR_TAG $tag ""]
+            if {$color ne ""} {
                 return "<span style=\"color: $color;\">"
-            } { puts "unhandled tag '$tag'" }
+            }
+            puts "unhandled tag '$tag'"
         }
     }
 }

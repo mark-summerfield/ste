@@ -86,10 +86,10 @@ oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
                 } else {
                     regexp {color:\s*(#[A-Fa-f0-9]+)} $param _ color
                     if {[info exists color]} {
-                        iff {set color_tag \
-                                [dict getdef $TAG_FOR_HTML_COLOR \
+                        set color_tag [dict getdef $TAG_FOR_HTML_COLOR \
                                         [string toupper $color] \
-                                        [lrandom $COLOR_TAGS]]} {
+                                        [lrandom $COLOR_TAGS]]
+                        if {$color_tag ne ""} {
                             if {$txt ne ""} {
                                 $Text insert end $txt $color_tag
                                 set txt ""

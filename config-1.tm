@@ -24,8 +24,8 @@ oo::define Config constructor {} {
         set ini [ini::open $Filename -encoding utf-8 r]
         try {
             tk scaling [ini::value $ini General Scale 1.0]
-            set Blinking [ini::value $ini General Blinking $Blinking]
-            if {!$Blinking} {
+            if {![set Blinking [ini::value $ini General Blinking \
+                    $Blinking]]} {
                 option add *insertOffTime 0
                 ttk::style configure . -insertofftime 0
             }

@@ -21,9 +21,9 @@ oo::define App method on_file_open {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
     const FILETYPES [TextEdit filetypes]
-    set filename [tk_getOpenFile -initialdir $dir -filetypes $FILETYPES \
-            -title "[tk appname] — Open" -parent .]
-    if {$filename ne ""} {
+    if {[set filename [tk_getOpenFile -initialdir $dir \
+            -filetypes $FILETYPES \
+            -title "[tk appname] — Open" -parent .]] ne ""} {
         set Filename $filename
         my file_open
     }
@@ -34,9 +34,9 @@ oo::define App method on_file_import_html {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
     const FILETYPES {{{HTML files} {.html}}}
-    set filename [tk_getOpenFile -initialdir $dir -filetypes $FILETYPES \
-            -title "[tk appname] — Open" -parent .]
-    if {$filename ne ""} {
+    if {[set filename [tk_getOpenFile -initialdir $dir \
+            -filetypes $FILETYPES \
+            -title "[tk appname] — Open" -parent .]] ne ""} {
         my file_import_html $filename
     }
 }
@@ -46,9 +46,9 @@ oo::define App method on_file_import_text {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
     const FILETYPES {{{text files} {.txt}}}
-    set filename [tk_getOpenFile -initialdir $dir -filetypes $FILETYPES \
-            -title "[tk appname] — Open" -parent .]
-    if {$filename ne ""} {
+    if {[set filename [tk_getOpenFile -initialdir $dir \
+            -filetypes $FILETYPES \
+            -title "[tk appname] — Open" -parent .]] ne ""} {
         my file_import_text $filename
     }
 }
@@ -65,9 +65,9 @@ oo::define App method on_file_save_as {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
     const FILETYPES [TextEdit filetypes]
-    set filename [tk_getSaveFile -initialdir $dir -filetypes $FILETYPES \
-            -title "[tk appname] — Save As" -parent .]
-    if {$filename ne ""} {
+    if {[set filename [tk_getSaveFile -initialdir $dir \
+            -filetypes $FILETYPES \
+            -title "[tk appname] — Save As" -parent .]] ne ""} {
         set Filename $filename
         my file_save
     }
@@ -137,8 +137,7 @@ oo::define App method on_edit_cut {} { $ATextEdit on_cut }
 oo::define App method on_edit_paste {} { $ATextEdit on_paste }
 
 oo::define App method on_edit_ins_chr {} {
-    set ch [InsChrForm show]
-    if {$ch ne ""} {
+    if {[set ch [InsChrForm show]] ne ""} {
         if {$ch eq "Q"} {
             $ATextEdit insert insert “”
             $ATextEdit mark set insert "insert -1 char"

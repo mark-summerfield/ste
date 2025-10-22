@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require htmlparse 1
+package require util
 
 oo::define TextEdit method import_text txt {
     my clear
@@ -85,10 +86,10 @@ oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
                 } else {
                     regexp {color:\s*(#[A-Fa-f0-9]+)} $param _ color
                     if {[info exists color]} {
-                        set color_tag [dict getdef $TAG_FOR_HTML_COLOR \
+                        iff {set color_tag \
+                                [dict getdef $TAG_FOR_HTML_COLOR \
                                         [string toupper $color] \
-                                        [lrandom $COLOR_TAGS]]
-                        if {$color_tag ne ""} {
+                                        [lrandom $COLOR_TAGS]]} {
                             if {$txt ne ""} {
                                 $Text insert end $txt $color_tag
                                 set txt ""

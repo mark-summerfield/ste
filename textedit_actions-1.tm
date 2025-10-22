@@ -104,7 +104,7 @@ oo::define TextEdit method TryCompletion p {
                 incr n
             }
             lassign [$Text bbox insert] x y
-            tk_popup $ContextMenu [incr x 5] $y
+            tk_popup $ContextMenu [expr {[winfo rootx $Text] + $x + 3}] $y
         }
     }
     return true

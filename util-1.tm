@@ -1,5 +1,25 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+proc iff {setcmd tcode {fcode ""}} {
+    set x [uplevel 1 $setcmd]
+    switch $x {
+        0 - false - no - off - "" - {} {
+            if {$fcode ne ""} { uplevel 1 $fcode }
+        }
+        default { uplevel 1 $tcode }
+    }
+}
+
+proc iff! {setcmd tcode {fcode ""}} {
+    set x [uplevel 1 $setcmd]
+    switch $x {
+        0 - false - no - off - "" - {} { uplevel 1 $tcode }
+        default { if {$fcode ne ""} { uplevel 1 $fcode } }
+    }
+}
+
+proc commas n {regsub -all {\d(?=(\d{3})+($|\.))} $n {\0,}}
+
 proc bool_to_str b {expr {$b ? true : false}}
 
 proc list_to_str lst {
@@ -7,8 +27,6 @@ proc list_to_str lst {
     foreach x $lst { lappend str "'$x'" }
     return "{[join $str " "]}"
 }
-
-proc commas n {regsub -all {\d(?=(\d{3})+($|\.))} $n {\0,}}
 
 proc lrandom lst {
     lindex $lst [expr {int(rand() * [llength $lst])}]

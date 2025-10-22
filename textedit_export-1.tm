@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require lambda 1
+package require util
 
 oo::define TextEdit method as_text {} {
     set lines [list]
@@ -112,12 +113,9 @@ oo::define TextEdit method HtmlOn tag {
                 text-decoration-color: #FF8C00\">"
         }
         default {
-            set color [dict getdef $COLOR_FOR_TAG $tag ""]
-            if {$color ne ""} {
+            iff {set color [dict getdef $COLOR_FOR_TAG $tag ""]} {
                 return "<span style=\"color: $color;\">"
-            } else {
-                puts "unhandled tag '$tag'"
-            }
+            } { puts "unhandled tag '$tag'" }
         }
     }
 }

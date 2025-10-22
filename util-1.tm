@@ -1,5 +1,23 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
+proc iff {setcmd tcode {ncode ""}} {
+    set x [uplevel 1 $setcmd]
+    switch $x {
+        0 - false - no - off - "" - {} {
+            if {$ncode ne ""} { uplevel 1 $ncode }
+        }
+        default { uplevel 1 $tcode }
+    }
+}
+
+proc iff! {setcmd tcode {ncode ""}} {
+    set x [uplevel 1 $setcmd]
+    switch $x {
+        0 - false - no - off - "" - {} { uplevel 1 $tcode }
+        default { if {$ncode ne ""} { uplevel 1 $ncode } }
+    }
+}
+
 proc commas n {regsub -all {\d(?=(\d{3})+($|\.))} $n {\0,}}
 
 proc bool_to_str b {expr {$b ? true : false}}

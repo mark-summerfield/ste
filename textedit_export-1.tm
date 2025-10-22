@@ -112,8 +112,7 @@ oo::define TextEdit method HtmlOn tag {
                 text-decoration-color: #FF8C00\">"
         }
         default {
-            set color [dict getdef $COLOR_FOR_TAG $tag ""]
-            if {$color ne ""} {
+            if {[set color [dict getdef $COLOR_FOR_TAG $tag ""]] ne ""} {
                 return "<span style=\"color: $color;\">"
             }
             puts "unhandled tag '$tag'"

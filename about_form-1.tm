@@ -57,9 +57,8 @@ oo::define AboutForm method make_bindings {} {
 
 oo::define AboutForm method on_click_url index {
     set indexes [.aboutForm.frame.text tag prevrange url $index]
-    set url [string trim [.aboutForm.frame.text \
-            get {*}$indexes]]
-    if {$url ne ""} {
+    if {[set url [string trim [.aboutForm.frame.text get {*}$indexes]]] \
+            ne ""} {
         if {![string match -nocase http*://* $url]} {
             set url [string cat http:// $url]
         }
@@ -79,8 +78,7 @@ oo::define AboutForm method Populate {} {
     set add [list $txt insert end]
     {*}$add "\n[tk appname] $::VERSION\n" {center title}
     {*}$add "$Desc.\n\n" {center navy}
-    set year [clock format [clock seconds] -format %Y]
-    if {$year > 2025} {
+    if {[set year [clock format [clock seconds] -format %Y]] > 2025} {
         set year "2025-[string range $year end-1 end]"
     }
     set bits [expr {8 * $::tcl_platform(wordSize)}]

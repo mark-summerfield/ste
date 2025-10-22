@@ -1,23 +1,5 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-proc iff {setcmd tcode {ncode ""}} {
-    set x [uplevel 1 $setcmd]
-    switch $x {
-        0 - false - no - off - "" - {} {
-            if {$ncode ne ""} { uplevel 1 $ncode }
-        }
-        default { uplevel 1 $tcode }
-    }
-}
-
-proc iff! {setcmd tcode {ncode ""}} {
-    set x [uplevel 1 $setcmd]
-    switch $x {
-        0 - false - no - off - "" - {} { uplevel 1 $tcode }
-        default { if {$ncode ne ""} { uplevel 1 $ncode } }
-    }
-}
-
 proc commas n {regsub -all {\d(?=(\d{3})+($|\.))} $n {\0,}}
 
 proc bool_to_str b {expr {$b ? true : false}}
@@ -38,8 +20,7 @@ proc util::pre_process_args argv {
     set ppargv [list]
     foreach arg $argv {
         if {[string match {-*} $arg]} {
-            set i [string first = $arg]
-            if {$i == -1} {
+            if {[set i [string first = $arg]] == -1} {
                 if {[string match {--*} $arg] || \
                         [string length $arg] == 2} {
                     lappend ppargv $arg

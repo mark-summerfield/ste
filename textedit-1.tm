@@ -142,8 +142,7 @@ oo::define TextEdit method after_load {{index insert}} {
 }
 
 oo::define TextEdit method selected {} {
-    set indexes [$Text tag ranges sel]
-    if {$indexes ne ""} {
+    if {[set indexes [$Text tag ranges sel]] ne ""} {
         return $indexes
     }
     return "[$Text index "insert wordstart"] [$Text index "insert wordend"]"

@@ -1,7 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require lambda 1
-package require util
 
 oo::define TextEdit method as_text {} {
     set lines [list]

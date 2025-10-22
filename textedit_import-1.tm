@@ -1,7 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require htmlparse 1
-package require util
 
 oo::define TextEdit method import_text txt {
     my clear

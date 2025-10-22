@@ -143,11 +143,10 @@ oo::define TextEdit method after_load {{index insert}} {
 
 oo::define TextEdit method selected {} {
     set indexes [$Text tag ranges sel]
-    if {$indexes eq ""} {
-        return "[$Text index "insert wordstart"]\
-                [$Text index "insert wordend"]"
+    if {$indexes ne ""} {
+        return $indexes
     }
-    return $indexes
+    return "[$Text index "insert wordstart"] [$Text index "insert wordend"]"
 }
 
 oo::define TextEdit method get_whole_word {} {

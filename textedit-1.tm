@@ -98,11 +98,6 @@ oo::define TextEdit classmethod colors {} {
     return $COLOR_FOR_TAG
 }
 
-oo::define TextEdit classmethod html_colors {} {
-    variable TAG_FOR_HTML_COLOR
-    return $TAG_FOR_HTML_COLOR
-}
-
 oo::define TextEdit method unknown {method_name args} {
     $Text $method_name {*}$args
 }

@@ -8,7 +8,7 @@ oo::define TextEdit initialize {
     variable HIGHLIGHT_COLOR
     variable STRIKE_COLOR
     variable COLOR_FOR_TAG
-    variable TAG_FOR_HTML_COLOR
+    variable TAG_FOR_COLOR
 
     const STE_PREFIX STE1\n
 
@@ -122,27 +122,6 @@ oo::define TextEdit initialize {
         magenta "#F032E6" \
         ]
 
-    ;# From most recent .nb2 format
-    const TAG_FOR_HTML_COLOR [dict create \
-        "#000000" black \
-        "#800000" maroon \
-        "#AA6E28" brown \
-        "#808000" olive \
-        "#008080" teal \
-        "#000080" navy \
-        "#F58230" orange \
-        "#8A8A00" gold \
-        "#728420" lime \
-        "#008000" green \
-        "#268282" cyan \
-        "#0000FF" blue \
-        "#911EB4" purple \
-        "#800080" magenta \
-        "#808080" grey \
-        "#876773" pink \
-        "#665877" lavender \
-        "#5C8A69" lime \
-        "#77745D" brown \
-        "#8A7461" pink \
-        ]
+    const TAG_FOR_COLOR [dict map {color tag} $COLOR_FOR_TAG {
+        set x $color ; set color $tag ; set tag $x }]
 }

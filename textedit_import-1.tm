@@ -18,7 +18,7 @@ oo::define TextEdit method import_html html {
 
 oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
     classvariable COLOR_FOR_TAG
-    classvariable TAG_FOR_HTML_COLOR
+    classvariable TAG_FOR_COLOR
     const COLOR_TAGS [dict keys $COLOR_FOR_TAG]
     set txt [string trimright [htmlparse::mapEscapes $txt] \n]
     set alignment ""
@@ -85,10 +85,9 @@ oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
                 } else {
                     regexp {color:\s*(#[A-Fa-f0-9]+)} $param _ color
                     if {[info exists color]} {
-                        if {[set color_tag \
-                                [dict getdef $TAG_FOR_HTML_COLOR \
-                                    [string toupper $color] \
-                                    [lrandom $COLOR_TAGS]]] ne ""} {
+                        if {[set color_tag [dict getdef $TAG_FOR_COLOR \
+                                [string toupper $color] \
+                                [lrandom $COLOR_TAGS]]] ne ""} {
                             if {$txt ne ""} {
                                 $Text insert end $txt $color_tag
                                 set txt ""

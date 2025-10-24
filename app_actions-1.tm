@@ -88,7 +88,7 @@ oo::define App method on_file_export_text {} {
 }
 
 oo::define App method on_file_print {} {
-    if {[catch {tk print [$ATextEdit textedit]} err]} {
+    if {[catch {tk print [$ATextEdit tk_text]} err]} {
         my show_error $err
     }
 }
@@ -113,7 +113,7 @@ oo::define App method on_about {} {
 }
 
 oo::define App method on_quit {} {
-    if {[[$ATextEdit textedit] edit modified]} {
+    if {[[$ATextEdit tk_text] edit modified]} {
         set reply [MaybeSaveForm show "[tk appname] — Unsaved Changes" \
             "Save unsaved changes?"]
         switch $reply {

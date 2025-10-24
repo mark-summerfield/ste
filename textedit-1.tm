@@ -106,7 +106,7 @@ oo::define TextEdit method focus {} { focus $Text }
 
 oo::define TextEdit method framename {} { return $FrameName }
 
-oo::define TextEdit method textedit {} { return $Text }
+oo::define TextEdit method tk_text {} { return $Text }
 
 oo::define TextEdit method isempty {} {
     expr {[string trim [$Text get 1.0 end]] eq ""}

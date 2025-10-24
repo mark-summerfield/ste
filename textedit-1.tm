@@ -6,7 +6,7 @@ package require textutil
 package require util
 
 oo::class create TextEdit {
-    variable FrameName
+    variable Frame
     variable Text
     variable ContextMenu
 }
@@ -20,14 +20,14 @@ package require textedit_serialize
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
-    set FrameName ${parent}tf#[incr N] ;# unique
-    ttk::frame $FrameName
+    set Frame ${parent}tf#[incr N] ;# unique
+    ttk::frame $Frame
     set ContextMenu [menu ${parent}contextmenu]
-    set Text [text $FrameName.txt -undo true -wrap word]
+    set Text [text $Frame.txt -undo true -wrap word]
     my MakeBindings
     my make_fonts $family $size
     my make_tags
-    ui::scrollize $FrameName txt vertical
+    ui::scrollize $Frame txt vertical
 }
 
 oo::define TextEdit method MakeBindings {} {
@@ -104,7 +104,7 @@ oo::define TextEdit method unknown {method_name args} {
 
 oo::define TextEdit method focus {} { focus $Text }
 
-oo::define TextEdit method framename {} { return $FrameName }
+oo::define TextEdit method ttk_frame {} { return $Frame }
 
 oo::define TextEdit method tk_text {} { return $Text }
 

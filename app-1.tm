@@ -3,7 +3,7 @@
 package require config
 package require ui
 
-oo::class create App {
+oo::singleton create App {
     variable Filename
     variable ATextEdit
     variable StatusLabel

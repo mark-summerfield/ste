@@ -27,6 +27,8 @@ oo::define TextEdit method on_bs {} {
     }
 }
 
+oo::define TextEdit method on_ctrl_a {} { $Text tag add sel 1.0 end }
+
 oo::define TextEdit method on_ctrl_bs {} {
     set i [$Text index "insert -1 char"]
     set x [$Text index "$i wordstart"]

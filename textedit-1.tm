@@ -34,6 +34,7 @@ oo::define TextEdit method MakeBindings {} {
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <BackSpace> [callback on_bs]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
+    bind $Text <Control-a> [callback on_ctrl_a]
     bind $Text <Double-1> [callback on_double_click]
     bind $Text <Return> [callback on_return]
     bind $Text <Tab> [callback on_tab]
@@ -117,6 +118,8 @@ oo::define TextEdit method clear {} {
     $Text edit modified false
     $Text edit reset
 }
+
+oo::define TextEdit method first_line {} { string trim [$Text get 1.0 2.0] }
 
 oo::define TextEdit method highlight_urls {} {
     foreach i [$Text search -all -regexp {(?:https?://|~/)} 1.0] {

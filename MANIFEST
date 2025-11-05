@@ -1,9 +1,7 @@
 # TODO
-# (1) if user does Style→Bullet List on a line that starts with a bullet, do
-# the same as for when they do Tab i.e., indented
-# (2) Add Style→No List to clear list; ideally with <Control-Enter> accel:
+# (1) Add Style→No List to clear list; ideally with <Control-Enter> accel:
 #     should clear NtextTab indent1 indent2 tags
-# (3) If completion uses a dict could I store the original in the value so
+# (2) If completion uses a dict could I store the original in the value so
 #     that I get case-sensitive completion?
 
 ste.tk

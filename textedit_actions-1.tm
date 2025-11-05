@@ -56,16 +56,16 @@ oo::define TextEdit method on_return {} {
     return -code break
 }
 
-oo::define TextEdit method on_tab {} {
+oo::define TextEdit method on_tab {{user true}} {
     set p [$Text index "insert -1 char"]
     set i [$Text index "$p linestart"]
     set j [$Text index "$i lineend"]
     set line [$Text get $i $j]
     if {[string match "• " $line]} {
         $Text tag add bindent1 $i "$j +1 char"
-        return -code break
+        if {$user} { return -code break }
     }
-    if {[my TryCompletion $p]} { return -code break }
+    if {[my TryCompletion $p] && $user} { return -code break }
 }
 
 oo::define TextEdit method TryCompletion p {

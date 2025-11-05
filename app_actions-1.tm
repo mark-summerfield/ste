@@ -161,7 +161,10 @@ oo::define App method on_style_bullet_list {} {
     set i [$ATextEdit index "insert linestart"]
     set j [$ATextEdit index "insert lineend"]
     set start [$ATextEdit get $i insert]
-    if {[regexp {^\S+} $start]} {
+    set line [$ATextEdit get $i $j]
+    if {$line eq "• "} {
+        $ATextEdit on_tab false
+    } elseif {[regexp {^\S+} $start]} {
         $ATextEdit insert insert "• "
     } else {
         set tag ""

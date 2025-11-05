@@ -1,3 +1,8 @@
+# TODO
+# (1) if user does Style→Bullet List on a line that starts with a bullet, do
+# the same as for when they do Tab i.e., indented
+# (2) Add Style→No List to clear list
+
 ste.tk
 app-1.tm
 app_make-1.tm

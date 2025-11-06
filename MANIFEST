@@ -1,9 +1,3 @@
-# TODO
-# (1) Add Style→No List to clear list; ideally with <Control-Enter> accel:
-#     should clear NtextTab indent1 indent2 tags
-# (2) If completion uses a dict could I store the original in the value so
-#     that I get case-sensitive completion?
-
 ste.tk
 app-1.tm
 app_make-1.tm

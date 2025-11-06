@@ -77,29 +77,30 @@ oo::define TextEdit method TryCompletion p {
     if {[string trim $prefix] eq ""} { return false }
     set candidates [dict create]
     foreach word [list {*}$COMMON_WORDS {*}[split [$Text get 1.0 end]]] {
-        set word [string tolower \
-            [regsub {^\W+} [regsub {\W+$} $word ""] ""]]
-        if {$word ne "" && $prefix ne $word && \
-                [string match $prefix* $word]} {
-            dict set candidates $word ""
+        set word [regsub {^\W+} [regsub {\W+$} $word ""] ""]
+        set lword [string tolower $word]
+        if {$lword ne "" && $prefix ne $lword && \
+                [string match $prefix* $lword]} {
+            dict set candidates $lword $word
         }
     }
-    set candidates [lsort [dict keys $candidates]]
-    switch [llength $candidates] {
+    set possibles [lsort [dict keys $candidates]]
+    switch [llength $possibles] {
         0 {}
         1 {
-            set word [lindex $candidates 0]
+            set word [lindex $possibles 0]
             $Text insert insert \
                 [string range $word [string length $prefix] end]
         }
         default {
             set size [string length $prefix]
-            set candidates [lsort -command [callback ByLength] $candidates]
+            set possibles [lsort -command [callback ByLength] $possibles]
             $ContextMenu delete 0 end 
             set n 0
-            foreach word $candidates {
-                if {$n > 9 || [string length $word] <= $size} { break }
-                if {$word eq ""} { continue }
+            foreach lword $possibles {
+                if {$n > 9 || [string length $lword] <= $size} { break }
+                if {$lword eq ""} { continue }
+                set word [dict get $candidates $lword]
                 $ContextMenu add command -label "$n $word" -underline 0 \
                     -command [callback Complete \
                         [string range $word [string length $prefix] end]]

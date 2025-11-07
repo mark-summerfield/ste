@@ -61,6 +61,7 @@ oo::define TextEdit method MakeBindings {} {
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <<ContextMenu>> "tk_popup $ContextMenu %X %Y"
     bind $Text <BackSpace> [callback on_bs]
+    bind $Text <Control-Delete> [callback on_ctrl_del]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
     bind $Text <Control-a> [callback on_ctrl_a]
     bind $Text <Double-1> [callback on_double_click]

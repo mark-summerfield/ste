@@ -27,6 +27,13 @@ oo::define TextEdit method on_bs {} {
     }
 }
 
+oo::define TextEdit method on_ctrl_del {} {
+    set i [$Text index "insert +1 char"]
+    set x [$Text index "$i wordstart"]
+    set y [$Text index "$x wordend"]
+    $Text delete $x $y
+}
+
 oo::define TextEdit method on_ctrl_a {} { $Text tag add sel 1.0 end }
 
 oo::define TextEdit method on_ctrl_bs {} {

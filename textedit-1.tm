@@ -17,21 +17,43 @@ package require textedit_import
 package require textedit_initialize
 package require textedit_serialize
 
+oo::define TextEdit classmethod make_color_menu {menu_name on_invoke} {
+    #              K E N B L C T V G I A W D O R P U M
+    const INDEXES {4 2 0 0 0 0 0 3 0 1 1 3 3 0 0 0 1 0}
+    foreach index $INDEXES {name color} [TextEdit colors] {
+        $menu_name add command -underline $index \
+            -image [my swatch $color $::MENU_ICON_SIZE] \
+            -compound left -label [string totitle $name] \
+            -command "$on_invoke $name"
+    }
+}
+
+oo::define TextEdit classmethod swatch {color size} {
+    const R [expr {max(3, $size / 4.0)}]
+    const W [expr {$R + 2.5}]
+    image create photo -data "<svg width=\"$size\" height=\"$size\">
+        <rect x=\"0\" y=\"0\" width=\"$size\" height=\"$size\" rx=\"$R\"
+        ry=\"$R\" fill=\"$color\" stroke-width=\"$W\" stroke=\"white\">
+        </svg>"
+}
+
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
     set Frame ${parent}tf#[incr N] ;# unique
     ttk::frame $Frame
-    set ContextMenu [menu ${parent}contextmenu]
+    set ContextMenu [menu $Frame.contextmenu]
     set Text [text $Frame.txt -undo true -wrap word]
     my MakeBindings
     my make_fonts $family $size
     my make_tags
+    my MakeContextMenu
     ui::scrollize $Frame txt vertical
 }
 
 oo::define TextEdit method MakeBindings {} {
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
+    bind $Text <<ContextMenu>> "tk_popup $ContextMenu %X %Y"
     bind $Text <BackSpace> [callback on_bs]
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
     bind $Text <Control-a> [callback on_ctrl_a]
@@ -39,6 +61,14 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <Return> [callback on_return]
     bind $Text <Tab> [callback on_tab]
     bind $Text <'> [callback on_single_quote]
+}
+
+oo::define TextEdit method MakeContextMenu {} {
+    $ContextMenu add command -command [callback apply_style highlight] \
+        -label Highlight -underline 0 -compound left \
+        -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
+    $ContextMenu add separator
+    my make_color_menu $ContextMenu [callback apply_color]
 }
 
 oo::define TextEdit method make_fonts {family size} {

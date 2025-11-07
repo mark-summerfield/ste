@@ -113,14 +113,14 @@ oo::define App method make_style_menu {} {
         -image [ui::icon format-text-underline.svg $::MENU_ICON_SIZE]
     menu .menu.style.colors
     .menu.style add cascade -menu .menu.style.colors -label Color \
-        -underline 1 -compound left \
+        -underline 0 -compound left \
         -image [ui::icon color.svg $::MENU_ICON_SIZE]
-    my make_color_menu .menu.style.colors
+    TextEdit make_color_menu .menu.style.colors [callback on_style_color]
     .menu.style add command -command [callback on_style highlight] \
         -label Highlight -underline 0 -compound left \
         -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style strike] \
-        -label Strikeout -underline 1 -compound left \
+        -label Strikeout -underline 4 -compound left \
         -image [ui::icon format-text-strikethrough.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style sub] \
@@ -131,29 +131,18 @@ oo::define App method make_style_menu {} {
         -image [ui::icon superscript.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style_bullet_list] \
-        -label "Bullet List" -underline 4 -compound left \
+        -label "Bullet List" -underline 5 -compound left \
         -image [ui::icon bullet-list.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style_align left] \
         -label "Left Align" -underline 0 -compound left \
         -image [ui::icon format-justify-left.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_align center] \
-        -label "Center Align" -underline 0 -compound left \
+        -label "Center Align" -underline 1 -compound left \
         -image [ui::icon format-justify-center.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_align right] \
         -label "Right Align" -underline 0 -compound left \
         -image [ui::icon format-justify-right.svg $::MENU_ICON_SIZE]
-}
-
-oo::define App method make_color_menu menu_name {
-    #              K E N B L C T V G I A W D O R P U M
-    const INDEXES {4 2 0 0 0 0 0 3 0 1 1 3 3 0 0 0 1 0}
-    foreach index $INDEXES {name color} [TextEdit colors] {
-        $menu_name add command -underline $index \
-            -image [misc::swatch $color $::MENU_ICON_SIZE] \
-            -compound left -label [string totitle $name] \
-            -command [callback on_style_color $name]
-    }
 }
 
 oo::define App method make_toolbars {} {
@@ -229,7 +218,7 @@ oo::define App method make_style_toolbar {} {
         -menu .mf.tb.colors_menu \
         -image [ui::icon color-menu.svg $::ICON_SIZE]
     $tip .mf.tb.style_colors "Style Color"
-    my make_color_menu .mf.tb.colors_menu
+    TextEdit make_color_menu .mf.tb.colors_menu [callback on_style_color]
     $tip .mf.tb.style_highlight "Style Highlight"
     ttk::button .mf.tb.style_strike -style Toolbutton -takefocus 0 \
         -command [callback on_style strike] \

@@ -30,7 +30,7 @@ st.sh
 
 # NOTE ideas:
 # - Create 3 separate toolbars: File Edit Style so users can move/show/hide
-#   them
+#   them; see notebox9
 # - Add status indicators: [nnn Lines][MOD]
 
 # vim: syn=yaml

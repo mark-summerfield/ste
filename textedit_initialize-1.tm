@@ -100,7 +100,6 @@ oo::define TextEdit initialize {
 
     const STRIKE_COLOR #FF8C00 ;# orange
 
-    ;# Any changes to COLOR_FOR_TAG must be reflected in App make_color_menu
     const COLOR_FOR_TAG [dict create \
         black "#000000" \
         grey "#555555" \

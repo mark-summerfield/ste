@@ -6,6 +6,7 @@ package require ntext 1
 oo::class create TextEdit {
     variable Frame
     variable Text
+    variable CompletionMenu
     variable ContextMenu
 }
 
@@ -41,6 +42,7 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
     set Frame ${parent}tf#[incr N] ;# unique
     ttk::frame $Frame
     set Text [text $Frame.txt -undo true -wrap word]
+    set CompletionMenu [menu $Frame.completionMenu]
     my MakeContextMenu
     my MakeBindings
     my make_fonts $family $size

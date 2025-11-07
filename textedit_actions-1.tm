@@ -116,19 +116,20 @@ oo::define TextEdit method TryCompletion p {
         default {
             set size [string length $prefix]
             set possibles [lsort -command [callback ByLength] $possibles]
-            $ContextMenu delete 0 end 
+            $CompletionMenu delete 0 end 
             set n 0
             foreach lword $possibles {
                 if {$n > 9 || [string length $lword] <= $size} { break }
                 if {$lword eq ""} { continue }
                 set word [dict get $candidates $lword]
-                $ContextMenu add command -label "$n $word" -underline 0 \
+                $CompletionMenu add command -label "$n $word" -underline 0 \
                     -command [callback Complete \
                         [string range $word [string length $prefix] end]]
                 incr n
             }
             lassign [$Text bbox insert] x y
-            tk_popup $ContextMenu [expr {[winfo rootx $Text] + $x + 3}] $y
+            tk_popup $CompletionMenu \
+                [expr {[winfo rootx $Text] + $x + 3}] $y
         }
     }
     return true

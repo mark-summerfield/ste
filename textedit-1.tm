@@ -2,8 +2,6 @@
 
 package require html 1
 package require ntext 1
-package require textutil
-package require util
 
 oo::class create TextEdit {
     variable Frame

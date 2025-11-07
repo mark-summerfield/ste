@@ -180,3 +180,14 @@ oo::define App method on_style_bullet_list {} {
         $ATextEdit tag add $tag insert "insert +1 line"
     }
 }
+
+oo::define App method on_style_no_bullet_list {} {
+    set i [$ATextEdit index "insert linestart"]
+    set j [$ATextEdit index "insert lineend"]
+    $ATextEdit tag remove NtextTab $i $j
+    $ATextEdit tag remove bindent0 $i $j
+    $ATextEdit tag remove bindent1 $i $j
+    if {[set line [$ATextEdit get $i $j]] ne ""} {
+        $ATextEdit delete $i $j
+    }
+}

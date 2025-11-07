@@ -64,6 +64,7 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <Control-BackSpace> [callback on_ctrl_bs]
     bind $Text <Control-a> [callback on_ctrl_a]
     bind $Text <Double-1> [callback on_double_click]
+    bind $Text <Control-Return> [callback on_ctrl_return]
     bind $Text <Return> [callback on_return]
     bind $Text <Tab> [callback on_tab]
     bind $Text <'> [callback on_single_quote]

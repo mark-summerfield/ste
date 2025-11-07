@@ -36,6 +36,20 @@ oo::define TextEdit method on_ctrl_bs {} {
     $Text delete $x $y
 }
 
+oo::define TextEdit method on_no_list {} {
+    set i [$Text index "insert linestart"]
+    set j [$Text index "insert lineend"]
+    $Text tag remove NtextTab $i $j
+    $Text tag remove bindent0 $i $j
+    $Text tag remove bindent1 $i $j
+}
+
+oo::define TextEdit method on_ctrl_return {} {
+    $Text insert insert \n
+    my on_no_list
+    return -code break
+}
+
 oo::define TextEdit method on_return {} {
     set i [$Text index "insert -1 char"]
     set i [$Text index "$i linestart"]

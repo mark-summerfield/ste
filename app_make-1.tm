@@ -132,6 +132,9 @@ oo::define App method make_style_menu {} {
     .menu.style add command -command [callback on_style_bullet_list] \
         -label "Bullet List" -underline 5 -compound left \
         -image [ui::icon bullet-list.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style_no_bullet_list] \
+        -label "No Bullet List" -underline 0 -compound left \
+        -image [ui::icon no-bullet-list.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style_align left] \
         -label "Left Align" -underline 0 -compound left \

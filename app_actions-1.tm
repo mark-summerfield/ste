@@ -188,6 +188,14 @@ oo::define App method on_style_no_bullet_list {} {
     $ATextEdit tag remove bindent0 $i $j
     $ATextEdit tag remove bindent1 $i $j
     if {[set line [$ATextEdit get $i $j]] ne ""} {
-        $ATextEdit delete $i $j
+        while {[$ATextEdit compare $i < $j]} {
+            if {[set c [$ATextEdit get $i]] ne ""} {
+                if {$c eq "•" || $c eq " "} {
+                    $ATextEdit delete $i
+                } else {
+                    break
+                }
+            }
+        }
     }
 }

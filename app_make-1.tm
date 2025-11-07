@@ -1,7 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
 package require config
-package require misc
 package require textedit
 package require tooltip 2
 package require ui

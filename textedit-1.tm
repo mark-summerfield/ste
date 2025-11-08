@@ -2,6 +2,7 @@
 
 package require html 1
 package require ntext 1
+package require ui
 
 oo::class create TextEdit {
     variable Frame

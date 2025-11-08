@@ -51,7 +51,7 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
 }
 
 oo::define TextEdit method MakeContextMenu {} {
-    set ContextMenu [menu $Frame.contextmenu]
+    set ContextMenu [menu $Frame.contextMenu]
     $ContextMenu add command -command [callback apply_style highlight] \
         -label Highlight -underline 0 -compound left \
         -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]

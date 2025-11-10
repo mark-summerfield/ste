@@ -143,37 +143,50 @@ oo::define TextEdit method HtmlOff tag {
 }
 
 oo::define TextEdit method as_html filename {
-    lassign [my get_tag_dicts] tag_on tag_off
-    dict for {index tag} $tag_on {
-        puts "$index +[$tag tags]"
+    set title [html::html_entities [file rootname [file tail $filename]]]
+    set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
+    lassign [my get_tag_dicts] tags_on tags_off
+    foreach para [lseq 1 to [$Text count -lines 1.0 end]] {
+        set line ""
+        foreach char [lseq 0 to [$Text count -chars $para.0 $para.end]] {
+            set index $para.$char
+            set tag_on [dict getdef $tags_on $index ""]
+            set tag_off [dict getdef $tags_off $index ""]
+            if {[set c [$Text get $index]] eq "\n"} {
+                set c ""
+            } else {
+                set c [html::html_entities $c]
+            }
+            if {$tag_off ne ""} {
+            }
+            if {$tag_on ne ""} {
+            }
+            if {$c ne ""} { lappend line $c }
+        }
+        if {[set line [join $line ""]] ne ""} {
+            lappend out "<p>\n$line\n</p>\n"
+        }
     }
-    dict for {index tag} $tag_off {
-        puts "$index -[$tag tags]"
-    }
-    #foreach tag $tag_on { puts on-[$tag to_string] }
-    #foreach tag $tag_off { puts off-[$tag to_string] }
-    #set tag_list [my get_tag_list]
-    #foreach tag $tag_list { puts [$tag to_string] }
-    #set txt [$Text get 1.0 end]
-    #puts "TEXT\n$txt"
+    lappend out "</body>\n</html>\n"
+    join $out ""
 }
 
 oo::define TextEdit method get_tag_dicts {} {
-    set tag_on [list]
-    set tag_off [list]
+    set tags_on [list]
+    set tags_off [list]
     foreach tag [$Text tag names] {
         if {$tag ne "left"} {
             foreach {from to} [$Text tag ranges $tag] {
-                lassign [split $from .] para char
-                lappend tag_on [Tag new $tag $para $char]
-                lassign [split $to .] para char
-                lappend tag_off [Tag new $tag $para $char]
+                lassign [split $from .] frompara fromchar
+                lappend tags_on [Tag new $tag $frompara $fromchar]
+                lassign [split $to .] topara tochar
+                lappend tags_off [Tag new $tag $topara $tochar]
             }
         }
     }
-    set tag_on [my merge_tags $tag_on]
-    set tag_off [my merge_tags $tag_off]
-    list [my dict_from_tag_list $tag_on] [my dict_from_tag_list $tag_off]
+    set tags_on [my merge_tags $tags_on]
+    set tags_off [my merge_tags $tags_off]
+    list [my dict_from_tag_list $tags_on] [my dict_from_tag_list $tags_off]
 }
 
 oo::define TextEdit classmethod merge_tags old {

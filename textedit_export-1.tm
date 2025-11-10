@@ -11,7 +11,7 @@ oo::define TextEdit method as_text {} {
     join $lines \n
 }
 
-oo::define TextEdit method as_html filename {
+oo::define TextEdit method as_html_orig filename {
     set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
     set title [html::html_entities [file rootname [file tail $filename]]]
     set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
@@ -140,4 +140,98 @@ oo::define TextEdit method HtmlOff tag {
         url { return </span> }
         default { return </span> }
     }
+}
+
+oo::define TextEdit method as_html filename {
+    lassign [my get_tag_dicts] tag_on tag_off
+    dict for {index tag} $tag_on {
+        puts "$index +[$tag tags]"
+    }
+    dict for {index tag} $tag_off {
+        puts "$index -[$tag tags]"
+    }
+    #foreach tag $tag_on { puts on-[$tag to_string] }
+    #foreach tag $tag_off { puts off-[$tag to_string] }
+    #set tag_list [my get_tag_list]
+    #foreach tag $tag_list { puts [$tag to_string] }
+    #set txt [$Text get 1.0 end]
+    #puts "TEXT\n$txt"
+}
+
+oo::define TextEdit method get_tag_dicts {} {
+    set tag_on [list]
+    set tag_off [list]
+    foreach tag [$Text tag names] {
+        if {$tag ne "left"} {
+            foreach {from to} [$Text tag ranges $tag] {
+                lassign [split $from .] para char
+                lappend tag_on [Tag new $tag $para $char]
+                lassign [split $to .] para char
+                lappend tag_off [Tag new $tag $para $char]
+            }
+        }
+    }
+    set tag_on [my merge_tags $tag_on]
+    set tag_off [my merge_tags $tag_off]
+    list [my dict_from_tag_list $tag_on] [my dict_from_tag_list $tag_off]
+}
+
+oo::define TextEdit classmethod merge_tags old {
+    set new [list]
+    set prev ""
+    foreach tag [lsort -command tags_compare $old] {
+        if {$prev ne ""} {
+            if {[$prev para] == [$tag para] && \
+                    [$prev char] == [$tag char]} {
+                $prev append [$tag tag]
+            } else {
+                lappend new $tag
+                set prev $tag
+            }
+        } else {
+            lappend new $tag
+            set prev $tag
+        }
+    }
+    return $new
+}
+
+oo::define TextEdit classmethod dict_from_tag_list tag_list {
+    set tag_dict [dict create]
+    foreach tag $tag_list {
+        dict set tag_dict [$tag para].[$tag char] $tag
+    }
+    return $tag_dict
+}
+
+proc tags_compare {t u} {
+    set paraT [$t para]
+    set paraU [$u para]
+    if {$paraT < $paraU} { return -1 }
+    if {$paraT > $paraU} { return 1 }
+    set charT [$t char]
+    set charU [$u char]
+    if {$charT < $charU} { return -1 }
+    if {$charT > $charU} { return 1 }
+    string compare [$t tag] [$u tag]
+}
+
+oo::class create Tag {
+    variable Tags
+    variable Para
+    variable Char
+
+    constructor {tag para char} {
+        set Tags [list $tag]
+        set Para $para
+        set Char $char
+    }
+
+    method tag {} { return [lindex $Tags 0] }
+    method tags {} { return $Tags }
+    method append tag { lappend Tags $tag }
+    method para {} { return $Para }
+    method char {} { return $Char }
+
+    method to_string {} { return "Tag: $Para.$Char $Tags" }
 }

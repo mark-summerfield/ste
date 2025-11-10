@@ -13,6 +13,7 @@ oo::class create TextEdit {
 
 package require textedit_actions
 package require textedit_export
+package require textedit_export_html
 package require textedit_import
 package require textedit_initialize
 package require textedit_serialize
@@ -96,7 +97,7 @@ oo::define TextEdit method make_fonts {family size} {
 }
 
 oo::define TextEdit method make_tags {} {
-    classvariable STRIKE_COLOR
+    classvariable URL_UL_COLOR
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
     $Text tag configure sub -font Small -offset -3p
@@ -105,7 +106,7 @@ oo::define TextEdit method make_tags {} {
     $Text tag configure strike -overstrike true -overstrikefg #FF1A1A
     $Text tag configure center -justify center
     $Text tag configure right -justify right
-    $Text tag configure url -underline true -underlinefg $STRIKE_COLOR
+    $Text tag configure url -underline true -underlinefg $URL_UL_COLOR
     $Text tag configure bold -font Bold
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic

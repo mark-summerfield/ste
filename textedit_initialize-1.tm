@@ -6,7 +6,7 @@ oo::define TextEdit initialize {
     variable FILETYPES
     variable COMMON_WORDS
     variable HIGHLIGHT_COLOR
-    variable STRIKE_COLOR
+    variable URL_UL_COLOR
     variable COLOR_FOR_TAG
     variable TAG_FOR_COLOR
 
@@ -98,7 +98,7 @@ oo::define TextEdit initialize {
 
     const HIGHLIGHT_COLOR yellow
 
-    const STRIKE_COLOR #FF8C00 ;# orange
+    const URL_UL_COLOR #6E1788 ;# darkpurple
 
     const COLOR_FOR_TAG [dict create \
         black "#000000" \

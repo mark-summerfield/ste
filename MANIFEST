@@ -13,6 +13,7 @@ textedit_initialize-1.tm
 textedit_actions-1.tm
 textedit_serialize-1.tm
 textedit_export-1.tm
+textedit_export_html-1.tm
 textedit_import-1.tm
 ins_chr_form-1.tm
 

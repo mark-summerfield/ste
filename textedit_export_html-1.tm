@@ -1,7 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-oo::define TextEdit method as_html filename {
-    set title [html::html_entities [file rootname [file tail $filename]]]
+oo::define TextEdit method as_html title {
     set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
     lassign [my GetTagDicts] tags_on tags_off
     foreach para [lseq 1 to [$Text count -lines 1.0 end]] {
@@ -33,7 +32,7 @@ oo::define TextEdit method as_html filename {
         }
     }
     lappend out "</body>\n</html>\n"
-    my HtmlFixUpUrls [join $out ""]
+    my HtmlFixUps [join $out ""]
 }
 
 oo::define TextEdit method HtmlTagOn {prefix tag} {
@@ -100,10 +99,11 @@ oo::define TextEdit method HtmlTagOff tag {
     }
 }
 
-oo::define TextEdit method HtmlFixUpUrls out {
-    set out [regsub -all -command {(?:file|https?)://\S+} $out \
+oo::define TextEdit method HtmlFixUps out {
+    set out [regsub -all -command {\m(?:file|https?)://[^\s<]+} $out \
         TextEditHtmlReplaceUrl]
-    regsub -all -command {~/\S+} $out TextEditHtmlReplaceTilde
+    set out [regsub -all -command {~/[^\s<]+} $out TextEditHtmlReplaceTilde]
+    regsub -all {</p>\n<p>\n</span>\n</p>} $out "</span>\n</p>"
 }
 
 proc TextEditHtmlReplaceTilde localfile {

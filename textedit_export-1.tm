@@ -76,7 +76,10 @@ oo::class create TextEditTag {
     }
 
     method tag {} { return [lindex $Tags 0] }
-    method tags {} { return $Tags }
+    method tags {} {
+        set Tags [lsort -nocase $Tags]
+        return $Tags
+    }
     method append tag {
         if {$tag eq "bindent1"} {
             if {[set i [lsearch -exact $Tags bindent0]] != -1} {

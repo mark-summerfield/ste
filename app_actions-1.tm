@@ -76,7 +76,8 @@ oo::define App method on_file_save_as {} {
 oo::define App method on_file_export_html {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .html]
-    writeFile $filename [$ATextEdit as_html $filename]
+    set title [html::html_entities [file rootname [file tail $filename]]]
+    writeFile $filename [$ATextEdit as_html $title]
     my show_message "Exported '$filename'"
 }
 

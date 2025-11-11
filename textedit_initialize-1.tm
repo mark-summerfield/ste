@@ -2,7 +2,6 @@
 
 oo::define TextEdit initialize {
     variable N 0
-    variable PDF_OUTPUT
     variable STE_PREFIX
     variable FILETYPES
     variable COMMON_WORDS
@@ -124,12 +123,4 @@ oo::define TextEdit initialize {
 
     const TAG_FOR_COLOR [dict map {color tag} $COLOR_FOR_TAG {
         set x $color ; set color $tag ; set tag $x }]
-
-    lappend ::auto_path [file home]/opt/pdf4tcl
-    if {[catch {package require pdf4tcl} err]} {
-        puts "cannot provide pdf output: $err"
-        set PDF_OUTPUT false
-    } else {
-        set PDF_OUTPUT true
-    }
 }

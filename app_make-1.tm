@@ -54,11 +54,6 @@ oo::define App method make_file_menu {} {
     .menu.file add command -command [callback on_file_export_html] \
         -label "Export as HTML" -underline 10 -compound left \
         -image [ui::icon export-html.svg $::MENU_ICON_SIZE]
-    if {[TextEdit can_save_pdf]} {
-        .menu.file add command -command [callback on_file_export_pdf] \
-            -label "Export as PDF" -underline 1 -compound left \
-            -image [ui::icon pdf-document.svg $::MENU_ICON_SIZE]
-        }
     .menu.file add command -command [callback on_file_export_text] \
         -label "Export as Text" -underline 10 -compound left \
         -image [ui::icon export-text.svg $::MENU_ICON_SIZE]

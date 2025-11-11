@@ -14,9 +14,15 @@ oo::class create TextEdit {
 package require textedit_actions
 package require textedit_export
 package require textedit_export_html
+package require textedit_export_pdf
 package require textedit_import
 package require textedit_initialize
 package require textedit_serialize
+
+oo::define TextEdit classmethod can_save_pdf {} {
+    variable PDF_OUTPUT
+    return $PDF_OUTPUT
+}
 
 oo::define TextEdit classmethod make_color_menu {the_menu the_callback} {
     #              K E N B L C T V G I A W D O R P U M

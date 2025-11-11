@@ -80,6 +80,13 @@ oo::define App method on_file_export_html {} {
     my show_message "Exported '$filename'"
 }
 
+oo::define App method on_file_export_pdf {} {
+    if {$Filename eq ""} { my save_as }
+    set filename [regsub {\.ste$} $Filename .pdf]
+    $ATextEdit to_pdf $filename
+    my show_message "Exported '$filename'"
+}
+
 oo::define App method on_file_export_text {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .txt]

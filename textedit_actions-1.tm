@@ -19,9 +19,11 @@ oo::define TextEdit method on_paste {} { tk_textPaste $Text }
 oo::define TextEdit method on_bs {} {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend"]
-    if {[$Text compare $i == $j]} {
+    set line [$Text get $i $j]
+    if {[regexp {^•\s+$} $line]} {
         set i [$Text index "$i -1 char"]
         set j [$Text index "$j +1 char"]
+        $Text tag remove NtextTab $i $j
         $Text tag remove bindent0 $i $j
         $Text tag remove bindent1 $i $j
     }
@@ -46,6 +48,8 @@ oo::define TextEdit method on_ctrl_bs {} {
 oo::define TextEdit method on_no_list {} {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend"]
+    set i [$Text index "$i -1 char"]
+    set j [$Text index "$j +1 char"]
     $Text tag remove NtextTab $i $j
     $Text tag remove bindent0 $i $j
     $Text tag remove bindent1 $i $j

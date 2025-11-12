@@ -185,18 +185,13 @@ oo::define App method on_style_bullet_list {} {
 oo::define App method on_style_no_bullet_list {} {
     set i [$ATextEdit index "insert linestart"]
     set j [$ATextEdit index "insert lineend"]
-    $ATextEdit tag remove NtextTab $i $j
-    $ATextEdit tag remove bindent0 $i $j
-    $ATextEdit tag remove bindent1 $i $j
-    if {[set line [$ATextEdit get $i $j]] ne ""} {
-        while {[$ATextEdit compare $i < $j]} {
-            if {[set c [$ATextEdit get $i]] ne ""} {
-                if {$c eq "•" || $c eq " "} {
-                    $ATextEdit delete $i
-                } else {
-                    break
-                }
-            }
-        }
+    set line [$ATextEdit get $i $j]
+    if {[regexp {^\s*•\s+$} $line]} {
+        $ATextEdit delete $i $j
+        set i [$ATextEdit index "$i -1 char"]
+        set j [$ATextEdit index "$j +1 char"]
+        $ATextEdit tag remove NtextTab $i $j
+        $ATextEdit tag remove bindent0 $i $j
+        $ATextEdit tag remove bindent1 $i $j
     }
 }

@@ -65,6 +65,7 @@ oo::define InsChrForm method make_widgets {} {
             -values [lreverse $ChrList]]
     $combo set [lindex $ChrList end]
     $combo selection range 0 end
+    ui::apply_edit_bindings $combo
     ttk::button .ins_chr_form.mf.ok_button -text OK \
         -underline 0 -command [callback on_ok] -compound left \
         -image [ui::icon ok.svg $::ICON_SIZE]

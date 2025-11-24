@@ -18,7 +18,6 @@ oo::define App method file_save {} {
     } else {
         writeFile $Filename binary $out
     }
-    $ATextEdit edit reset
     $ATextEdit edit modified false
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Saved '$Filename'."

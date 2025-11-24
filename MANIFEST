@@ -1,11 +1,3 @@
-# TODO
-# TextEdit:
-# - add instance var CanEmitChanged
-# - bind to <<Modified>> and iff CanEmitChanged true then emit <<Changed>>
-# - go through every method that changes things e.g. {de}serialize during
-#   which CanEmitChanged should be false
-# This is to allow for * in titlebar to indicate unsaved changes.
-
 ste.tk
 app-1.tm
 app_make-1.tm

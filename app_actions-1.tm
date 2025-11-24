@@ -7,6 +7,20 @@ package require ins_chr_form
 package require maybe_save_form
 package require ref
 
+oo::define App method on_poll {} {
+    set title [wm title .]
+    if {[$ATextEdit edit modified]} {
+        if {[string index $title end] ne "❋"} {
+            wm title . "$title ❋"
+        }
+    } else {
+        if {[string index $title end] eq "❋"} {
+            wm title . [string trim [string range $title 0 end-1]]
+        }
+    }
+    after $::POLL_TIMEOUT [callback on_poll]
+}
+
 oo::define App method on_file_new {} {
     my on_file_save
     set Filename ""

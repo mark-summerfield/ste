@@ -36,7 +36,7 @@ oo::define App method show {} {
         $ATextEdit see insert
         $ATextEdit focus
     }
-    after $::POLL_TIMEOUT [callback on_poll]
+    my on_poll
 }
 
 oo::define App method show_message {msg {timeout short}} {

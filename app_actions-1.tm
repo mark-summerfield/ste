@@ -210,6 +210,15 @@ oo::define App method on_style_no_bullet_list {} {
     }
 }
 
+oo::define App method on_find_changed {} {
+    const opts "-pady 3 -padx 3"
+    pack forget .mf.ff
+    if {$ShowFindPanel} {
+        pack .mf.ff -side bottom -fill x {*}$opts
+        focus .mf.ff.findEntry
+    }
+}
+
 oo::define App method on_find {} {
     $FindEntry configure -foreground black
     set what [$FindEntry get]

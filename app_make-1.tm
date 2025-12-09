@@ -96,6 +96,10 @@ oo::define App method make_edit_menu {} {
     .menu.edit add command -command [callback on_edit_ins_chr] \
         -label "Insert Character…" -underline 0 -compound left \
         -image [ui::icon ins-char.svg $::MENU_ICON_SIZE]
+    .menu.edit add separator
+    .menu.edit add checkbutton -command [callback on_find_changed] \
+        -label "Show Find" -underline 5 -compound left -accelerator Ctrl+F \
+        -variable [my varname ShowFindPanel]
 }
 
 oo::define App method make_style_menu {} {
@@ -283,7 +287,6 @@ oo::define App method make_layout {} {
     pack .mf.statusLabel -side bottom -fill x {*}$opts
     pack [ttk::sizegrip .mf.statusLabel.sizer] -side right -anchor se \
         {*}$opts
-    pack .mf.ff -side bottom -fill x {*}$opts
     pack [$ATextEdit ttk_frame] -fill both -expand 1 {*}$opts
     pack .mf -fill both -expand 1
 }
@@ -334,6 +337,7 @@ oo::define App method make_bindings {} {
     bind . <Control-b> [callback on_style bold]
     # Auto: Control-c Copy
     bind . <Control-e> [callback on_style_align center]
+    bind . <Control-f> {.menu.edit invoke last}
     bind . <Control-i> [callback on_style italic]
     bind . <Alt-i> {focus .mf.ff.findEntry}
     bind . <Control-l> [callback on_style_align left]

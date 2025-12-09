@@ -8,6 +8,7 @@ oo::singleton create App {
     variable ATextEdit
     variable FindEntry
     variable FindIndex
+    variable ShowFindPanel
     variable StatusLabel
 }
 
@@ -20,6 +21,7 @@ oo::define App constructor {} {
     tk appname ste
     set config [Config new] ;# we need tk scaling done early
     set FindIndex 1.0
+    set ShowFindPanel 0
     set Filename [expr {$::argc ? [lindex $::argv 0] : ""}]
     if {$Filename eq ""} { set Filename [$config lastfile] }
     my make_ui

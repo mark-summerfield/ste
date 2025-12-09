@@ -209,3 +209,21 @@ oo::define App method on_style_no_bullet_list {} {
         $ATextEdit tag remove bindent1 $i $j
     }
 }
+
+oo::define App method on_find {} {
+    $FindEntry configure -foreground black
+    set what [$FindEntry get]
+    if {$what ne ""} {
+        set i [$ATextEdit search -exact -nocase -- $what $FindIndex end]
+        if {$i ne "" && [$ATextEdit compare $i != $FindIndex]} {
+            $ATextEdit tag remove sel 1.0 end
+            set j [$ATextEdit index "$i + [string length $what] chars"]
+            $ATextEdit tag add sel $i $j
+            $ATextEdit see $i
+            set FindIndex [$ATextEdit index $j]
+        } else {
+            $FindEntry configure -foreground red
+            set FindIndex 1.0
+        }
+    }
+}

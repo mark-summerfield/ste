@@ -6,6 +6,8 @@ package require ui
 oo::singleton create App {
     variable Filename
     variable ATextEdit
+    variable FindEntry
+    variable FindIndex
     variable StatusLabel
 }
 
@@ -17,6 +19,7 @@ oo::define App constructor {} {
     ui::wishinit
     tk appname ste
     set config [Config new] ;# we need tk scaling done early
+    set FindIndex 1.0
     set Filename [expr {$::argc ? [lindex $::argv 0] : ""}]
     if {$Filename eq ""} { set Filename [$config lastfile] }
     my make_ui

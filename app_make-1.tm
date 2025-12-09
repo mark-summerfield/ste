@@ -255,18 +255,37 @@ oo::define App method make_style_toolbar {} {
 oo::define App method make_widgets {} {
     set config [Config new]
     set ATextEdit [TextEdit new .mf [$config family] [$config size]]
+    my make_find_panel
     set StatusLabel [ttk::label .mf.statusLabel]
+}
+
+oo::define App method make_find_panel {} {
+    ttk::frame .mf.ff -relief sunken -height $::ICON_SIZE
+    ttk::label .mf.ff.findLabel -text Find -underline 1
+    set FindEntry [ttk::entry .mf.ff.findEntry]
+    ui::apply_edit_bindings $FindEntry
+    tooltip::tooltip $FindEntry "Text to find\nClick the Find button or\
+        Press F3 to do or redo the find."
+    ttk::button .mf.ff.findButton -text Find -underline 2 \
+        -image [ui::icon edit-find.svg $::ICON_SIZE] -compound left \
+        -width 9 -command [callback on_find]
+    tooltip::tooltip .mf.ff.findButton "Do or redo the find."
+    const opts "-pady 3 -padx 3"
+    pack .mf.ff.findLabel -side left {*}$opts
+    pack .mf.ff.findEntry -side left -fill both -expand 1 {*}$opts
+    pack .mf.ff.findButton -side right {*}$opts
 }
 
 oo::define App method make_layout {} {
     const opts "-pady 3 -padx 3"
     my make_toolbars_layout
     pack .mf.tb -side top -fill x {*}$opts
-    pack .mf.statusLabel -side bottom -fill x  {*}$opts
+    pack .mf.statusLabel -side bottom -fill x {*}$opts
     pack [ttk::sizegrip .mf.statusLabel.sizer] -side right -anchor se \
         {*}$opts
-    pack [$ATextEdit ttk_frame] -fill both -expand true {*}$opts
-    pack .mf -fill both -expand true
+    pack .mf.ff -side bottom -fill x {*}$opts
+    pack [$ATextEdit ttk_frame] -fill both -expand 1 {*}$opts
+    pack .mf -fill both -expand 1
 }
 
 oo::define App method make_toolbars_layout {} {
@@ -310,12 +329,16 @@ oo::define App method make_toolbars_layout {} {
 }
 
 oo::define App method make_bindings {} {
+    bind .mf.ff.findEntry <Return> {.mf.ff.findButton invoke}
+    bind . <F3> {.mf.ff.findButton invoke}
     bind . <Control-b> [callback on_style bold]
     # Auto: Control-c Copy
     bind . <Control-e> [callback on_style_align center]
     bind . <Control-i> [callback on_style italic]
+    bind . <Alt-i> {focus .mf.ff.findEntry}
     bind . <Control-l> [callback on_style_align left]
     bind . <Control-n> [callback on_file_new]
+    bind . <Alt-n> {.mf.ff.findButton invoke}
     bind . <Control-o> [callback on_file_open]
     bind . <Control-p> [callback on_file_print]
     bind . <Control-q> [callback on_quit]

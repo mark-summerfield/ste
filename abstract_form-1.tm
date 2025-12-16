@@ -4,7 +4,7 @@ oo::abstract create AbstractForm {
     variable Form
 }
 
-oo::define AbstractForm constructor {form on_close {modal true}} {
+oo::define AbstractForm constructor {form on_close {modal 1}} {
     set Form $form
     wm withdraw $Form
     if {[tk windowingsystem] eq "x11"} { wm attributes $Form -type dialog }

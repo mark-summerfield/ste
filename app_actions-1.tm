@@ -110,7 +110,7 @@ oo::define App method on_file_print {} {
 
 oo::define App method on_config {} {
     set config [Config new]
-    set ok [Ref new false]
+    set ok [Ref new 0]
     set family [$config family]
     set size [$config size]
     set form [ConfigForm new $ok]
@@ -178,7 +178,7 @@ oo::define App method on_style_bullet_list {} {
     set start [$ATextEdit get $i insert]
     set line [$ATextEdit get $i $j]
     if {$line eq "• "} {
-        $ATextEdit on_tab false
+        $ATextEdit on_tab 0
     } elseif {[regexp {^\S+} $start]} {
         $ATextEdit insert insert "• "
     } else {

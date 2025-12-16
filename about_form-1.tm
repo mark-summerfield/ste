@@ -29,7 +29,7 @@ oo::define AboutForm constructor {desc {url ""} {license GPLv3}} {
 oo::define AboutForm method make_widgets {} {
     tk::toplevel .aboutForm
     wm title .aboutForm "[tk appname] — About"
-    wm resizable .aboutForm false false
+    wm resizable .aboutForm 0 0
     ttk::frame .aboutForm.frame
     set background [ttk::style lookup TFrame -background]
     tk::text .aboutForm.frame.text -width 50 \
@@ -43,9 +43,9 @@ oo::define AboutForm method make_widgets {} {
 }
 
 oo::define AboutForm method make_layout {} {
-    pack .aboutForm.frame.text -side top -fill both -expand true -pady 3
+    pack .aboutForm.frame.text -side top -fill both -expand 1 -pady 3
     pack .aboutForm.frame.closeButton -side bottom -pady 6
-    pack .aboutForm.frame -fill both -expand true -pady 6
+    pack .aboutForm.frame -fill both -expand 1 -pady 6
 }
 
 oo::define AboutForm method make_bindings {} {
@@ -119,7 +119,6 @@ oo::define AboutForm method AddTextTags txt {
     {*}$cmd green -foreground darkgreen
     {*}$cmd bold -font bold
     {*}$cmd italic -font italic
-    {*}$cmd url -underline true -underlinefg darkgreen
-    {*}$cmd hr -overstrike true -overstrikefg gray67 \
-        -spacing3 10
+    {*}$cmd url -underline 1 -underlinefg darkgreen
+    {*}$cmd hr -overstrike 1 -overstrikefg gray67 -spacing3 10
 }

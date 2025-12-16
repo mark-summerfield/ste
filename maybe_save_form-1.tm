@@ -34,7 +34,7 @@ oo::define MaybeSaveForm method make_widgets {title body_text} {
         set size [expr {max(24, round(16 * [tk scaling]))}]
     }
     tk::toplevel .maybe_save_form
-    wm resizable .maybe_save_form false false
+    wm resizable .maybe_save_form 0 0
     wm title .maybe_save_form $title
     ttk::frame .maybe_save_form.frame
     ttk::label .maybe_save_form.frame.label -text $body_text \
@@ -53,13 +53,13 @@ oo::define MaybeSaveForm method make_widgets {title body_text} {
 
 oo::define MaybeSaveForm method make_layout {} {
     set opts "-padx 3 -pady 3"
-    pack .maybe_save_form.frame.label -side top -fill both -expand true \
+    pack .maybe_save_form.frame.label -side top -fill both -expand 1 \
         {*}$opts
     pack .maybe_save_form.frame.save_button -side left -anchor e {*}$opts
     pack .maybe_save_form.frame.dontsave_button -side left -anchor e \
         {*}$opts
     pack .maybe_save_form.frame.cancel_button -side left -anchor w {*}$opts
-    pack .maybe_save_form.frame -fill both -expand true
+    pack .maybe_save_form.frame -fill both -expand 1
 }
 
 oo::define MaybeSaveForm method make_bindings {} {

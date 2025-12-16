@@ -40,7 +40,7 @@ oo::define InsChrForm constructor ch {
 oo::define InsChrForm method make_widgets {} {
     classvariable ChrList
     tk::toplevel .ins_chr_form
-    wm resizable .ins_chr_form false false
+    wm resizable .ins_chr_form 0 0
     wm title .ins_chr_form "[tk appname] — Insert Character"
     ttk::frame .ins_chr_form.mf
     ttk::radiobutton .ins_chr_form.mf.arrow_radio -text "→ Arrow" \
@@ -90,7 +90,7 @@ oo::define InsChrForm method make_layout {} {
         -padx 3 -pady 6
     grid .ins_chr_form.mf.ok_button -row 5 -column 0 -sticky e {*}$opts
     grid .ins_chr_form.mf.cancel_button -row 5 -column 1 -sticky w {*}$opts
-    pack .ins_chr_form.mf -fill both -expand true
+    pack .ins_chr_form.mf -fill both -expand 1
 }
 
 oo::define InsChrForm method make_bindings {} {

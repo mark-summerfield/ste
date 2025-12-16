@@ -78,7 +78,7 @@ proc util::open_url url {
     exec {*}$cmd $url &
 }
 
-proc util::n_s {size {comma false}} {
+proc util::n_s {size {comma 0}} {
     if {!$size} { return [list "no" "s"] }
     if {$size == 1} { return [list "one" ""] }
     if {$comma} { return [list [commas $size] "s"] }

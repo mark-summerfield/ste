@@ -81,7 +81,7 @@ oo::define TextEdit method on_return {} {
     return -code break
 }
 
-oo::define TextEdit method on_tab {{user true}} {
+oo::define TextEdit method on_tab {{user 1}} {
     set p [$Text index "insert -1 char"]
     set i [$Text index "$p linestart"]
     set j [$Text index "$i lineend"]
@@ -101,7 +101,7 @@ oo::define TextEdit method TryCompletion p {
     set i [$Text index "$p wordstart"]
     set j [$Text index "$i wordend"]
     set prefix [string tolower [$Text get $i $j]]
-    if {[string trim $prefix] eq ""} { return false }
+    if {[string trim $prefix] eq ""} { return 0 }
     set candidates [dict create]
     foreach word [list {*}$COMMON_WORDS {*}[split [$Text get 1.0 end]]] {
         set word [regsub {^\W+} [regsub {\W+$} $word ""] ""]
@@ -138,7 +138,7 @@ oo::define TextEdit method TryCompletion p {
                 [expr {[winfo rootx $Text] + $x + 3}] $y
         }
     }
-    return true
+    return 1
 }
 
 # longest to shortest or compare strings for tie-break

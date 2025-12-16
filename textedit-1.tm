@@ -46,10 +46,10 @@ oo::define TextEdit constructor {parent {family ""} {size 0}} {
     set Frame ${parent}tf#[incr N] ;# unique
     ttk::frame $Frame
     set sa [scrollutil::scrollarea $Frame.sa -xscrollbarmode none]
-    set Text [text $Frame.sa.txt -undo true -wrap word]
+    set Text [text $Frame.sa.txt -undo 1 -wrap word]
     $sa setwidget $Text
     pack $sa -fill both -expand 1
-    set Completion true
+    set Completion 1
     set CompletionMenu [menu $Frame.completionMenu]
     my MakeContextMenu
     my MakeBindings
@@ -111,11 +111,11 @@ oo::define TextEdit method make_tags {} {
     classvariable COLOR_FOR_TAG
     $Text tag configure sub -font Small -offset -3p
     $Text tag configure sup -font Small -offset 3p
-    $Text tag configure ul -underline true
-    $Text tag configure strike -overstrike true -overstrikefg #FF1A1A
+    $Text tag configure ul -underline 1
+    $Text tag configure strike -overstrike 1 -overstrikefg #FF1A1A
     $Text tag configure center -justify center
     $Text tag configure right -justify right
-    $Text tag configure url -underline true -underlinefg $URL_UL_COLOR
+    $Text tag configure url -underline 1 -underlinefg $URL_UL_COLOR
     $Text tag configure bold -font Bold
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
@@ -159,13 +159,13 @@ oo::define TextEdit method isempty {} {
 oo::define TextEdit method clear {} {
     $Text delete 1.0 end
     $Text edit reset
-    $Text edit modified false
+    $Text edit modified 0
 }
 
 oo::define TextEdit method after_load {{index insert}} {
     my highlight_urls
     $Text edit reset
-    $Text edit modified false
+    $Text edit modified 0
     if {$index ne "insert"} { $Text mark set insert $index }
     $Text see $index
 }
@@ -235,7 +235,7 @@ oo::define TextEdit method apply_style_to {indexes style} {
         } else {
             $Text tag add $style {*}$indexes
         }
-        $Text edit modified true
+        $Text edit modified 1
     }
 }
 
@@ -265,7 +265,7 @@ oo::define TextEdit method apply_align_to {indexes align} {
                 $Text tag add $align {*}$indexes
             }
         }
-        $Text edit modified true
+        $Text edit modified 1
     }
 }
 
@@ -281,5 +281,5 @@ oo::define TextEdit method apply_color_to {indexes color} {
     if {$color ne "black"} {
         $Text tag add $color {*}$indexes
     }
-    $Text edit modified true
+    $Text edit modified 1
 }

@@ -71,6 +71,7 @@ oo::define TextEdit method MakeContextMenu {} {
 }
 
 oo::define TextEdit method MakeBindings {} {
+    set ::ntext::tabColor ""
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <<ContextMenu>> "tk_popup $ContextMenu %X %Y"
     bind $Text <BackSpace> [callback on_bs]

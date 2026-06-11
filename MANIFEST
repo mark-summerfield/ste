@@ -6,13 +6,13 @@
 #	bindent2 with -lmargin1 4 chars and -lmargin2 6 chars.
 #   - create bindings:
 #	. Tab → indent or completion & set correct indent tag
-#	. Ctrl-Tab → indent + bullet & ditto
-#	. Shift-Tab → unindent (remove 2 spaces or bullet space) & ditto
+#	. Ctrl-Tab → indent + bullet space & ditto
+#	. Shift-Tab → unindent (remove bullet space) & ditto
 #	. Backspace → normal backspace delete 1 char (just delete
 #		      binding and event handler)
 #	. Return → insert \n and set the new line to have the same
-#		   indentation (2 spaces or bullet space) and same indent
-#		   tag as the preceding line
+#		   indentation (spaces or spaces bullet space) and same
+#		   indent tag as the preceding line
 #	. Ctrl-Return → insert \n and set the new line to no indent tags
 
 ste.tk

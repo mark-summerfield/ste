@@ -1,3 +1,20 @@
+# TODO
+# Rework bullets/indents in TextEdit:
+#   - create 3 text widget tags:
+#	bindent0 with -lmargin1 0 and -lmargin2 2 chars;
+#	bindent1 with -lmargin1 2 chars and -lmargin2 4 chars;
+#	bindent2 with -lmargin1 4 chars and -lmargin2 6 chars.
+#   - create bindings:
+#	. Tab → indent or completion & set correct indent tag
+#	. Ctrl-Tab → indent + bullet & ditto
+#	. Shift-Tab → unindent (remove 2 spaces or bullet space) & ditto
+#	. Backspace → normal backspace delete 1 char (just delete
+#		      binding and event handler)
+#	. Return → insert \n and set the new line to have the same
+#		   indentation (2 spaces or bullet space) and same indent
+#		   tag as the preceding line
+#	. Ctrl-Return → insert \n and set the new line to no indent tags
+
 ste.tk
 app-1.tm
 app_make-1.tm
@@ -31,7 +48,7 @@ st.sh
 
 # NOTE ideas:
 # - Create 3 separate toolbars: File Edit Style so users can move/show/hide
-#   them; see notebox9
+#   them; see Notebox9
 # - Add status indicators: [nnn Lines][MOD]
 
 # vim: syn=yaml

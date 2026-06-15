@@ -5,7 +5,9 @@ package require ntext 1
 package require scrollutil_tile 2
 package require ui
 
-const ::TextEdit_DEBUG 1
+set ::TextEdit_DEBUG 1
+set ::TextEdit_BINDENT "• "
+set ::TextEdit_TINDENT "   "
 
 oo::class create TextEdit {
     variable Frame
@@ -123,8 +125,8 @@ oo::define TextEdit method make_tags {} {
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
     $Text tag configure highlight -background $HIGHLIGHT_COLOR
-    const BINDENT [font measure Sans "• "]
-    const TINDENT [font measure Sans "   "]
+    const BINDENT [font measure Sans $::TextEdit_BINDENT]
+    const TINDENT [font measure Sans $::TextEdit_TINDENT]
     if {$::TextEdit_DEBUG} {
         $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT \
             -background #FFC0CB

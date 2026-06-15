@@ -71,10 +71,10 @@ oo::define TextEdit method on_return {} {
 oo::define TextEdit method on_tab {{user 1} {bullet 0} {brk 1}} {
     if {[string match "*.0" [$Text index insert]]} { ;# start of new line
         if {$bullet} {
-            $Text insert insert "• " bindent0
+            $Text insert insert $::TextEdit_BINDENT bindent0
             set new_indent bindent0
         } else {
-            $Text insert insert "   " tindent0
+            $Text insert insert $::TextEdit_TINDENT tindent0
             set new_indent tindent0
         }
         $Text tag add $new_indent "insert linestart" "insert lineend +1c"

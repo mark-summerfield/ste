@@ -23,7 +23,7 @@ package require textedit_initialize
 package require textedit_serialize
 
 oo::define TextEdit classmethod make_color_menu {the_menu the_callback} {
-    #              K E N B L C T V G I A W D O R P U M
+    ;#             K E N B L C T V G I A W D O R P U M
     const INDEXES {4 2 0 0 0 0 0 3 0 1 1 3 3 0 0 0 1 0}
     foreach index $INDEXES {name color} [TextEdit colors] {
         $the_menu add command -underline $index \

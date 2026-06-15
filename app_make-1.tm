@@ -133,12 +133,19 @@ oo::define App method make_style_menu {} {
         -label Superscript -underline 2 -compound left \
         -image [ui::icon superscript.svg $::MENU_ICON_SIZE]
     .menu.style add separator
-    .menu.style add command -command [callback on_style_bullet_list] \
-        -label "Bullet List" -underline 5 -compound left \
+    .menu.style add command -command [callback on_style_insert_bullet] \
+        -label "Insert Bullet Point" -underline 5 -compound left \
+        -accelerator Ctrl+Tab \
         -image [ui::icon bullet-list.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_style_no_bullet_list] \
-        -label "No Bullet List" -underline 0 -compound left \
-        -image [ui::icon no-bullet-list.svg $::MENU_ICON_SIZE]
+    .menu.style add command \
+        -command [callback on_style_indent_or_complete] \
+        -accelerator Tab -label "Indent or Complete" -underline 1 \
+        -compound left \
+        -image [ui::icon format-indent-more.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style_unindent] \
+        -label "Unindent" -underline 4 -compound left \
+        -accelerator Backspace \
+        -image [ui::icon format-indent-less.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style_align left] \
         -label "Left Align" -underline 0 -compound left \
@@ -239,9 +246,9 @@ oo::define App method make_style_toolbar {} {
         -image [ui::icon superscript.svg $::ICON_SIZE]
     $tip .mf.tb.style_sup "Style Superscript"
     ttk::button .mf.tb.style_bullet -style Toolbutton -takefocus 0 \
-        -command [callback on_style_bullet_list] \
+        -command [callback on_style_insert_bullet] \
         -image [ui::icon bullet-list.svg $::ICON_SIZE]
-    $tip .mf.tb.style_bullet "Bullet List"
+    $tip .mf.tb.style_bullet "Insert Bullet Point"
     ttk::button .mf.tb.style_left -style Toolbutton -takefocus 0 \
         -command [callback on_style_align left] \
         -image [ui::icon format-justify-left.svg $::ICON_SIZE]

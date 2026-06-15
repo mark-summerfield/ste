@@ -156,8 +156,6 @@ oo::define App method on_edit_ins_chr {} {
         if {$ch eq "Q"} {
             $ATextEdit insert insert “”
             $ATextEdit mark set insert "insert -1 char"
-        } elseif {$ch eq "•"} {
-            my on_style_bullet_list
         } else {
             $ATextEdit insert insert $ch
         }
@@ -172,43 +170,13 @@ oo::define App method on_style_color color {
 
 oo::define App method on_style_align align { $ATextEdit apply_align $align }
 
-oo::define App method on_style_bullet_list {} {
-    set i [$ATextEdit index "insert linestart"]
-    set j [$ATextEdit index "insert lineend"]
-    set start [$ATextEdit get $i insert]
-    set line [$ATextEdit get $i $j]
-    if {$line eq "• "} {
-        $ATextEdit on_tab 0
-    } elseif {[regexp {^\S+} $start]} {
-        $ATextEdit insert insert "• "
-    } else {
-        set tag ""
-        set tags [$ATextEdit tag names insert]
-        if {"bindent0" in $tags} {
-            $ATextEdit tag remove bindent0 $i $j
-            set tag bindent1
-        } else {
-            set tag bindent0
-        }
-        $ATextEdit tag remove NtextTab $i $j
-        $ATextEdit insert insert "• " $tag
-        $ATextEdit tag add $tag insert "insert +1 line"
-    }
+oo::define App method on_style_insert_bullet {} { $ATextEdit on_ctrl_tab 0 }
+
+oo::define App method on_style_indent_or_complete {} {
+    $ATextEdit on_tab 1 0 0
 }
 
-oo::define App method on_style_no_bullet_list {} {
-    set i [$ATextEdit index "insert linestart"]
-    set j [$ATextEdit index "insert lineend"]
-    set line [$ATextEdit get $i $j]
-    if {[regexp {^\s*•\s+$} $line]} {
-        $ATextEdit delete $i $j
-        set i [$ATextEdit index "$i -1 char"]
-        set j [$ATextEdit index "$j +1 char"]
-        $ATextEdit tag remove NtextTab $i $j
-        $ATextEdit tag remove bindent0 $i $j
-        $ATextEdit tag remove bindent1 $i $j
-    }
-}
+oo::define App method on_style_unindent {} { $ATextEdit on_bs 0 }
 
 oo::define App method on_find_changed {} {
     const opts "-pady 3 -padx 3"

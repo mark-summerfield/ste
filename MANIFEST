@@ -1,3 +1,13 @@
+# TODO
+#   - change bindent "• " → " • "
+#   - change tindent "  " → "   "
+# TODO
+#   - implement numbered lists:
+#	. change nindent "1. " … "9. "
+# TODO
+#   - Ctrl+PageUp → move cursor to first line on screen
+#   - Ctrl+PageDn → move cursor to last line on screen
+
 ste.tk
 app-1.tm
 app_make-1.tm

@@ -11,6 +11,12 @@ oo::define App method file_open {} {
 }
 
 oo::define App method file_save {} {
+    if {![file isdirectory [file dirname $Filename]]} {
+        if {![$ATextEdit isempty]} {
+            my on_file_save_as
+        }
+        return
+    }
     set ext [file extension $Filename]
     set out [$ATextEdit serialize $ext]
     if {$ext eq ".tkt"} {

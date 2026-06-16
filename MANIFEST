@@ -39,6 +39,9 @@ README.md
 
 st.sh
 
+# TODO
+# - update import/export to handle [bnt]indent[0-2]
+#
 # NOTE ideas:
 # - Create 3 separate toolbars: File Edit Style so users can move/show/hide
 #   them; see Notebox9

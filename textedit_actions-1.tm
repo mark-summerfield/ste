@@ -27,7 +27,7 @@ oo::define TextEdit method on_bs {{brk 1}} {
         set i [$Text index "insert linestart"]
         set j [$Text index "insert lineend"]
         if {[set line [$Text get $i $j]] ne ""} {
-            if {[regexp {^(?:•|[1-9]\.)\s+$} $line match]} {
+            if {[regexp {^(?:\s•|[1-9]\.)?\s+$} $line match]} {
                 set indent [my GetIndent]
                 $Text delete $i "$i + [string length $match] chars"
                 my ReduceIndent $indent
@@ -115,7 +115,7 @@ oo::define TextEdit method on_tab {{user 1} {kind 0} {brk 1}} {
     set j [$Text index "insert lineend +1c"]
     if {[set line [$Text get $i $j]] ne ""} {
         if {[string is space $pc] && \
-                [regexp {^(?:•|[1-9]\.)\s+} $line match]} {
+                [regexp {^(?:\s•|[1-9]\.)?\s+} $line match]} {
             set indent [my GetIndent]
             my IncreaseIndent $i $j $indent $match
         }

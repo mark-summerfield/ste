@@ -3,11 +3,12 @@
 package require util
 
 oo::define App method file_open {} {
-    $ATextEdit deserialize [readFile $Filename binary] \
-        [file extension $Filename]
-    $ATextEdit focus
-    wm title . "[tk appname] — [file tail $Filename]"
-    my show_message "Opened '$Filename'."
+    if {[$ATextEdit deserialize [readFile $Filename binary] \
+            [file extension $Filename]]} {
+        $ATextEdit focus
+        wm title . "[tk appname] — [file tail $Filename]"
+        my show_message "Opened '$Filename'."
+    }
 }
 
 oo::define App method file_save {} {

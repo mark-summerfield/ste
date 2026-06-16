@@ -14,6 +14,7 @@ oo::define TextEdit method serialize {{file_format .ste}} {
 }
 
 oo::define TextEdit method deserialize {raw file_format} {
+    if {$file_format ni {.ste .tkt .tktz}} { return 0 }
     my clear
     set txt_dump [my GetTxtDump $raw $file_format]
     array set tags {}
@@ -44,6 +45,7 @@ oo::define TextEdit method deserialize {raw file_format} {
         $Text tag add $value $tags($value) end
     }
     my after_load $insert_index
+    return 1
 }
 
 oo::define TextEdit method GetTxtDump {raw file_format} {

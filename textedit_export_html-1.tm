@@ -40,14 +40,34 @@ oo::define TextEdit method HtmlTagOn {prefix tag} {
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
     switch $tag {
-        bindent0 {
-            set prefix_ "<p style=\"padding-left: 1em;\
+        bindent0 - tindent0 {
+            set prefix_ "<p style=\"padding-left: 2em;\
                 text-indent: -1em;\">"
             return
         }
-        bindent1 {
-            set prefix_ "<p style=\"padding-left: 2em;\
+        bindent1 - tindent1 {
+            set prefix_ "<p style=\"padding-left: 4em;\
                 text-indent: -1em;\">"
+            return
+        }
+        bindent2 - tindent2 {
+            set prefix_ "<p style=\"padding-left: 6em;\
+                text-indent: -1em;\">"
+            return
+        }
+        nindent0 {
+            set prefix_ "<p style=\"padding-left: 2em;\
+                text-indent: -1.5em;\">"
+            return
+        }
+        nindent1 {
+            set prefix_ "<p style=\"padding-left: 4em;\
+                text-indent: -1.5em;\">"
+            return
+        }
+        nindent2 {
+            set prefix_ "<p style=\"padding-left: 6em;\
+                text-indent: -1.5em;\">"
             return
         }
         center {

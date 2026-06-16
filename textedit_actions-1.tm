@@ -39,6 +39,15 @@ oo::define TextEdit method on_bs {{brk 1}} {
     # otherwise normal backspace delete
 }
 
+oo::define TextEdit method on_ctrl_prior {} {
+    $Text mark set insert [$Text index @0,0]
+}
+
+oo::define TextEdit method on_ctrl_next {} {
+    $Text mark set insert \
+        [$Text index "@0,[expr {[winfo height $Text] - 1}]"]
+}
+
 oo::define TextEdit method on_ctrl_bs {} {
     set i [$Text index "insert -1c"]
     set x [$Text index "$i wordstart"]

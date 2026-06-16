@@ -112,7 +112,7 @@ oo::define App method make_style_menu {} {
         -label Italic -underline 0 -compound left -accelerator Ctrl+I \
         -image [ui::icon format-text-italic.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style ul] \
-        -label Underline -underline 0 -compound left \
+        -label Underline -underline 2 -compound left \
         -image [ui::icon format-text-underline.svg $::MENU_ICON_SIZE]
     menu .menu.style.colors
     .menu.style add cascade -menu .menu.style.colors -label Color \
@@ -130,20 +130,24 @@ oo::define App method make_style_menu {} {
         -label Subscript -underline 0 -compound left \
         -image [ui::icon subscript.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style sup] \
-        -label Superscript -underline 2 -compound left \
+        -label Superscript -underline 3 -compound left \
         -image [ui::icon superscript.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style_insert_bullet] \
-        -label "Insert Bullet Point" -underline 5 -compound left \
+        -label "Insert Bullet Point" -underline 14 -compound left \
         -accelerator Ctrl+Tab \
         -image [ui::icon bullet-list.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style_insert_number] \
+        -label "Insert Numbered Point" -underline 7 -compound left \
+        -accelerator Ctrl+1 \
+        -image [ui::icon numbered-list.svg $::MENU_ICON_SIZE]
     .menu.style add command \
         -command [callback on_style_indent_or_complete] \
-        -accelerator Tab -label "Indent or Complete" -underline 1 \
+        -accelerator Tab -label "Indent or Complete" -underline 5 \
         -compound left \
         -image [ui::icon format-indent-more.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_unindent] \
-        -label "Unindent" -underline 4 -compound left \
+        -label "Unindent" -underline 0 -compound left \
         -accelerator Backspace \
         -image [ui::icon format-indent-less.svg $::MENU_ICON_SIZE]
     .menu.style add separator
@@ -151,7 +155,7 @@ oo::define App method make_style_menu {} {
         -label "Left Align" -underline 0 -compound left \
         -image [ui::icon format-justify-left.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_align center] \
-        -label "Center Align" -underline 1 -compound left \
+        -label "Center Align" -underline 7 -compound left \
         -image [ui::icon format-justify-center.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_align right] \
         -label "Right Align" -underline 0 -compound left \
@@ -249,6 +253,10 @@ oo::define App method make_style_toolbar {} {
         -command [callback on_style_insert_bullet] \
         -image [ui::icon bullet-list.svg $::ICON_SIZE]
     $tip .mf.tb.style_bullet "Insert Bullet Point"
+    ttk::button .mf.tb.style_number -style Toolbutton -takefocus 0 \
+        -command [callback on_style_insert_number] \
+        -image [ui::icon numbered-list.svg $::ICON_SIZE]
+    $tip .mf.tb.style_number "Insert Numbered Point"
     ttk::button .mf.tb.style_left -style Toolbutton -takefocus 0 \
         -command [callback on_style_align left] \
         -image [ui::icon format-justify-left.svg $::ICON_SIZE]
@@ -331,6 +339,7 @@ oo::define App method make_toolbars_layout {} {
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
     pack .mf.tb.style_bullet -side left
+    pack .mf.tb.style_number -side left
     pack [ttk::separator .mf.tb.sep[incr n] -orient vertical] -side left \
         -fill y {*}$opts
     pack .mf.tb.style_left -side left

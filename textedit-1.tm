@@ -84,6 +84,7 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <'> [callback on_single_quote]
     bind $Text <Tab> [callback on_tab]
     bind $Text <Control-Tab> [callback on_ctrl_tab]
+    bind $Text <Control-Key-1> [callback on_ctrl_key_1]
     bind $Text <Return> [callback on_return]
 }
 
@@ -128,17 +129,23 @@ oo::define TextEdit method make_tags {} {
     const TINDENT [font measure Sans "   "]
     if {$::TextEdit_DEBUG} {
         $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT \
-            -background #FFC0CB
+            -background #FFB4B4
         $Text tag configure bindent1 -lmargin1 $BINDENT \
-            -lmargin2 [expr {2 * $BINDENT}] -background #C0FFD5
+            -lmargin2 [expr {2 * $BINDENT}] -background #FFCDCD
         $Text tag configure bindent2 -lmargin1 [expr {2 * $BINDENT}] \
-            -lmargin2 [expr {3 * $BINDENT}] -background #C0EBFF
+            -lmargin2 [expr {3 * $BINDENT}] -background #FFE7E7
         $Text tag configure tindent0 -lmargin1 0 -lmargin2 $TINDENT \
-            -background #FFFFCD
+            -background #B4FFB4
         $Text tag configure tindent1 -lmargin1 $TINDENT \
-            -lmargin2 [expr {2 * $TINDENT}] -background #CDE6FF
+            -lmargin2 [expr {2 * $TINDENT}] -background #CDFFCD
         $Text tag configure tindent2 -lmargin1 [expr {2 * $TINDENT}] \
-            -lmargin2 [expr {3 * $TINDENT}] -background #E6CDFF
+            -lmargin2 [expr {3 * $TINDENT}] -background #E7FFE7
+        $Text tag configure nindent0 -lmargin1 0 -lmargin2 $NINDENT \
+            -background #B4B4FF
+        $Text tag configure nindent1 -lmargin1 $NINDENT \
+            -lmargin2 [expr {2 * $NINDENT}] -background #CDCDFF
+        $Text tag configure nindent2 -lmargin1 [expr {2 * $NINDENT}] \
+            -lmargin2 [expr {3 * $NINDENT}] -background #E7E7FF
     } else {
         $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT
         $Text tag configure bindent1 -lmargin1 $BINDENT \
@@ -150,6 +157,11 @@ oo::define TextEdit method make_tags {} {
             -lmargin2 [expr {2 * $TINDENT}]
         $Text tag configure tindent2 -lmargin1 [expr {2 * $TINDENT}] \
             -lmargin2 [expr {3 * $TINDENT}]
+        $Text tag configure nindent0 -lmargin1 0 -lmargin2 $NINDENT
+        $Text tag configure nindent1 -lmargin1 $NINDENT \
+            -lmargin2 [expr {2 * $NINDENT}]
+        $Text tag configure nindent2 -lmargin1 [expr {2 * $NINDENT}] \
+            -lmargin2 [expr {3 * $NINDENT}]
     }
     dict for {key value} $COLOR_FOR_TAG {
         $Text tag configure $key -foreground $value

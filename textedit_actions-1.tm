@@ -27,7 +27,7 @@ oo::define TextEdit method on_bs {{brk 1}} {
         set i [$Text index "insert linestart"]
         set j [$Text index "insert lineend"]
         if {[set line [$Text get $i $j]] ne ""} {
-            if {[regexp {^[•\s]+$} $line match]} {
+            if {[regexp {^(?:•|[1-9]\.)\s+$} $line match]} {
                 set indent [my GetIndent]
                 $Text delete $i "$i + [string length $match] chars"
                 my ReduceIndent $indent
@@ -62,20 +62,32 @@ oo::define TextEdit method on_return {} {
     set j [$Text index "insert lineend"]
     set line [$Text get $i $j]
     $Text insert insert \n
+    set indent [my GetIndent]
     if {[regexp {^[•\s]+} $line match]} {
-        $Text insert insert $match [my GetIndent]
+        $Text insert insert $match $indent
+    } elseif {[regexp {^([1-9])\.\s+} $line match n]} {
+        if {$n < 9} {
+            $Text insert insert [incr n][string range $match 1 end] $indent
+        }
     }
     return -code break
 }
 
-oo::define TextEdit method on_tab {{user 1} {bullet 0} {brk 1}} {
+oo::define TextEdit method on_tab {{user 1} {kind 0} {brk 1}} {
     if {[string match "*.0" [$Text index insert]]} { ;# start of new line
-        if {$bullet} {
-            $Text insert insert " • " bindent0
-            set new_indent bindent0
-        } else {
-            $Text insert insert "   " tindent0
-            set new_indent tindent0
+        switch $kind {
+            1 {
+                $Text insert insert " • " bindent0
+                set new_indent bindent0
+            }
+            2 {
+                $Text insert insert "1. " nindent0
+                set new_indent nindent0
+            }
+            default {
+                $Text insert insert "   " tindent0
+                set new_indent tindent0
+            }
         }
         $Text tag add $new_indent "insert linestart" "insert lineend +1c"
         if {$brk} { return -code break }
@@ -93,9 +105,10 @@ oo::define TextEdit method on_tab {{user 1} {bullet 0} {brk 1}} {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend +1c"]
     if {[set line [$Text get $i $j]] ne ""} {
-        if {[string is space $pc] && [regexp {^[•\s]+} $line match]} {
+        if {[string is space $pc] && \
+                [regexp {^(?:•|[1-9]\.)\s+} $line match]} {
             set indent [my GetIndent]
-            my IncreaseIndent $i $j $indent
+            my IncreaseIndent $i $j $indent $match
         }
     }
     if {$brk} { return -code break }
@@ -104,6 +117,11 @@ oo::define TextEdit method on_tab {{user 1} {bullet 0} {brk 1}} {
 
 oo::define TextEdit method on_ctrl_tab {{brk 1}} {
     catch {[my on_tab 0 1]}
+    if {$brk} { return -code break }
+}
+
+oo::define TextEdit method on_ctrl_key_1 {{brk 1}} {
+    catch {[my on_tab 0 2]}
     if {$brk} { return -code break }
 }
 
@@ -186,6 +204,7 @@ oo::define TextEdit method ClearIndents {} {
     $Text tag remove NtextTab $i $j
     foreach n {0 1 2} {
         $Text tag remove bindent$n $i $j
+        $Text tag remove nindent$n $i $j
         $Text tag remove tindent$n $i $j
     }
 }
@@ -201,28 +220,43 @@ oo::define TextEdit method ReduceIndent indent {
     set j [$Text index "insert lineend"]
     my ClearIndents
     switch $indent {
-        tindent0 {}
-        tindent1 { $Text tag add tindent0 $i $j }
-        tindent2 { $Text tag add tindent1 $i $j }
         bindent0 {}
         bindent1 { $Text tag add bindent0 $i $j }
         bindent2 { $Text tag add bindent1 $i $j }
+        nindent0 {}
+        nindent1 { $Text tag add nindent0 $i $j }
+        nindent2 { $Text tag add nindent1 $i $j }
+        tindent0 {}
+        tindent1 { $Text tag add tindent0 $i $j }
+        tindent2 { $Text tag add tindent1 $i $j }
         default {}
     }
 }
 
-oo::define TextEdit method IncreaseIndent {i j indent} {
+oo::define TextEdit method IncreaseIndent {i j indent {match ""}} {
     $Text tag remove NtextTab $i $j
-    if {$indent in {tindent0 tindent1 bindent0 bindent1}} {
+    if {$indent in {bindent0 bindent1 nindent0 nindent1 tindent0 \
+                    tindent1}} {
         $Text tag remove $indent $i $j
     }
     switch $indent {
-        tindent0 { $Text tag add tindent1 $i $j }
-        tindent1 { $Text tag add tindent2 $i $j }
-        tindent2 {}
         bindent0 { $Text tag add bindent1 $i $j }
         bindent1 { $Text tag add bindent2 $i $j }
         bindent2 {}
+        nindent0 {
+            set n [string index $match 0]
+            $Text replace $i "$i +1c" 1
+            $Text tag add nindent1 $i $j
+        }
+        nindent1 {
+            set n [string index $match 0]
+            $Text replace $i "$i +1c" 1
+            $Text tag add nindent2 $i $j
+        }
+        nindent2 {}
+        tindent0 { $Text tag add tindent1 $i $j }
+        tindent1 { $Text tag add tindent2 $i $j }
+        tindent2 {}
         default {}
     }
 }

@@ -172,6 +172,10 @@ oo::define App method on_style_align align { $ATextEdit apply_align $align }
 
 oo::define App method on_style_insert_bullet {} { $ATextEdit on_ctrl_tab 0 }
 
+oo::define App method on_style_insert_number {} {
+    $ATextEdit on_ctrl_key_1 0
+}
+
 oo::define App method on_style_indent_or_complete {} {
     $ATextEdit on_tab 1 0 0
 }

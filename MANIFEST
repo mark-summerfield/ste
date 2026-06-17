@@ -30,6 +30,8 @@ README.md
 st.sh
 
 # NOTE ideas:
+# - Improved HTML output (not for round-trips)
+# - .odt output (again, not for round-trips)
 # - Create 3 separate toolbars: File Edit Style so users can move/show/hide
 #   them; see Notebox9
 # - Add status indicators: [nnn Lines][MOD]

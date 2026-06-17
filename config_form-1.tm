@@ -11,6 +11,7 @@ oo::class create ConfigForm {
     variable Blinking
     variable FontFamily
     variable FontSize
+    variable ShowIndents
 }
 
 oo::define ConfigForm constructor ok {
@@ -19,6 +20,7 @@ oo::define ConfigForm constructor ok {
     set Blinking [$config blinking]
     set FontFamily [$config family]
     set FontSize [$config size]
+    set ShowIndents [$config show_indents]
     my make_widgets 
     my make_layout
     my make_bindings
@@ -41,6 +43,13 @@ oo::define ConfigForm method make_widgets {} {
     $tip .configForm.mf.scaleSpinbox "Application’s scale factor.\n\
         Restart to apply."
     .configForm.mf.scaleSpinbox set [format %.2f [tk scaling]]
+    ttk::checkbutton .configForm.mf.showIndentsCheckbutton \
+        -text "Show Indents" -underline 5 -variable [my varname ShowIndents]
+    if {$ShowIndents} {
+        .configForm.mf.showIndentsCheckbutton state selected
+    }
+    $tip .configForm.mf.showIndentsCheckbutton \
+        "Whether to color highlight indents."
     ttk::checkbutton .configForm.mf.blinkCheckbutton \
         -text "Cursor Blink" -underline 7 \
         -variable [my varname Blinking]
@@ -76,7 +85,8 @@ oo::define ConfigForm method make_layout {} {
     grid .configForm.mf.fontButton -row 1 -column 0 -sticky w {*}$opts
     grid .configForm.mf.fontLabel -row 1 -column 1 -columnspan 2 \
         -sticky news {*}$opts
-    grid .configForm.mf.blinkCheckbutton -row 2 -column 1 -sticky we
+    grid .configForm.mf.showIndentsCheckbutton -row 2 -column 1 -sticky we
+    grid .configForm.mf.blinkCheckbutton -row 3 -column 1 -sticky we
     grid .configForm.mf.configFileLabel -row 8 -column 0 -sticky we \
         {*}$opts
     grid .configForm.mf.configFilenameLabel -row 8 -column 1 \
@@ -96,6 +106,7 @@ oo::define ConfigForm method make_bindings {} {
     bind .configForm <Return> [callback on_ok]
     bind .configForm <Alt-b> {.configForm.mf.blinkCheckbutton invoke}
     bind .configForm <Alt-f> [callback on_font]
+    bind .configForm <Alt-i> {.configForm.mf.showIndentsCheckbutton invoke}
     bind .configForm <Alt-o> [callback on_ok]
     bind .configForm <Alt-s> {focus .configForm.mf.scaleSpinbox}
 }
@@ -126,6 +137,7 @@ oo::define ConfigForm method on_ok {} {
     $config set_blinking $Blinking
     $config set_family $FontFamily
     $config set_size $FontSize
+    $config set_show_indents $ShowIndents
     $Ok set 1
     my delete
 }

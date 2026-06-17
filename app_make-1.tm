@@ -274,6 +274,7 @@ oo::define App method make_style_toolbar {} {
 oo::define App method make_widgets {} {
     set config [Config new]
     set ATextEdit [TextEdit new .mf [$config family] [$config size]]
+    $ATextEdit show_indents [$config show_indents]
     my make_find_panel
     set StatusLabel [ttk::label .mf.statusLabel]
 }

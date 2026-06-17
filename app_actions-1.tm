@@ -113,11 +113,15 @@ oo::define App method on_config {} {
     set ok [Ref new 0]
     set family [$config family]
     set size [$config size]
+    set show_indents [$config show_indents]
     set form [ConfigForm new $ok]
     tkwait window [$form form]
     if {[$ok get]} {
         if {$family ne [$config family] || $size != [$config size]} {
             $ATextEdit make_fonts [$config family] [$config size]
+        }
+        if {$show_indents != [$config show_indents]} {
+            $ATextEdit show_indents [$config show_indents]
         }
     }
 }

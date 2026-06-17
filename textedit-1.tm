@@ -5,8 +5,6 @@ package require ntext 1
 package require scrollutil_tile 2
 package require ui
 
-set ::TextEdit_DEBUG 1
-
 oo::class create TextEdit {
     variable Frame
     variable Text
@@ -129,42 +127,21 @@ oo::define TextEdit method make_tags {} {
     const BINDENT [font measure Sans " • "]
     const NINDENT [font measure Sans "9. "]
     const TINDENT [font measure Sans "   "]
-    if {$::TextEdit_DEBUG} {
-        $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT \
-            -background #FFB4B4
-        $Text tag configure bindent1 -lmargin1 $BINDENT \
-            -lmargin2 [expr {2 * $BINDENT}] -background #FFCDCD
-        $Text tag configure bindent2 -lmargin1 [expr {2 * $BINDENT}] \
-            -lmargin2 [expr {3 * $BINDENT}] -background #FFE7E7
-        $Text tag configure tindent0 -lmargin1 0 -lmargin2 $TINDENT \
-            -background #B4FFB4
-        $Text tag configure tindent1 -lmargin1 $TINDENT \
-            -lmargin2 [expr {2 * $TINDENT}] -background #CDFFCD
-        $Text tag configure tindent2 -lmargin1 [expr {2 * $TINDENT}] \
-            -lmargin2 [expr {3 * $TINDENT}] -background #E7FFE7
-        $Text tag configure nindent0 -lmargin1 0 -lmargin2 $NINDENT \
-            -background #B4B4FF
-        $Text tag configure nindent1 -lmargin1 $NINDENT \
-            -lmargin2 [expr {2 * $NINDENT}] -background #CDCDFF
-        $Text tag configure nindent2 -lmargin1 [expr {2 * $NINDENT}] \
-            -lmargin2 [expr {3 * $NINDENT}] -background #E7E7FF
-    } else {
-        $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT
-        $Text tag configure bindent1 -lmargin1 $BINDENT \
-            -lmargin2 [expr {2 * $BINDENT}]
-        $Text tag configure bindent2 -lmargin1 [expr {2 * $BINDENT}] \
-            -lmargin2 [expr {3 * $BINDENT}]
-        $Text tag configure tindent0 -lmargin1 0 -lmargin2 $TINDENT
-        $Text tag configure tindent1 -lmargin1 $TINDENT \
-            -lmargin2 [expr {2 * $TINDENT}]
-        $Text tag configure tindent2 -lmargin1 [expr {2 * $TINDENT}] \
-            -lmargin2 [expr {3 * $TINDENT}]
-        $Text tag configure nindent0 -lmargin1 0 -lmargin2 $NINDENT
-        $Text tag configure nindent1 -lmargin1 $NINDENT \
-            -lmargin2 [expr {2 * $NINDENT}]
-        $Text tag configure nindent2 -lmargin1 [expr {2 * $NINDENT}] \
-            -lmargin2 [expr {3 * $NINDENT}]
-    }
+    $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT
+    $Text tag configure bindent1 -lmargin1 $BINDENT \
+        -lmargin2 [expr {2 * $BINDENT}]
+    $Text tag configure bindent2 -lmargin1 [expr {2 * $BINDENT}] \
+        -lmargin2 [expr {3 * $BINDENT}]
+    $Text tag configure tindent0 -lmargin1 0 -lmargin2 $TINDENT
+    $Text tag configure tindent1 -lmargin1 $TINDENT \
+        -lmargin2 [expr {2 * $TINDENT}]
+    $Text tag configure tindent2 -lmargin1 [expr {2 * $TINDENT}] \
+        -lmargin2 [expr {3 * $TINDENT}]
+    $Text tag configure nindent0 -lmargin1 0 -lmargin2 $NINDENT
+    $Text tag configure nindent1 -lmargin1 $NINDENT \
+        -lmargin2 [expr {2 * $NINDENT}]
+    $Text tag configure nindent2 -lmargin1 [expr {2 * $NINDENT}] \
+        -lmargin2 [expr {3 * $NINDENT}]
     dict for {key value} $COLOR_FOR_TAG {
         $Text tag configure $key -foreground $value
     }
@@ -320,4 +297,24 @@ oo::define TextEdit method apply_color_to {indexes color} {
         $Text tag add $color {*}$indexes
     }
     $Text edit modified 1
+}
+
+oo::define TextEdit method show_indents show {
+    if {$show} {
+        $Text tag configure bindent0 -background #FFB4B4
+        $Text tag configure bindent1 -background #FFCDCD
+        $Text tag configure bindent2 -background #FFE7E7
+        $Text tag configure tindent0 -background #B4FFB4
+        $Text tag configure tindent1 -background #CDFFCD
+        $Text tag configure tindent2 -background #E7FFE7
+        $Text tag configure nindent0 -background #B4B4FF
+        $Text tag configure nindent1 -background #CDCDFF
+        $Text tag configure nindent2 -background #E7E7FF
+    } else {
+        foreach n {0 1 2} {
+            $Text tag configure bindent$n -background {}
+            $Text tag configure nindent$n -background {}
+            $Text tag configure tindent$n -background {}
+        }
+    }
 }

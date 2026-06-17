@@ -11,6 +11,7 @@ oo::singleton create Config {
     variable FontFamily
     variable FontSize
     variable LastFile
+    variable ShowIndents
 }
 
 oo::define Config constructor {} {
@@ -20,6 +21,7 @@ oo::define Config constructor {} {
     set FontFamily [font configure TkDefaultFont -family]
     set FontSize [expr {1 + [font configure TkDefaultFont -size]}]
     set LastFile ""
+    set ShowIndents 0
     if {[file exists $Filename] && [file size $Filename]} {
         set ini [ini::open $Filename -encoding utf-8 r]
         try {
@@ -33,6 +35,8 @@ oo::define Config constructor {} {
             set FontFamily [ini::value $ini General FontFamily $FontFamily]
             set FontSize [ini::value $ini General FontSize $FontSize]
             set LastFile [ini::value $ini General LastFile $LastFile]
+            set ShowIndents [ini::value $ini General ShowIndents \
+                $ShowIndents]
         } on error err {
             puts "invalid config in '$Filename'; using defaults: $err"
         } finally {
@@ -50,6 +54,7 @@ oo::define Config method save filename {
         ini::set $ini General FontFamily [my family]
         ini::set $ini General FontSize [my size]
         ini::set $ini General LastFile $filename
+        ini::set $ini General ShowIndents [my show_indents]
         ini::commit $ini
     } finally {
         ini::close $ini
@@ -74,8 +79,13 @@ oo::define Config method set_family family { set FontFamily $family }
 oo::define Config method lastfile {} { return $LastFile }
 oo::define Config method set_lastfile lastfile { set LastFile $lastfile }
 
+oo::define Config method show_indents {} { return $ShowIndents }
+oo::define Config method set_show_indents show_indents {
+    set ShowIndents $show_indents
+}
+
 oo::define Config method to_string {} {
     return "Config filename=$Filename blinking=$Blinking\
         scaling=[tk scaling] geometry=$Geometry fontfamily=$FontFamily\
-        fontsize=$FontSize lastfile=$LastFile"
+        fontsize=$FontSize lastfile=$LastFile show_indents=$ShowIndents"
 }

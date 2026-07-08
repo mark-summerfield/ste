@@ -15,17 +15,17 @@ oo::define TextEdit method as_html title {
             } else {
                 set c [html::html_entities $c]
             }
-            if {$tag_off ne ""} {
-                foreach tag [$tag_off tags] {
-                    lappend line [my HtmlTagOff $tag]
-                }
-            }
             if {$tag_on ne ""} {
                 foreach tag [$tag_on tags] {
                     lappend line [my HtmlTagOn prefix $tag]
                 }
             }
             if {$c ne ""} { lappend line $c }
+            if {$tag_off ne ""} {
+                foreach tag [$tag_off tags] {
+                    lappend line [my HtmlTagOff $tag]
+                }
+            }
         }
         if {[set line [string trim [join $line ""]]] ne ""} {
             lappend out "$prefix\n$line\n</p>\n"
@@ -40,34 +40,11 @@ oo::define TextEdit method HtmlTagOn {prefix tag} {
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
     switch $tag {
-        bindent0 - tindent0 {
-            set prefix_ "<p style=\"padding-left: 2em;\
-                text-indent: -1em;\">"
-            return
-        }
-        bindent1 - tindent1 {
-            set prefix_ "<p style=\"padding-left: 4em;\
-                text-indent: -1em;\">"
-            return
-        }
-        bindent2 - tindent2 {
-            set prefix_ "<p style=\"padding-left: 6em;\
-                text-indent: -1em;\">"
-            return
-        }
-        nindent0 {
-            set prefix_ "<p style=\"padding-left: 2em;\
-                text-indent: -1.5em;\">"
-            return
-        }
-        nindent1 {
-            set prefix_ "<p style=\"padding-left: 4em;\
-                text-indent: -1.5em;\">"
-            return
-        }
-        nindent2 {
-            set prefix_ "<p style=\"padding-left: 6em;\
-                text-indent: -1.5em;\">"
+        bindent0 - bindent1 - bindent2 { set prefix_ <ul><li> ; return }
+        nindent0 - nindent1 - nindent2 { set prefix_ <ol><li> ; return }
+        tindent0 - tindent1 - tindent2 {
+            set prefix_ "<ul style=\"list-style-type: none; padding: 0;\
+                margin: 0;\"><li>"
             return
         }
         center {
@@ -101,6 +78,9 @@ oo::define TextEdit method HtmlTagOn {prefix tag} {
 oo::define TextEdit method HtmlTagOff tag {
     classvariable COLOR_FOR_TAG
     switch $tag {
+        bindent0 - bindent1 - bindent2 { return </li></ul> }
+        nindent0 - nindent1 - nindent2 { return </li></ol> }
+        tindent0 - tindent1 - tindent2 { return </li></ul> }
         bold { return </b> }
         bolditalic { return </i></b> }
         italic { return </i> }
@@ -123,7 +103,18 @@ oo::define TextEdit method HtmlFixUps out {
     set out [regsub -all -command {\m(?:file|https?)://[^\s<]+} $out \
         TextEditHtmlReplaceUrl]
     set out [regsub -all -command {~/[^\s<]+} $out TextEditHtmlReplaceTilde]
-    regsub -all {</p>\n<p>\n</span>\n</p>} $out "</span>\n</p>"
+    set out [regsub -all {</p>\n<p>\n</span>\n</p>} $out "</span>\n</p>"]
+    set out [regsub -all {<ol><li>\s*[1-9]\.\s+(.*?)</p>} \
+        $out "<ol><li>\\1</li></ol>"]
+    set out [regsub -all {<ol><li>\s+[1-9]\.?</li></ol>\.?\s+(.*?)</p>} \
+        $out "<ol><li>\\1</li></ol>"]
+    set out [regsub -all {<p>\s+[1-9]\.\s+(.*?)</p>} $out \
+        "<ol><li>\\1</li></ol>"]
+    set out [regsub -all {<li>\s+</li></ul>([^\n]+(?:</p>)?)} $out \
+        "<li>\\1</li></ul>"]
+    set out [regsub -all {(?:<li>|<p>)\n?&bull;\s+([^\n]+(?:</p>)?)} $out \
+        "<ul><li>\\1</li></ul>"]
+    return $out
 }
 
 proc TextEditHtmlReplaceTilde localfile {

@@ -13,7 +13,7 @@ textedit_initialize-1.tm
 textedit_actions-1.tm
 textedit_serialize-1.tm
 textedit_export-1.tm
-textedit_export_html-1.tm # NOTE ordered list output is very poor
+textedit_export_html-1.tm
 textedit_import-1.tm
 ins_chr_form-1.tm
 
@@ -31,6 +31,9 @@ st.sh
 
 # NOTE ideas:
 # - Improved HTML output (not for round-trips)
+#	. plain indented output doesn't work at all
+#	. bullet lists are poor
+#	. numbered lists are very poor
 # - .odt output (again, not for round-trips)
 # - Create 3 separate toolbars: File Edit Style so users can move/show/hide
 #   them; see Notebox9

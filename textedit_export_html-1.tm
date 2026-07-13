@@ -1,142 +1,263 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
+#
+# Adpated from Claude AI-generated code.
+#
+# Self-contained, round-trippable HTML export. Pairs with from_html in
+# textedit_import_html-1.tm.
+#
+# Structurally this is the same walk as XmlFromDump (textedit_export_
+# xml-1.tm) -- one <p> per line, tag-state runs -- and reuses that file's
+# tag-classification/priority-resolution helpers (XmlClassifyTag,
+# XmlResolveTag, xml_escape, xml_escape_attr) since those are format-
+# agnostic. The difference is purely presentational: rather than
+# inventing justify=/indent=/level= XML attributes, HTML just uses the
+# real Tk tag names directly as CSS class names (<p class="right">,
+# <span class="bold red">, <p class="bindent1">), styled by an embedded
+# <style> block built from the exact values in make_tags/COLOR_FOR_TAG --
+# so this depends on textedit_export_xml-1.tm being loaded first.
+#
+# `url` runs become <a class="url ..." href="TEXT">TEXT</a> (href is
+# just the run's own text, since ste's `url` tag is applied to literal
+# URL text, not a separate target) -- real, clickable links, still with
+# any other simultaneous tags (bold, a colour, ...) as extra classes.
+#
+# Marks become a void custom element, <ste-mark data-name="NAME"/>,
+# rather than co-opting <a name="..."> (obsolete in HTML5) or <span>
+# (which would be ambiguous with untagged marker spans).
+#
+# Blank lines are genuinely empty <p></p> (not "<p>&nbsp;</p>") so a
+# round trip through from_html doesn't inject a stray character -- a
+# `p:empty { min-height: ... }` CSS rule keeps them visible in a browser.
 
 oo::define TextEdit method as_html title {
-    set out [list "<html>\n<head><title>$title</title></head>\n<body>\n"]
-    lassign [my GetTagDicts] tags_on tags_off
-    foreach para [lseq 1 to [$Text count -lines 1.0 end]] {
-        set prefix "<p>"
-        set line ""
-        foreach char [lseq 0 to [$Text count -chars $para.0 $para.end]] {
-            set index $para.$char
-            set tag_on [dict getdef $tags_on $index ""]
-            set tag_off [dict getdef $tags_off $index ""]
-            if {[set c [$Text get $index]] eq "\n"} {
-                set c " "
-            } else {
-                set c [html::html_entities $c]
-            }
-            if {$tag_on ne ""} {
-                foreach tag [$tag_on tags] {
-                    lappend line [my HtmlTagOn prefix $tag]
-                }
-            }
-            if {$c ne ""} { lappend line $c }
-            if {$tag_off ne ""} {
-                foreach tag [$tag_off tags] {
-                    lappend line [my HtmlTagOff $tag]
-                }
-            }
-        }
-        if {[set line [string trim [join $line ""]]] ne ""} {
-            lappend out "$prefix\n$line\n</p>\n"
-        }
-    }
-    lappend out "</body>\n</html>\n"
-    my HtmlFixUps [join $out ""]
+    set dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
+    my HtmlFromDump $dump $title
 }
 
-oo::define TextEdit method HtmlTagOn {prefix tag} {
-    upvar 1 $prefix prefix_
+oo::define TextEdit method HtmlFromDump {dump title} {
+    set inlineTags {}     ;# ordered list of currently-active inline tags
+    set justifyStack {}   ;# stack of currently-active justify tags
+    set indentStack {}    ;# stack of currently-active indent tags
+
+    # See textedit_export_xml-1.tm::XmlFromDump for why these are seeded
+    # lazily rather than immediately at paragraph-flush time (same-index
+    # tagoff/tagon pairs at a level-transition boundary, e.g.
+    # "tagoff bindent0 X.0 tagon bindent1 X.0").
+    set justifySeen {}
+    set indentSeen {}
+    set pendingSeed 0
+
+    set paraChildren {}   ;# serialized child fragments of current para
+    set havePara 0         ;# has *anything* happened since para started?
+
+    set body {}
+
+    foreach {key value index} $dump {
+        switch -- $key {
+            tagon {
+                switch -- [my XmlClassifyTag $value] {
+                    skip {}
+                    justify {
+                        lappend justifyStack $value
+                        if {$value ni $justifySeen} { lappend justifySeen $value }
+                    }
+                    indent {
+                        lappend indentStack $value
+                        if {$value ni $indentSeen} { lappend indentSeen $value }
+                    }
+                    default {
+                        if {$value ni $inlineTags} { lappend inlineTags $value }
+                    }
+                }
+            }
+            tagoff {
+                switch -- [my XmlClassifyTag $value] {
+                    skip {}
+                    justify {
+                        set p [lsearch -exact $justifyStack $value]
+                        if {$p >= 0} {
+                            set justifyStack [lreplace $justifyStack $p $p]
+                        }
+                    }
+                    indent {
+                        set p [lsearch -exact $indentStack $value]
+                        if {$p >= 0} {
+                            set indentStack [lreplace $indentStack $p $p]
+                        }
+                    }
+                    default {
+                        set p [lsearch -exact $inlineTags $value]
+                        if {$p >= 0} {
+                            set inlineTags [lreplace $inlineTags $p $p]
+                        }
+                    }
+                }
+            }
+            mark {
+                if {$value in {insert current}} continue
+                if {$pendingSeed} {
+                    set justifySeen $justifyStack
+                    set indentSeen $indentStack
+                    set pendingSeed 0
+                }
+                lappend paraChildren [my HtmlMakeMark $value]
+                set havePara 1
+            }
+            text {
+                set remaining $value
+                while {1} {
+                    set nlPos [string first "\n" $remaining]
+                    if {$nlPos < 0} {
+                        if {$remaining ne {}} {
+                            if {$pendingSeed} {
+                                set justifySeen $justifyStack
+                                set indentSeen $indentStack
+                                set pendingSeed 0
+                            }
+                            lappend paraChildren [my HtmlMakeRun $remaining $inlineTags]
+                            set havePara 1
+                        }
+                        break
+                    }
+                    set chunk [string range $remaining 0 [expr {$nlPos - 1}]]
+                    if {$chunk ne {}} {
+                        if {$pendingSeed} {
+                            set justifySeen $justifyStack
+                            set indentSeen $indentStack
+                            set pendingSeed 0
+                        }
+                        lappend paraChildren [my HtmlMakeRun $chunk $inlineTags]
+                    }
+                    if {$pendingSeed} {
+                        set justifySeen $justifyStack
+                        set indentSeen $indentStack
+                        set pendingSeed 0
+                    }
+                    append body [my HtmlMakePara $justifySeen $indentSeen $paraChildren]
+                    set paraChildren {}
+                    set havePara 0
+                    set justifySeen {}
+                    set indentSeen {}
+                    set pendingSeed 1
+                    set remaining [string range $remaining [expr {$nlPos + 1}] end]
+                }
+            }
+            default {
+                # Forward-compatible passthrough for events HtmlMakeRun/
+                # HtmlMakeMark don't know about (e.g. image/window, if
+                # ste ever grows that support).
+                if {$pendingSeed} {
+                    set justifySeen $justifyStack
+                    set indentSeen $indentStack
+                    set pendingSeed 0
+                }
+                lappend paraChildren "<ste-event data-key=\"[my xml_escape_attr $key]\" \
+                    data-value=\"[my xml_escape_attr $value]\" data-index=\"$index\"/>"
+                set havePara 1
+            }
+        }
+    }
+
+    if {$pendingSeed} {
+        set justifySeen $justifyStack
+        set indentSeen $indentStack
+        set pendingSeed 0
+    }
+    if {$havePara} {
+        append body [my HtmlMakePara $justifySeen $indentSeen $paraChildren]
+    }
+
+    my HtmlDocument $title $body
+}
+
+# Build a <span>/<a> element (or bare escaped text if no tags are
+# active). `url` gets a real, clickable <a href="..."> instead of <span>
+# -- ste's url tag is applied to literal URL text, so the text itself
+# *is* the target.
+oo::define TextEdit method HtmlMakeRun {text tags} {
+    if {[llength $tags] == 0} {
+        return [my xml_escape $text]
+    }
+    set cls [my xml_escape_attr [join $tags { }]]
+    if {"url" in $tags} {
+        return "<a class=\"$cls\" href=\"[my xml_escape_attr $text]\">[my xml_escape $text]</a>"
+    }
+    return "<span class=\"$cls\">[my xml_escape $text]</span>"
+}
+
+oo::define TextEdit method HtmlMakeMark name {
+    return "<ste-mark data-name=\"[my xml_escape_attr $name]\"/>"
+}
+
+# Build a <p ...>...</p> (or empty <p></p>). Unlike XmlMakePara, the
+# resolved justify/indent tags are used directly as class names -- no
+# translation to kind/level attributes needed, since the CSS in
+# HtmlDocument targets the raw tag names (.right, .bindent1, ...).
+oo::define TextEdit method HtmlMakePara {justifySeen indentSeen paraChildren} {
+    set classes {}
+    set justify [my XmlResolveTag $justifySeen {center right}]
+    if {$justify ne {}} { lappend classes $justify }
+    set indentTag {}
+    if {[llength $indentSeen]} {
+        set kinds {}
+        foreach t $indentSeen {
+            regexp {^(bindent|tindent|nindent)[0-9]+$} $t -> k
+            if {$k ni $kinds} { lappend kinds $k }
+        }
+        set winningKind [my XmlResolveTag $kinds {tindent bindent nindent}]
+        foreach t $indentSeen {
+            if {[string match "${winningKind}*" $t]} { set indentTag $t; break }
+        }
+    }
+    if {$indentTag ne {}} { lappend classes $indentTag }
+    set clsAttr {}
+    if {[llength $classes]} {
+        set clsAttr " class=\"[my xml_escape_attr [join $classes { }]]\""
+    }
+    return "<p$clsAttr>[join $paraChildren {}]</p>\n"
+}
+
+# Wrap the accumulated <p>...</p> body in a full, self-contained HTML5
+# document with an embedded stylesheet built from the exact values
+# make_tags/COLOR_FOR_TAG use, so a plain browser renders it the same
+# way $Text does.
+oo::define TextEdit method HtmlDocument {title body} {
     classvariable HIGHLIGHT_COLOR
+    classvariable URL_UL_COLOR
     classvariable COLOR_FOR_TAG
-    switch $tag {
-        bindent0 - bindent1 - bindent2 { set prefix_ <ul><li> ; return }
-        nindent0 - nindent1 - nindent2 { set prefix_ <ol><li> ; return }
-        tindent0 - tindent1 - tindent2 {
-            set prefix_ "<ul style=\"list-style-type: none; padding: 0;\
-                margin: 0;\"><li>"
-            return
-        }
-        center {
-            set prefix_ "<p style=\"text-align: center;\">"
-            return
-        }
-        right {
-            set prefix_ "<p style=\"text-align: right;\">"
-            return
-        }
-        bold { return <b> }
-        bolditalic { return <b><i> }
-        italic { return <i> }
-        highlight { return "<span style=\"background-color:\
-            $HIGHLIGHT_COLOR;\">" }
-        strike { return <del> }
-        sub { return <sub> }
-        sup { return <sup> }
-        ul - underline { return <u> }
-        url { return }
-        default {
-            if {[set color [dict getdef $COLOR_FOR_TAG $tag ""]] ne ""} {
-                return "<span style=\"color: $color;\">"
-            }
-            puts "unhandled tag '$tag'"
-            return
+
+    set css {}
+    append css "body{font-family:sans-serif;font-size:1em;line-height:1.5;"
+    append css "max-width:50em;margin:2em auto;padding:0 1em;color:#000;background:#fff}\n"
+    append css "p{margin:0 0 .6em 0}\n"
+    append css "p:empty{min-height:1em}\n"
+    append css ".center{text-align:center}\n.right{text-align:right}\n"
+    # Hanging indent, matching make_tags' -lmargin1 (first line) /
+    # -lmargin2 (wrapped lines) pairs: lmargin1 is one unit less than
+    # lmargin2, so text-indent is a fixed -1 unit relative to margin-left.
+    foreach kind {bindent tindent nindent} {
+        for {set n 0} {$n <= 2} {incr n} {
+            set ml [expr {($n + 1) * 1.5}]
+            append css ".$kind$n\{margin-left:${ml}em;text-indent:-1.5em\}\n"
         }
     }
-}
-
-oo::define TextEdit method HtmlTagOff tag {
-    classvariable COLOR_FOR_TAG
-    switch $tag {
-        bindent0 - bindent1 - bindent2 { return </li></ul> }
-        nindent0 - nindent1 - nindent2 { return </li></ol> }
-        tindent0 - tindent1 - tindent2 { return </li></ul> }
-        bold { return </b> }
-        bolditalic { return </i></b> }
-        italic { return </i> }
-        highlight { return </span> }
-        strike { return </del> }
-        sub { return </sub> }
-        sup { return </sup> }
-        ul - underline { return </u> }
-        url { return }
-        default {
-            if {[set color [dict getdef $COLOR_FOR_TAG $tag ""]] ne ""} {
-                return "</span>"
-            }
-            return
-        }
+    append css ".bold{font-weight:bold}\n"
+    append css ".italic{font-style:italic}\n"
+    append css ".bolditalic{font-weight:bold;font-style:italic}\n"
+    append css ".ul,.underline{text-decoration:underline}\n"
+    append css ".strike{text-decoration:line-through;text-decoration-color:#FF1A1A}\n"
+    append css ".highlight{background-color:$HIGHLIGHT_COLOR}\n"
+    append css ".sub{font-size:75%;vertical-align:sub}\n"
+    append css ".sup{font-size:75%;vertical-align:super}\n"
+    append css "a.url{text-decoration:underline;text-decoration-color:$URL_UL_COLOR;color:inherit}\n"
+    append css "ste-mark{display:inline-block;width:0;height:0;overflow:hidden}\n"
+    dict for {tag hex} $COLOR_FOR_TAG {
+        append css ".$tag\{color:$hex\}\n"
     }
-}
 
-oo::define TextEdit method HtmlFixUps out {
-    set out [regsub -all -command {\m(?:file|https?)://[^\s<]+} $out \
-        TextEditHtmlReplaceUrl]
-    set out [regsub -all -command {~/[^\s<]+} $out TextEditHtmlReplaceTilde]
-    set out [regsub -all {</p>\n<p>\n</span>\n</p>} $out "</span>\n</p>"]
-    set out [regsub -all {<ol><li>\s*[1-9]\.\s+(.*?)</p>} \
-        $out "<ol><li>\\1</li></ol>"]
-    set out [regsub -all {<ol><li>\s+[1-9]\.?</li></ol>\.?\s+(.*?)</p>} \
-        $out "<ol><li>\\1</li></ol>"]
-    set out [regsub -all {<p>\s+[1-9]\.\s+(.*?)</p>} $out \
-        "<ol><li>\\1</li></ol>"]
-    set out [regsub -all {<li>\s+</li></ul>([^\n]+(?:</p>)?)} $out \
-        "<li>\\1</li></ul>"]
-    set out [regsub -all {(?:<li>|<p>)\n?&bull;\s+([^\n]+(?:</p>)?)} $out \
-        "<ul><li>\\1</li></ul>"]
+    set escTitle [my xml_escape $title]
+    set out "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n"
+    append out "<title>$escTitle</title>\n<style>\n$css</style>\n</head>\n"
+    append out "<body data-title=\"[my xml_escape_attr $title]\">\n$body</body>\n</html>\n"
     return $out
-}
-
-proc TextEditHtmlReplaceTilde localfile {
-    lassign [TextEditUrlAndDot $localfile] localfile dot
-    set url file://[file home][string range $localfile 1 end]
-    return "<a href=\"$url\"\>$localfile</a>$dot"
-        
-}
-
-proc TextEditHtmlReplaceUrl url {
-    lassign [TextEditUrlAndDot $url] url dot
-    set i [string first / $url]
-    set name [string range $url [incr i 2] end]
-    if {[string match */ $name]} { set name [string range $name 0 end-1] }
-    return "<a href=\"$url\"\>$name</a>$dot"
-}
-
-proc TextEditUrlAndDot url {
-    set dot ""
-    if {[string match *. $url]} {
-        set url [string range $url 0 end-1]
-        set dot .
-    }
-    list $url $dot
 }

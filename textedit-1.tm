@@ -15,9 +15,10 @@ oo::class create TextEdit {
 
 package require textedit_actions
 package require textedit_export
-package require textedit_export_xml
 package require textedit_export_html
+package require textedit_export_xml
 package require textedit_import
+package require textedit_import_html
 package require textedit_import_xml
 package require textedit_initialize
 package require textedit_serialize

@@ -13,10 +13,11 @@ textedit_initialize-1.tm
 textedit_actions-1.tm
 textedit_serialize-1.tm
 textedit_export-1.tm
-textedit_export_html-1.tm
+textedit_import-1.tm
 textedit_export_xml-1.tm # TODO refactor/rework
 textedit_import_xml-1.tm # TODO refactor/rework
-textedit_import-1.tm
+textedit_export_html-1.tm # TODO refactor/rework
+textedit_import_html-1.tm # TODO refactor/rework
 ins_chr_form-1.tm
 
 
@@ -33,9 +34,7 @@ README.md
 st.sh
 
 # TODO
-#   New exports (not for round-trips):
-#	. HTML
-#	. ODT
+#   New export (not for round-trips): .odt
 # NOTE ideas:
 # - Create 3 separate toolbars: File Edit Style so users can move/show/hide
 #   them; see Notebox9

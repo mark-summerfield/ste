@@ -38,11 +38,14 @@ oo::define App method make_file_menu {} {
     .menu.file add command -command [callback on_file_open] -label Open… \
         -underline 0 -accelerator Ctrl+O -compound left \
         -image [ui::icon document-open.svg $::MENU_ICON_SIZE]
+    .menu.file add command -command [callback on_file_import_xml] \
+        -label "Import XML…" -underline 8 -compound left \
+        -image [ui::icon import-xml.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_import_html] \
-        -label "Import Html…" -underline 0 -compound left \
+        -label "Import HTML…" -underline 10 -compound left \
         -image [ui::icon import-html.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_import_text] \
-        -label "Import Text…" -underline 1 -compound left \
+        -label "Import Text…" -underline 8 -compound left \
         -image [ui::icon import-txt.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_save] -label Save \
         -underline 0 -accelerator Ctrl+S -compound left \
@@ -57,6 +60,9 @@ oo::define App method make_file_menu {} {
     .menu.file add command -command [callback on_file_export_text] \
         -label "Export as Text" -underline 10 -compound left \
         -image [ui::icon export-text.svg $::MENU_ICON_SIZE]
+    .menu.file add command -command [callback on_file_export_xml] \
+        -label "Export as XML" -underline 10 -compound left \
+        -image [ui::icon export-xml.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_print] -label Print… \
         -underline 0 -compound left \
         -image [ui::icon document-print.svg $::MENU_ICON_SIZE]

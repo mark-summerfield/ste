@@ -45,3 +45,11 @@ oo::define App method file_import_html filename {
     wm title . "[tk appname] — [file tail $Filename]"
     my show_message "Opened '$filename' (will save as '$Filename')." long
 }
+
+oo::define App method file_import_xml filename {
+    $ATextEdit import_xml [readFile $filename]
+    $ATextEdit focus
+    set Filename [regsub {\.xml$} $filename .ste]
+    wm title . "[tk appname] — [file tail $Filename]"
+    my show_message "Opened '$filename' (will save as '$Filename')." long
+}

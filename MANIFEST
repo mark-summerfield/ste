@@ -14,8 +14,11 @@ textedit_actions-1.tm
 textedit_serialize-1.tm
 textedit_export-1.tm
 textedit_export_html-1.tm
+textedit_export_xml-1.tm # TODO refactor/rework
+textedit_import_xml-1.tm # TODO refactor/rework
 textedit_import-1.tm
 ins_chr_form-1.tm
+
 
 ref-1.tm
 util-1.tm
@@ -29,12 +32,11 @@ README.md
 
 st.sh
 
+# TODO
+#   New exports (not for round-trips):
+#	. HTML
+#	. ODT
 # NOTE ideas:
-# - Improved HTML output (not for round-trips)
-#	. plain indented output doesn't work at all
-#	. bullet lists are poor
-#	. numbered lists are very poor
-# - .odt output (again, not for round-trips)
 # - Create 3 separate toolbars: File Edit Style so users can move/show/hide
 #   them; see Notebox9
 # - Add status indicators: [nnn Lines][MOD]

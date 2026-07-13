@@ -43,6 +43,18 @@ oo::define App method on_file_open {} {
     }
 }
 
+oo::define App method on_file_import_xml {} {
+    my on_file_save
+    set dir [expr {$Filename eq "" ? [file home] \
+                                   : [file dirname $Filename]}]
+    const FILETYPES {{{XML files} {.xml}}}
+    if {[set filename [tk_getOpenFile -initialdir $dir \
+            -filetypes $FILETYPES \
+            -title "[tk appname] — Open" -parent .]] ne ""} {
+        my file_import_xml $filename
+    }
+}
+
 oo::define App method on_file_import_html {} {
     my on_file_save
     set dir [expr {$Filename eq "" ? [file home] \
@@ -99,6 +111,14 @@ oo::define App method on_file_export_text {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .txt]
     writeFile $filename [$ATextEdit as_text]
+    my show_message "Exported '$filename'"
+}
+
+oo::define App method on_file_export_xml {} {
+    if {$Filename eq ""} { my save_as }
+    set filename [regsub {\.ste$} $Filename .xml]
+    set title [TextEdit xml_escape [file rootname [file tail $filename]]]
+    writeFile $filename [$ATextEdit as_xml $title]
     my show_message "Exported '$filename'"
 }
 

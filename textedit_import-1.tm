@@ -16,6 +16,12 @@ oo::define TextEdit method import_html html {
     my after_load 1.0
 }
 
+oo::define TextEdit method import_xml xml {
+    my clear
+    my from_xml $xml 
+    my after_load 1.0
+}
+
 oo::define TextEdit method HandleHtmlTag {tag slash param txt} {
     classvariable COLOR_FOR_TAG
     classvariable TAG_FOR_COLOR

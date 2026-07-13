@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 #
-# Adpated from Claude AI-generated code.
+# Adpated from Claude AI-generated code (all comments bar this are from
+# the AI).
 #
 # Converts the text widget's contents into an intermediate XML document
 # that's easy to walk when writing exporters (as_html, a future
@@ -38,14 +39,14 @@
 # the flow isn't lost.
 
 oo::define TextEdit method as_xml title {
-    set dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
-    my XmlFromDump $dump $title
+    set tkt [$Text dump -text -mark -tag 1.0 "end -1 char"]
+    my XmlFromDump $tkt $title
 }
 
 # Pure function of the dump list (plus a title for the root element) --
 # kept separate from as_xml so it can be unit tested without a live text
 # widget, e.g. against a loaded .tkt file's contents.
-oo::define TextEdit classmethod XmlFromDump {dump title} {
+oo::define TextEdit classmethod XmlFromDump {tkt title} {
     set inlineTags {}     ;# ordered list of currently-active inline tags
     set justifyStack {}   ;# stack of currently-active justify tags
     set indentStack {}    ;# stack of currently-active indent tags
@@ -76,21 +77,27 @@ oo::define TextEdit classmethod XmlFromDump {dump title} {
     set out "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
     append out "<ste title=\"[my xml_escape_attr $title]\">\n"
 
-    foreach {key value index} $dump {
+    foreach {key value index} $tkt {
         switch -- $key {
             tagon {
                 switch -- [my XmlClassifyTag $value] {
                     skip {}
                     justify {
                         lappend justifyStack $value
-                        if {$value ni $justifySeen} { lappend justifySeen $value }
+                        if {$value ni $justifySeen} {
+                            lappend justifySeen $value
+                        }
                     }
                     indent {
                         lappend indentStack $value
-                        if {$value ni $indentSeen} { lappend indentSeen $value }
+                        if {$value ni $indentSeen} {
+                            lappend indentSeen $value
+                        }
                     }
                     default {
-                        if {$value ni $inlineTags} { lappend inlineTags $value }
+                        if {$value ni $inlineTags} {
+                            lappend inlineTags $value
+                        }
                     }
                 }
             }
@@ -99,19 +106,19 @@ oo::define TextEdit classmethod XmlFromDump {dump title} {
                     skip {}
                     justify {
                         set p [lsearch -exact $justifyStack $value]
-                        if {$p >= 0} {
+                        if {$p != -1} {
                             set justifyStack [lreplace $justifyStack $p $p]
                         }
                     }
                     indent {
                         set p [lsearch -exact $indentStack $value]
-                        if {$p >= 0} {
+                        if {$p != -1} {
                             set indentStack [lreplace $indentStack $p $p]
                         }
                     }
                     default {
                         set p [lsearch -exact $inlineTags $value]
-                        if {$p >= 0} {
+                        if {$p != -1} {
                             set inlineTags [lreplace $inlineTags $p $p]
                         }
                     }
@@ -124,8 +131,8 @@ oo::define TextEdit classmethod XmlFromDump {dump title} {
                     set indentSeen $indentStack
                     set pendingSeed 0
                 }
-                lappend paraChildren \
-                    "<mark name=\"[my xml_escape_attr $value]\" index=\"$index\"/>"
+                lappend paraChildren "<mark name=\"[my xml_escape_attr \
+                    $value]\" index=\"$index\"/>"
                 set havePara 1
             }
             text {
@@ -139,19 +146,22 @@ oo::define TextEdit classmethod XmlFromDump {dump title} {
                                 set indentSeen $indentStack
                                 set pendingSeed 0
                             }
-                            lappend paraChildren [my XmlMakeRun $remaining $inlineTags]
+                            lappend paraChildren [my XmlMakeRun $remaining \
+                                    $inlineTags]
                             set havePara 1
                         }
                         break
                     }
-                    set chunk [string range $remaining 0 [expr {$nlPos - 1}]]
+                    set chunk [string range $remaining 0 \
+                            [expr {$nlPos - 1}]]
                     if {$chunk ne {}} {
                         if {$pendingSeed} {
                             set justifySeen $justifyStack
                             set indentSeen $indentStack
                             set pendingSeed 0
                         }
-                        lappend paraChildren [my XmlMakeRun $chunk $inlineTags]
+                        lappend paraChildren [my XmlMakeRun $chunk \
+                                $inlineTags]
                     }
                     # Safety net: a paragraph with no content at all
                     # (blank line) still needs a seed, or a carried-over
@@ -161,13 +171,15 @@ oo::define TextEdit classmethod XmlFromDump {dump title} {
                         set indentSeen $indentStack
                         set pendingSeed 0
                     }
-                    append out [my XmlMakePara $justifySeen $indentSeen $paraChildren]
+                    append out [my XmlMakePara $justifySeen $indentSeen \
+                            $paraChildren]
                     set paraChildren {}
                     set havePara 0
                     set justifySeen {}
                     set indentSeen {}
                     set pendingSeed 1
-                    set remaining [string range $remaining [expr {$nlPos + 1}] end]
+                    set remaining [string range $remaining \
+                            [expr {$nlPos + 1}] end]
                 }
             }
             default {
@@ -180,7 +192,8 @@ oo::define TextEdit classmethod XmlFromDump {dump title} {
                     set pendingSeed 0
                 }
                 lappend paraChildren \
-                    "<$key value=\"[my xml_escape_attr $value]\" index=\"$index\"/>"
+                    "<$key value=\"[my xml_escape_attr $value]\" \
+                    index=\"$index\"/>"
                 set havePara 1
             }
         }
@@ -197,7 +210,6 @@ oo::define TextEdit classmethod XmlFromDump {dump title} {
     }
 
     append out "</ste>\n"
-    return $out
 }
 
 # Classify a tag name: skip, justify, indent, or inline (default).
@@ -210,10 +222,9 @@ oo::define TextEdit classmethod XmlClassifyTag tag {
 
 # Build a <run> element (or bare escaped text if no tags are active).
 oo::define TextEdit classmethod XmlMakeRun {text tags} {
-    if {[llength $tags] == 0} {
-        return "<run>[my xml_escape $text]</run>"
-    }
-    return "<run tags=\"[my xml_escape_attr [join $tags { }]]\">[my xml_escape $text]</run>"
+    if {![llength $tags]} { return "<run>[my xml_escape $text]</run>" }
+    return "<run tags=\"[my xml_escape_attr \
+        [join $tags { }]]\">[my xml_escape $text]</run>"
 }
 
 # Given the set of tags seen active at any point during the current
@@ -221,10 +232,8 @@ oo::define TextEdit classmethod XmlMakeRun {text tags} {
 # priority list (this mirrors Tk's own tag-priority based conflict
 # resolution, i.e. creation order in make_tags: center before right).
 oo::define TextEdit classmethod XmlResolveTag {seen priority} {
-    set winner {}
-    foreach cand $priority {
-        if {$cand in $seen} { set winner $cand }
-    }
+    set winner {} ;# We want to keep overwriting with highest priority
+    foreach cand $priority { if {$cand in $seen} { set winner $cand } }
     # Fall back to whatever was seen first if nothing matched the
     # priority list (shouldn't normally happen).
     if {$winner eq {} && [llength $seen]} { set winner [lindex $seen 0] }
@@ -234,8 +243,10 @@ oo::define TextEdit classmethod XmlResolveTag {seen priority} {
 # Build a <para ...>...</para> (or self-closed <para/> when empty).
 # justifySeen/indentSeen are the *sets* of paragraph-level tags that were
 # active at any point while this paragraph's content was being emitted.
-oo::define TextEdit classmethod XmlMakePara {justifySeen indentSeen paraChildren} {
-    const INDENT_KIND [dict create bindent bullet tindent indent nindent number]
+oo::define TextEdit classmethod XmlMakePara {justifySeen indentSeen \
+        paraChildren} {
+    const INDENT_KIND [dict create bindent bullet tindent indent \
+            nindent number]
     set attrs {}
     set justify [my XmlResolveTag $justifySeen {center right}]
     if {$justify ne {}} {
@@ -248,22 +259,25 @@ oo::define TextEdit classmethod XmlMakePara {justifySeen indentSeen paraChildren
     set indentTag {}
     if {[llength $indentSeen]} {
         set kinds {}
-        foreach t $indentSeen {
-            regexp {^(bindent|tindent|nindent)[0-9]+$} $t -> k
-            if {$k ni $kinds} { lappend kinds $k }
+        foreach indent $indentSeen {
+            regexp {^(bindent|tindent|nindent)[0-9]+$} $indent _ kind
+            if {$kind ni $kinds} { lappend kinds $kind }
         }
         set winningKind [my XmlResolveTag $kinds {tindent bindent nindent}]
-        foreach t $indentSeen {
-            if {[string match "${winningKind}*" $t]} { set indentTag $t; break }
+        foreach indent $indentSeen {
+            if {[string match "${winningKind}*" $indent]} {
+                set indentTag $indent
+                break
+            }
         }
     }
     if {$indentTag ne {}} {
-        regexp {^(bindent|tindent|nindent)([0-9]+)$} $indentTag -> kind level
+        regexp {^(bindent|tindent|nindent)([0-9]+)$} $indentTag _ kind level
         lappend attrs "indent=\"[dict get $INDENT_KIND $kind]\""
         lappend attrs "level=\"$level\""
     }
     set attrStr [expr {[llength $attrs] ? " [join $attrs { }]" : {}}]
-    if {[llength $paraChildren] == 0} {
+    if {![llength $paraChildren]} {
         return "  <para$attrStr/>\n"
     }
     set body "  <para$attrStr>\n"
@@ -271,7 +285,6 @@ oo::define TextEdit classmethod XmlMakePara {justifySeen indentSeen paraChildren
         append body "    $child\n"
     }
     append body "  </para>\n"
-    return $body
 }
 
 oo::define TextEdit classmethod xml_escape s {
@@ -279,5 +292,5 @@ oo::define TextEdit classmethod xml_escape s {
 }
 
 oo::define TextEdit classmethod xml_escape_attr s {
-    string map {\" &quot;} [my xml_escape $s]
+    string map {& &amp; < &lt; > &gt; \" &quot;} $s
 }

@@ -107,6 +107,14 @@ oo::define App method on_file_export_html {} {
     my show_message "Exported '$filename'"
 }
 
+oo::define App method on_file_export_odt {} {
+    if {$Filename eq ""} { my save_as }
+    set filename [regsub {\.ste$} $Filename .odt]
+    set title [file rootname [file tail $filename]]
+    $ATextEdit as_odt $filename $title
+    my show_message "Exported '$filename'"
+}
+
 oo::define App method on_file_export_text {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .txt]

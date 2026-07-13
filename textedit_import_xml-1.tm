@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 #
-# Adpated from Claude AI-generated code.
+# Adpated from Claude AI-generated code (all comments bar this are from
+# the AI).
 #
 # Populates $Text from the XML produced by as_xml/XmlFromDump. Returns
 # the `title` attribute from the root <ste> element.
@@ -46,7 +47,8 @@ oo::define TextEdit method from_xml xml {
         set tag [string range $xml $lt $gt]
         set pos [expr {$gt + 1}]
 
-        if {![regexp {^<(/?)([A-Za-z0-9_]+)(.*?)(/?)>$} $tag -> closing name attrsStr selfClose]} {
+        if {![regexp {^<(/?)([A-Za-z0-9_]+)(.*?)(/?)>$} $tag _ closing \
+                name attrsStr selfClose]} {
             continue
         }
         set attrs [my XmlParseAttrs $attrsStr]
@@ -83,7 +85,8 @@ oo::define TextEdit method from_xml xml {
                 }
                 if {$selfClose ne "/"} {
                     set closeIdx [string first "</run>" $xml $pos]
-                    set text [my xml_unescape [string range $xml $pos [expr {$closeIdx - 1}]]]
+                    set text [my xml_unescape [string range $xml $pos \
+                            [expr {$closeIdx - 1}]]]
                     if {$text ne {}} {
                         $Text insert end $text [concat $runTags $paraTags]
                     }
@@ -114,13 +117,15 @@ oo::define TextEdit classmethod xml_unescape s {
 # unescaping each value.
 oo::define TextEdit classmethod XmlParseAttrs s {
     set result [dict create]
-    foreach {whole key val} [regexp -all -inline {([A-Za-z0-9_:-]+)="([^"]*)"} $s] {
+    foreach {whole key val} [regexp -all -inline \
+            {([A-Za-z0-9_:-]+)="([^"]*)"} $s] { ;# "
         dict set result $key [my xml_unescape $val]
     }
     return $result
 }
 
-# indent="bullet"/"indent"/"number" + level="N" -> bindent<N>/tindent<N>/nindent<N>
+# indent="bullet"/"indent"/"number" + level="N" _ \
+# bindent<N>/tindent<N>/nindent<N>
 oo::define TextEdit classmethod XmlIndentTag attrs {
     if {![dict exists $attrs indent] || ![dict exists $attrs level]} {
         return {}
@@ -138,8 +143,6 @@ oo::define TextEdit classmethod XmlParaTags attrs {
         lappend tags [dict get $attrs justify]
     }
     set indentTag [my XmlIndentTag $attrs]
-    if {$indentTag ne {}} {
-        lappend tags $indentTag
-    }
+    if {$indentTag ne {}} { lappend tags $indentTag }
     return $tags
 }

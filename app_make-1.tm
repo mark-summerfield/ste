@@ -57,6 +57,9 @@ oo::define App method make_file_menu {} {
     .menu.file add command -command [callback on_file_export_html] \
         -label "Export as HTML" -underline 10 -compound left \
         -image [ui::icon export-html.svg $::MENU_ICON_SIZE]
+    .menu.file add command -command [callback on_file_export_odt] \
+        -label "Export as ODT" -underline 11 -compound left \
+        -image [ui::icon export-odt.svg $::MENU_ICON_SIZE]
     .menu.file add command -command [callback on_file_export_text] \
         -label "Export as Text" -underline 10 -compound left \
         -image [ui::icon export-text.svg $::MENU_ICON_SIZE]

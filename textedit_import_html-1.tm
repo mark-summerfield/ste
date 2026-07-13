@@ -1,6 +1,7 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 #
-# Adpated from Claude AI-generated code.
+# Adpated from Claude AI-generated code (all comments bar this are from
+# the AI).
 #
 # Populates $Text from the HTML produced by as_html/HtmlFromDump.
 # Returns the title (read from <body data-title="...">).
@@ -38,7 +39,8 @@ oo::define TextEdit method from_html html {
         # not wrapped in <span>/<a> -- the runs a plain xml_escape (no
         # tags) round-trips to.
         if {$lt > $pos && $insideP} {
-            set text [my xml_unescape [string range $html $pos [expr {$lt - 1}]]]
+            set text [my xml_unescape [string range $html $pos \
+                    [expr {$lt - 1}]]]
             if {$text ne {}} {
                 $Text insert end $text $paraTags
             }
@@ -49,7 +51,8 @@ oo::define TextEdit method from_html html {
         set tag [string range $html $lt $gt]
         set pos [expr {$gt + 1}]
 
-        if {![regexp {^<(/?)([A-Za-z0-9_-]+)(.*?)(/?)>$} $tag -> closing name attrsStr selfClose]} {
+        if {![regexp {^<(/?)([A-Za-z0-9_-]+)(.*?)(/?)>$} $tag _ closing \
+                name attrsStr selfClose]} {
             continue
         }
         set attrs [my XmlParseAttrs $attrsStr]
@@ -87,7 +90,8 @@ oo::define TextEdit method from_html html {
                     set closeTag "</$name>"
                     set closeIdx [string first $closeTag $html $pos]
                     if {$closeIdx < 0} break
-                    set text [my xml_unescape [string range $html $pos [expr {$closeIdx - 1}]]]
+                    set text [my xml_unescape [string range $html $pos \
+                            [expr {$closeIdx - 1}]]]
                     if {$text ne {}} {
                         $Text insert end $text [concat $runTags $paraTags]
                     }

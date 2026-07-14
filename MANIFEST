@@ -18,7 +18,7 @@ textedit_export_xml-1.tm
 textedit_import_xml-1.tm
 textedit_export_html-1.tm
 textedit_import_html-1.tm
-textedit_export_odt-1.tm # TODO fix or abandon
+textedit_export_odt-1.tm # TODO rework
 ins_chr_form-1.tm
 
 ref-1.tm

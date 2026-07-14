@@ -125,12 +125,12 @@ oo::define TextEdit method on_tab {{user 1} {kind 0} {brk 1}} {
 }
 
 oo::define TextEdit method on_ctrl_tab {{brk 1}} {
-    catch {[my on_tab 0 1]}
+    catch {my on_tab 0 1}
     if {$brk} { return -code break }
 }
 
 oo::define TextEdit method on_ctrl_key_1 {{brk 1}} {
-    catch {[my on_tab 0 2]}
+    catch {my on_tab 0 2}
     if {$brk} { return -code break }
 }
 

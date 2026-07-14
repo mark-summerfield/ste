@@ -35,7 +35,8 @@
 oo::define TextEdit method as_odt {path title} {
     set dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
     set paras [my OdtDumpToParas $dump]
-    lassign [my OdtBuildContent $paras $title] contentXml paraStyleXml runStyleXml
+    lassign [my OdtBuildContent $paras $title] contentXml paraStyleXml \
+            runStyleXml
 
     set mimetype "application/vnd.oasis.opendocument.text"
     set manifest [my OdtManifest]
@@ -81,14 +82,20 @@ oo::define TextEdit method OdtDumpToParas dump {
                     skip {}
                     justify {
                         lappend justifyStack $value
-                        if {$value ni $justifySeen} { lappend justifySeen $value }
+                        if {$value ni $justifySeen} {
+                            lappend justifySeen $value
+                        }
                     }
                     indent {
                         lappend indentStack $value
-                        if {$value ni $indentSeen} { lappend indentSeen $value }
+                        if {$value ni $indentSeen} {
+                            lappend indentSeen $value
+                        }
                     }
                     default {
-                        if {$value ni $inlineTags} { lappend inlineTags $value }
+                        if {$value ni $inlineTags} {
+                            lappend inlineTags $value
+                        }
                     }
                 }
             }
@@ -97,15 +104,21 @@ oo::define TextEdit method OdtDumpToParas dump {
                     skip {}
                     justify {
                         set p [lsearch -exact $justifyStack $value]
-                        if {$p >= 0} { set justifyStack [lreplace $justifyStack $p $p] }
+                        if {$p >= 0} {
+                            set justifyStack [lreplace $justifyStack $p $p]
+                        }
                     }
                     indent {
                         set p [lsearch -exact $indentStack $value]
-                        if {$p >= 0} { set indentStack [lreplace $indentStack $p $p] }
+                        if {$p >= 0} {
+                            set indentStack [lreplace $indentStack $p $p]
+                        }
                     }
                     default {
                         set p [lsearch -exact $inlineTags $value]
-                        if {$p >= 0} { set inlineTags [lreplace $inlineTags $p $p] }
+                        if {$p >= 0} {
+                            set inlineTags [lreplace $inlineTags $p $p]
+                        }
                     }
                 }
             }
@@ -116,7 +129,8 @@ oo::define TextEdit method OdtDumpToParas dump {
                     set indentSeen $indentStack
                     set pendingSeed 0
                 }
-                lappend paraChildren [dict create mark [dict create name $value]]
+                lappend paraChildren [dict create mark [dict create name \
+                        $value]]
                 set havePara 1
             }
             text {
@@ -131,12 +145,14 @@ oo::define TextEdit method OdtDumpToParas dump {
                                 set pendingSeed 0
                             }
                             lappend paraChildren [dict create run \
-                                [dict create tags $inlineTags text $remaining]]
+                                [dict create tags $inlineTags \
+                                    text $remaining]]
                             set havePara 1
                         }
                         break
                     }
-                    set chunk [string range $remaining 0 [expr {$nlPos - 1}]]
+                    set chunk [string range $remaining 0 \
+                            [expr {$nlPos - 1}]]
                     if {$chunk ne {}} {
                         if {$pendingSeed} {
                             set justifySeen $justifyStack
@@ -151,13 +167,15 @@ oo::define TextEdit method OdtDumpToParas dump {
                         set indentSeen $indentStack
                         set pendingSeed 0
                     }
-                    lappend paras [my OdtMakeParaModel $justifySeen $indentSeen $paraChildren]
+                    lappend paras [my OdtMakeParaModel $justifySeen \
+                            $indentSeen $paraChildren]
                     set paraChildren {}
                     set havePara 0
                     set justifySeen {}
                     set indentSeen {}
                     set pendingSeed 1
-                    set remaining [string range $remaining [expr {$nlPos + 1}] end]
+                    set remaining [string range $remaining \
+                            [expr {$nlPos + 1}] end]
                 }
             }
             default {
@@ -170,7 +188,8 @@ oo::define TextEdit method OdtDumpToParas dump {
                     set indentSeen $indentStack
                     set pendingSeed 0
                 }
-                lappend paraChildren [dict create other [dict create key $key value $value]]
+                lappend paraChildren [dict create other [dict create \
+                        key $key value $value]]
                 set havePara 1
             }
         }
@@ -181,7 +200,8 @@ oo::define TextEdit method OdtDumpToParas dump {
         set pendingSeed 0
     }
     if {$havePara} {
-        lappend paras [my OdtMakeParaModel $justifySeen $indentSeen $paraChildren]
+        lappend paras [my OdtMakeParaModel $justifySeen $indentSeen \
+                $paraChildren]
     }
     return $paras
 }
@@ -189,21 +209,25 @@ oo::define TextEdit method OdtDumpToParas dump {
 # Resolve the winning justify/indent tag for a paragraph (same
 # priority-resolution logic as XmlMakePara/HtmlMakePara) and package it
 # with its children into one paragraph-model dict.
-oo::define TextEdit method OdtMakeParaModel {justifySeen indentSeen paraChildren} {
+oo::define TextEdit method OdtMakeParaModel {justifySeen indentSeen \
+        paraChildren} {
     set justify [my XmlResolveTag $justifySeen {center right}]
     set indentTag {}
     if {[llength $indentSeen]} {
         set kinds {}
-        foreach t $indentSeen {
-            regexp {^(bindent|tindent|nindent)[0-9]+$} $t -> k
-            if {$k ni $kinds} { lappend kinds $k }
+        foreach indent $indentSeen {
+            regexp {^(bindent|tindent|nindent)[0-9]+$} $indent _ kind
+            if {$kind ni $kinds} { lappend kinds $kind }
         }
         set winningKind [my XmlResolveTag $kinds {tindent bindent nindent}]
-        foreach t $indentSeen {
-            if {[string match "${winningKind}*" $t]} { set indentTag $t; break }
+        foreach indent $indentSeen {
+            if {[string match "${winningKind}*" $indent]} {
+                set indentTag $indent
+                break
+            }
         }
     }
-    return [dict create justify $justify indent $indentTag children $paraChildren]
+    dict create justify $justify indent $indentTag children $paraChildren
 }
 
 # --- style collection + content.xml assembly ------------------------
@@ -221,18 +245,27 @@ oo::define TextEdit method OdtRunTagProps tag {
     switch -- $tag {
         bold        { return {fo:font-weight="bold"} }
         italic      { return {fo:font-style="italic"} }
-        bolditalic  { return {fo:font-weight="bold" fo:font-style="italic"} }
+        bolditalic  {
+            return {fo:font-weight="bold" fo:font-style="italic"}
+        }
         ul - underline {
-            return {style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color"}
+            return {style:text-underline-style="solid" 
+                style:text-underline-width="auto" \
+                    style:text-underline-color="font-color"}
         }
         strike      {
-            return {style:text-line-through-style="solid" style:text-line-through-type="single" style:text-line-through-color="#FF1A1A"}
+            return {style:text-line-through-style="solid" \
+                style:text-line-through-type="single" \
+                style:text-line-through-color="#FF1A1A"}
         }
         highlight   { return {fo:background-color="#FFFF00"} }
         sub         { return {style:text-position="sub 58%"} }
         sup         { return {style:text-position="super 58%"} }
         url         {
-            return [list style:text-underline-style=\"solid\" style:text-underline-width=\"auto\" style:text-underline-color=\"$URL_UL_COLOR\" fo:color=\"$URL_UL_COLOR\"]
+            return [list style:text-underline-style=\"solid\" \
+                style:text-underline-width=\"auto\" \
+                style:text-underline-color=\"$URL_UL_COLOR\" \
+                fo:color=\"$URL_UL_COLOR\"]
         }
         default     { return {} }
     }
@@ -247,7 +280,7 @@ oo::define TextEdit method OdtParaTagProps {justify indent} {
         right  { lappend props {fo:text-align="end"} }
     }
     if {$indent ne {}} {
-        regexp {^(?:bindent|tindent|nindent)([0-9]+)$} $indent -> level
+        regexp {^(?:bindent|tindent|nindent)([0-9]+)$} $indent _ level
         set unit 1.27 ;# cm, ~0.5in per level -- matches the em-based
                         ;# hanging indent used in as_html's CSS
         set margin [expr {($level + 1) * $unit}]
@@ -281,8 +314,10 @@ oo::define TextEdit method OdtBuildContent {paras title} {
                 dict set paraStyleNameFor $paraKey $name
                 set props [my OdtParaTagProps $justify $indent]
                 append paraStyleDefs "<style:style style:name=\"$name\"" \
-                    " style:family=\"paragraph\" style:parent-style-name=\"Standard\">" \
-                    "<style:paragraph-properties [join $props { }]/></style:style>\n"
+                    " style:family=\"paragraph\" \
+                    style:parent-style-name=\"Standard\">" \
+                    "<style:paragraph-properties \
+                    [join $props { }]/></style:style>\n"
             }
             set paraStyleName [dict get $paraStyleNameFor $paraKey]
         }
@@ -315,21 +350,26 @@ oo::define TextEdit method OdtBuildContent {paras title} {
                         }
                     }
                     set props [dict values $propsDict]
-                    append runStyleDefs "<style:style style:name=\"$name\"" \
-                        " style:family=\"text\"><style:text-properties [join $props { }]/></style:style>\n"
+                    append runStyleDefs \
+                        "<style:style style:name=\"$name\"" \
+                        " style:family=\"text\"><style:text-properties \
+                        [join $props { }]/></style:style>\n"
                 }
                 set runStyleName [dict get $runStyleNameFor $runKey]
                 set escText [my xml_escape $text]
-                set span "<text:span text:style-name=\"$runStyleName\">$escText</text:span>"
+                set span "<text:span \
+                    text:style-name=\"$runStyleName\">$escText</text:span>"
                 if {"url" in $tags} {
                     set href [my xml_escape_attr $text]
-                    append childrenXml "<text:a xlink:href=\"$href\" xlink:type=\"simple\">$span</text:a>"
+                    append childrenXml "<text:a xlink:href=\"$href\" \
+                        xlink:type=\"simple\">$span</text:a>"
                 } else {
                     append childrenXml $span
                 }
             } elseif {[dict exists $child mark]} {
                 set name [dict get $child mark name]
-                append childrenXml "<text:bookmark text:name=\"[my xml_escape_attr $name]\"/>"
+                append childrenXml "<text:bookmark text:name=\"[my \
+                    xml_escape_attr $name]\"/>"
             }
             ;# {other ...} children (forward-compat passthrough) carry
             ;# no representable content in this schema -- skipped.
@@ -354,7 +394,7 @@ oo::define TextEdit method OdtBuildContent {paras title} {
     append out "<office:body><office:text>\n$bodyXml</office:text></office:body>\n"
     append out "</office:document-content>\n"
 
-    return [list $out $paraStyleDefs $runStyleDefs]
+    list $out $paraStyleDefs $runStyleDefs
 }
 
 # --- the other package parts: manifest, styles.xml, meta.xml --------
@@ -370,7 +410,6 @@ oo::define TextEdit method OdtManifest {} {
         append out "<manifest:file-entry manifest:full-path=\"$f\" manifest:media-type=\"text/xml\"/>\n"
     }
     append out "</manifest:manifest>\n"
-    return $out
 }
 
 oo::define TextEdit method OdtStyles {} {
@@ -387,7 +426,6 @@ oo::define TextEdit method OdtStyles {} {
     append out "<style:style style:name=\"Standard\" style:family=\"paragraph\" style:class=\"text\"/>\n"
     append out "</office:styles>\n"
     append out "</office:document-styles>\n"
-    return $out
 }
 
 oo::define TextEdit method OdtMeta title {
@@ -400,7 +438,6 @@ oo::define TextEdit method OdtMeta title {
     append out "<office:meta><dc:title>[my xml_escape $title]</dc:title>" \
         "<meta:generator>ste</meta:generator></office:meta>\n"
     append out "</office:document-meta>\n"
-    return $out
 }
 
 # --- minimal, spec-correct ZIP writer --------------------------------
@@ -456,9 +493,12 @@ oo::define TextEdit method OdtWriteZip {path entries} {
         [string length $central] $offset 0]
 
     set fh [open $path wb]
-    fconfigure $fh -translation binary
-    puts -nonewline $fh $localBlob
-    puts -nonewline $fh $central
-    puts -nonewline $fh $eocd
-    close $fh
+    try {
+        fconfigure $fh -translation binary
+        puts -nonewline $fh $localBlob
+        puts -nonewline $fh $central
+        puts -nonewline $fh $eocd
+    } finally {
+        close $fh
+    }
 }

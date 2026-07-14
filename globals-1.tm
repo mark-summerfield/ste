@@ -1,6 +1,6 @@
 # Copyright © 2025 Mark Summerfield. All rights reserved.
 
-const VERSION 1.4.0
+const VERSION 1.5.0
 const SHORT_TIMEOUT 10_000
 const LONG_TIMEOUT 30_000
 const POLL_TIMEOUT 1_000

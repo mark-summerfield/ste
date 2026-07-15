@@ -13,7 +13,7 @@ oo::define TextEdit initialize {
     const STE_PREFIX STE1\n
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
-        {{compressed tkt files} {.tktz}}}
+        {{compressed tkt files} {.tktz}} {{ste XML files} {.xml}}}
 
     const COMMON_WORDS {about above access accessories account action \
         active activities activity added additional address adult \

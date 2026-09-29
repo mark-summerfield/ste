@@ -1,4 +1,4 @@
-# Copyright © 2025 Mark Summerfield. All rights reserved.
+# Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 const VERSION 1.5.1
 const SHORT_TIMEOUT 10_000

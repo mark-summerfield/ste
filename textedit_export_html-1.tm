@@ -1,4 +1,4 @@
-# Copyright © 2025 Mark Summerfield. All rights reserved.
+# Copyright © 2025-26 Mark Summerfield. All rights reserved.
 #
 # Adpated from Claude AI-generated code (all comments bar this are from
 # the AI).

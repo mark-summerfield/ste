@@ -114,6 +114,19 @@ oo::define App method make_edit_menu {} {
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
+    .menu.style add command -command [callback on_style h1] \
+        -label "Heading 1" -underline 8 -compound left \
+        -image [ui::icon h1.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style h2] \
+        -label "Heading 2" -underline 8 -compound left \
+        -image [ui::icon h2.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style h3] \
+        -label "Heading 3" -underline 8 -compound left \
+        -image [ui::icon h3.svg $::MENU_ICON_SIZE]
+    .menu.style add command -command [callback on_style h4] \
+        -label "Heading 4" -underline 8 -compound left \
+        -image [ui::icon h4.svg $::MENU_ICON_SIZE]
+    .menu.style add separator
     .menu.style add command -command [callback on_style bold] \
         -label Bold -underline 0 -compound left -accelerator Ctrl+B \
         -image [ui::icon format-text-bold.svg $::MENU_ICON_SIZE]

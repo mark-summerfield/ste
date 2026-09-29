@@ -45,20 +45,22 @@ oo::define TextEdit classmethod swatch {color size} {
 }
 
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
+    my MakeFonts $family $size ;# classmethod only executes once
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
     set Frame ${parent}tf#[incr N] ;# unique
     ttk::frame $Frame
     set sa [scrollutil::scrollarea $Frame.sa -xscrollbarmode none]
-    set Text [text $Frame.sa.txt -undo 1 -wrap word]
+    set tab [expr {4 * [font measure Roman n]}]
+    set Text [text $Frame.sa.txt -undo 1 -wrap word -font Roman \
+            -tabstyle wordprocessor -tabs "$tab left"]
+    my make_tags
     $sa setwidget $Text
     pack $sa -fill both -expand 1
     set Completion 1
     set CompletionMenu [menu $Frame.completionMenu]
     my MakeContextMenu
     my MakeBindings
-    my make_fonts $family $size
-    my make_tags
 }
 
 oo::define TextEdit method completion {} { return $Completion }
@@ -92,25 +94,34 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <Return> [callback on_return]
 }
 
-oo::define TextEdit method make_fonts {family size} {
+oo::define TextEdit classmethod MakeFonts {family size} {
+    variable Initialized
+    if {$Initialized} return
+    set Initialized 1
     if {$family eq ""} {
         set family [font configure TkDefaultFont -family]
     }
     if {!$size} {
         set size [expr {1 + [font configure TkDefaultFont -size]}]
     }
-    foreach name {Sans Small Bold Italic BoldItalic} {
+    foreach name {Roman Small Bold Italic BoldItalic} {
         catch { font delete $name }
     }
-    font create Sans -family $family -size $size
+    font create Roman -family $family -size $size
     font create Small -family $family \
-        -size [expr {int(round($size * 0.75))}]
+            -size [expr {int(round($size * 0.75))}]
     font create Bold -family $family -size $size -weight bold
     font create Italic -family $family -size $size -slant italic
     font create BoldItalic -family $family -size $size -weight bold \
-        -slant italic
-    set tab [expr {4 * [font measure Sans n]}]
-    $Text configure -font Sans -tabstyle wordprocessor -tabs "$tab left"
+            -slant italic
+    font create H1 -family $family -weight bold \
+            -size [expr {int(round($size * 2))}]
+    font create H2 -family $family -weight bold \
+            -size [expr {int(round($size * 1.6))}]
+    font create H3 -family $family -weight bold \
+            -size [expr {int(round($size * 1.3))}]
+    font create H4 -family $family -weight bold \
+            -size [expr {int(round($size * 1.1))}]
 }
 
 oo::define TextEdit method make_tags {} {
@@ -124,13 +135,17 @@ oo::define TextEdit method make_tags {} {
     $Text tag configure center -justify center
     $Text tag configure right -justify right
     $Text tag configure url -underline 1 -underlinefg $URL_UL_COLOR
+    $Text tag configure h1 -font H1
+    $Text tag configure h2 -font H2
+    $Text tag configure h3 -font H3
+    $Text tag configure h4 -font H4
     $Text tag configure bold -font Bold
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
     $Text tag configure highlight -background $HIGHLIGHT_COLOR
-    const BINDENT [font measure Sans " • "]
-    const NINDENT [font measure Sans "9. "]
-    const TINDENT [font measure Sans "   "]
+    const BINDENT [font measure Roman " • "]
+    const NINDENT [font measure Roman "9. "]
+    const TINDENT [font measure Roman "   "]
     $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT
     $Text tag configure bindent1 -lmargin1 $BINDENT \
         -lmargin2 [expr {2 * $BINDENT}]
@@ -251,7 +266,21 @@ oo::define TextEdit method apply_style_to {indexes style} {
             $Text tag remove ul {*}$indexes
         } elseif {$style eq "strike" && "strike" in $tags} {
             $Text tag remove strike {*}$indexes
+        } elseif {$style eq "h1" && "h1" in $tags} {
+            $Text tag remove h1 {*}$indexes
+        } elseif {$style eq "h2" && "h2" in $tags} {
+            $Text tag remove h2 {*}$indexes
+        } elseif {$style eq "h3" && "h3" in $tags} {
+            $Text tag remove h3 {*}$indexes
+        } elseif {$style eq "h4" && "h4" in $tags} {
+            $Text tag remove h4 {*}$indexes
         } else {
+            if {$style in {h1 h2 h3 h4}} {
+                foreach tag {h1 h2 h3 h4 sub sup ul strike bold italic \
+                        bolditalic} {
+                    $Text tag remove $tag {*}$indexes
+                }
+            }
             $Text tag add $style {*}$indexes
         }
         $Text edit modified 1

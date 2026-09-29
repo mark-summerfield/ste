@@ -1,6 +1,7 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 oo::define TextEdit initialize {
+    variable Initialized 0
     variable N 0
     variable STE_PREFIX
     variable FILETYPES

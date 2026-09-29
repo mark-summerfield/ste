@@ -45,7 +45,7 @@ oo::define TextEdit classmethod swatch {color size} {
 }
 
 oo::define TextEdit constructor {parent {family ""} {size 0}} {
-    my MakeFonts $family $size ;# classmethod only executes once
+    my make_fonts $family $size ;# classmethod only executes once
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
     set Frame ${parent}tf#[incr N] ;# unique
@@ -94,7 +94,7 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <Return> [callback on_return]
 }
 
-oo::define TextEdit classmethod MakeFonts {family size} {
+oo::define TextEdit classmethod make_fonts {family size} {
     variable Initialized
     if {$Initialized} return
     set Initialized 1
@@ -117,7 +117,7 @@ oo::define TextEdit classmethod MakeFonts {family size} {
     font create H1 -family $family -weight bold \
             -size [expr {int(round($size * 2))}]
     font create H2 -family $family -weight bold \
-            -size [expr {int(round($size * 1.6))}]
+            -size [expr {int(round($size * 1.5))}]
     font create H3 -family $family -weight bold \
             -size [expr {int(round($size * 1.3))}]
     font create H4 -family $family -weight bold \

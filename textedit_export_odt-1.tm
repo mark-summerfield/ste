@@ -243,6 +243,10 @@ oo::define TextEdit method OdtRunTagProps tag {
         return [list fo:color=\"[dict get $COLOR_FOR_TAG $tag]\"]
     }
     switch -- $tag {
+        h1 { return {fo:font-size="25pt" fo:font-weight="bold"} }
+        h2 { return {fo:font-size="20pt" fo:font-weight="bold"} }
+        h3 { return {fo:font-size="16pt" fo:font-weight="bold"} }
+        h4 { return {fo:font-size="13pt" fo:font-weight="bold"} }
         bold        { return {fo:font-weight="bold"} }
         italic      { return {fo:font-style="italic"} }
         bolditalic  {

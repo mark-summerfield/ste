@@ -262,6 +262,18 @@ oo::define TextEdit method HtmlDocument {title body} {
                 ".$kind$n\{margin-left:${ml}em;text-indent:-1.5em\}\n"
         }
     }
+    append css [string cat ".h1{font-size: 2em;" \
+            "margin-top: 0.67em; margin-bottom: 0.67em; margin-left: 0;" \
+            "margin-right: 0; font-weight:bold}\n"]
+    append css [string cat ".h2{font-size: 1.5em;" \
+            "margin-top: 0.83em; margin-bottom: 0.83em; margin-left: 0;" \
+            "margin-right: 0; font-weight:bold}\n"]
+    append css [string cat ".h3{font-size: 1.3em;" \
+            "margin-top: 1em; margin-bottom: 1em; margin-left: 0;" \
+            "margin-right: 0; font-weight:bold}\n"]
+    append css [string cat ".h4{font-size: 1.1em;" \
+            "margin-top: 1.33em; margin-bottom: 1.33em; margin-left: 0;" \
+            "margin-right: 0; font-weight:bold}\n"]
     append css ".bold{font-weight:bold}\n"
     append css ".italic{font-style:italic}\n"
     append css ".bolditalic{font-weight:bold;font-style:italic}\n"

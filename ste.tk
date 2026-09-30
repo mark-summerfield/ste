@@ -8,8 +8,12 @@ if {![catch {file readlink [info script]} name]} {
 }
 tcl::tm::path add $APPPATH
 
-package require app
-package require globals
+const VERSION 1.6.1
+const APPNAME ste
 
-set app [App new]
-$app show
+package require config
+Config new ;# we need tk scaling done early
+
+package require app
+
+[App new] show

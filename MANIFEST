@@ -4,7 +4,7 @@ app_make-1.tm
 app_actions-1.tm
 app_support-1.tm
 misc-1.tm
-globals-1.tm # VERSION
+globals-1.tm
 config-1.tm
 config_form-1.tm
 

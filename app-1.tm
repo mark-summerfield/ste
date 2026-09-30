@@ -1,6 +1,6 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
-package require config
+package require globals
 package require ui
 
 oo::singleton create App {
@@ -18,8 +18,8 @@ package require app_support
 
 oo::define App constructor {} {
     ui::wishinit
-    tk appname ste
-    set config [Config new] ;# we need tk scaling done early
+    tk appname $::APPNAME
+    set config [Config new]
     set FindIndex 1.0
     set ShowFindPanel 0
     set Filename [expr {$::argc ? [lindex $::argv 0] : ""}]

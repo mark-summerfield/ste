@@ -283,8 +283,8 @@ oo::define TextEdit method HtmlDocument {title body} {
     append css ".highlight{background-color:$HIGHLIGHT_COLOR}\n"
     append css ".sub{font-size:75%;vertical-align:sub}\n"
     append css ".sup{font-size:75%;vertical-align:super}\n"
-    append css [string cat "a.url{text-decoration:underline;" \
-            "text-decoration-color:$URL_UL_COLOR;color:inherit}\n"]
+    append css [string cat "a.url\{text-decoration:underline;" \
+            "text-decoration-color:$URL_UL_COLOR;color:inherit\}\n"]
     append css [string cat "ste-mark{display:inline-block;width:0;" \
             "height:0;overflow:hidden}\n"]
     dict for {tag hex} $COLOR_FOR_TAG { append css ".$tag\{color:$hex\}\n" }

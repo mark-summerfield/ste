@@ -5,6 +5,7 @@ package require ui
 
 oo::singleton create App {
     variable Filename
+    variable Toolbars
     variable ATextEdit
     variable FindEntry
     variable FindIndex
@@ -20,6 +21,7 @@ oo::define App constructor {} {
     ui::wishinit
     tk appname $::APPNAME
     set config [Config new]
+    set Toolbars {}
     set FindIndex 1.0
     set ShowFindPanel 0
     set Filename [expr {$::argc ? [lindex $::argv 0] : ""}]
@@ -33,6 +35,13 @@ oo::define App method show {} {
     wm geometry . [$config geometry]
     raise .
     update
+    after idle [callback on_startup]
+}
+
+oo::define App method on_startup {} {
+    set config [Config new]
+    $Toolbars hide_toolbars {*}[$config hidden_toolbars]
+    update
     if {$Filename ne "" && [file isfile $Filename]} {
         my file_open
     } else {
@@ -41,7 +50,6 @@ oo::define App method show {} {
         $ATextEdit see insert
         $ATextEdit focus
     }
-    my on_poll
 }
 
 oo::define App method show_message {msg {timeout short}} {

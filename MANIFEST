@@ -33,9 +33,6 @@ README.md
 
 st.sh
 
-# NOTE ideas:
-# - Create 3 separate toolbars: File Edit Style so users can move/show/hide
-#   them; see Notebox9
-# - Add status indicators: [nnn Lines][MOD]
+# NOTE idea: - add status indicators: [nnn Lines][MOD]
 
 # vim: syn=yaml

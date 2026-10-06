@@ -12,6 +12,7 @@ oo::singleton create Config {
     variable FontSize
     variable LastFile
     variable ShowIndents
+    variable HiddenToolbars ;# list of hidden toolbars
 }
 
 oo::define Config constructor {} {
@@ -22,6 +23,7 @@ oo::define Config constructor {} {
     set FontSize [expr {1 + [font configure TkDefaultFont -size]}]
     set LastFile ""
     set ShowIndents 0
+    set HiddenToolbars [list]
     if {[file exists $Filename] && [file size $Filename]} {
         set ini [ini::open $Filename -encoding utf-8 r]
         try {
@@ -37,6 +39,8 @@ oo::define Config constructor {} {
             set LastFile [ini::value $ini General LastFile $LastFile]
             set ShowIndents [ini::value $ini General ShowIndents \
                 $ShowIndents]
+            set HiddenToolbars [split [ini::value $ini General \
+                    HiddenToolbars [join $HiddenToolbars]] " "]
         } on error err {
             puts "invalid config in '$Filename'; using defaults: $err"
         } finally {
@@ -55,6 +59,7 @@ oo::define Config method save filename {
         ini::set $ini General FontSize [my size]
         ini::set $ini General LastFile $filename
         ini::set $ini General ShowIndents [my show_indents]
+        ini::set $ini General HiddenToolbars [join $HiddenToolbars]
         ini::commit $ini
     } finally {
         ini::close $ini
@@ -84,8 +89,14 @@ oo::define Config method set_show_indents show_indents {
     set ShowIndents $show_indents
 }
 
+oo::define Config method hidden_toolbars {} { return $HiddenToolbars }
+oo::define Config method set_hidden_toolbars toolbars {
+    set HiddenToolbars $toolbars ;# toolbars must be a list
+}
+
 oo::define Config method to_string {} {
     return "Config filename=$Filename blinking=$Blinking\
         scaling=[tk scaling] geometry=$Geometry fontfamily=$FontFamily\
-        fontsize=$FontSize lastfile=$LastFile show_indents=$ShowIndents"
+        fontsize=$FontSize lastfile=$LastFile show_indents=$ShowIndents\
+        hidden_toolbars=$HiddenToolbars"
 }

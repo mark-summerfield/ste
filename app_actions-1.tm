@@ -168,9 +168,18 @@ oo::define App method on_quit {} {
             save { my on_file_save }
         }
     }
-    set config [Config new]
-    $config save [file normalize $Filename]
+    my save_config
     exit
+}
+
+oo::define App method save_config {} {
+    set hidden_toolbars [list]
+    dict for {toolbar show} [$Toolbars toolbars] {
+        if {!$show} { lappend hidden_toolbars $toolbar }
+    }
+    set config [Config new]
+    $config set_hidden_toolbars $hidden_toolbars
+    $config save [file normalize $Filename]
 }
 
 oo::define App method on_edit_undo {} { $ATextEdit on_undo }

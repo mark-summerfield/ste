@@ -44,7 +44,7 @@ proc util::term_width {{defwidth 72}} {
     if {[dict exists [chan configure stdout] -mode]} { ;# tty
         return [lindex [chan configure stdout -winsize] 0]
     }
-    return $defwidth ;# redirected
+    set defwidth ;# redirected
 }
 
 proc util::islink filename { expr {![catch {file link $filename}]} }

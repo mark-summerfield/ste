@@ -214,7 +214,7 @@ oo::define TextEdit classmethod XmlFromDump {tkt title} {
 
 # Classify a tag name: skip, justify, indent, or inline (default).
 oo::define TextEdit classmethod XmlClassifyTag tag {
-    if {$tag eq "left"} { return skip }
+    if {$tag eq "left" || [string match fnt:* $tag]} { return skip }
     if {$tag in {center right}} { return justify }
     if {[regexp {^[bnt]indent[0-9]+$} $tag]} { return indent }
     return inline

@@ -44,8 +44,9 @@ oo::define TextEdit classmethod swatch {color size} {
         </svg>"
 }
 
-oo::define TextEdit constructor {parent {family ""} {size 0}} {
-    my make_fonts $family $size ;# classmethod only executes once
+oo::define TextEdit constructor {parent {sans ""} {serif ""} {mono ""} \
+        {size 0}} {
+    my ensure_fonts $sans $serif $mono $size
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
     set Frame ${parent}tf#[incr N] ;# unique
@@ -73,6 +74,12 @@ oo::define TextEdit method MakeContextMenu {} {
         -label Highlight -underline 0 -compound left \
         -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
     $ContextMenu add separator
+    menu $ContextMenu.fonts
+    $ContextMenu add cascade -menu $ContextMenu.fonts -label Font \
+            -underline 0 -compound left \
+            -image [ui::icon preferences-desktop-font.svg $::MENU_ICON_SIZE]
+    my make_font_menu $ContextMenu.fonts [callback apply_font]
+    $ContextMenu add separator
     my make_color_menu $ContextMenu [callback apply_color]
 }
 
@@ -94,40 +101,93 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <Return> [callback on_return]
 }
 
-oo::define TextEdit classmethod make_fonts {family size} {
+oo::define TextEdit classmethod make_font_menu {the_menu the_callback} {
+    foreach kind {sans serif mono} index {0 1 0} {
+        $the_menu add command -underline $index \
+                -label [string totitle $kind] -command "$the_callback $kind"
+    }
+}
+
+# Only creates the fonts the first time
+oo::define TextEdit classmethod ensure_fonts {sans serif mono size} {
     variable Initialized
     if {$Initialized} return
     set Initialized 1
-    if {$family eq ""} {
-        set family [font configure TkDefaultFont -family]
+    my make_fonts $sans $serif $mono $size
+}
+
+# Creates (or reconfigures, so any widgets using them update) the three
+# families of named fonts: Roman, Small, Bold, Italic, BoldItalic, H1-H4
+# (sans), and SerifRoman, ..., MonoRoman, ...
+oo::define TextEdit classmethod make_fonts {sans serif mono size} {
+    variable DEFAULT_FAMILIES
+    variable FONT_SPECS
+    variable FamilyFor
+    variable Size
+    foreach kind {sans serif mono} {
+        if {[set $kind] eq ""} {
+            set $kind [dict get $DEFAULT_FAMILIES $kind]
+        }
     }
     if {!$size} {
         set size [expr {1 + [font configure TkDefaultFont -size]}]
     }
-    foreach name {Roman Small Bold Italic BoldItalic} {
-        catch { font delete $name }
+    set FamilyFor [dict create sans $sans serif $serif mono $mono]
+    set Size $size
+    foreach kind {sans serif mono} {
+        set family [dict get $FamilyFor $kind]
+        foreach {suffix scale weight slant} $FONT_SPECS {
+            set name [my font_name $kind $suffix]
+            set opts [list -family $family -weight $weight -slant $slant \
+                    -size [expr {int(round($size * $scale))}]]
+            if {$name in [font names]} {
+                font configure $name {*}$opts
+            } else {
+                font create $name {*}$opts
+            }
+        }
     }
-    font create Roman -family $family -size $size
-    font create Small -family $family \
-            -size [expr {int(round($size * 0.75))}]
-    font create Bold -family $family -size $size -weight bold
-    font create Italic -family $family -size $size -slant italic
-    font create BoldItalic -family $family -size $size -weight bold \
-            -slant italic
-    font create H1 -family $family -weight bold \
-            -size [expr {int(round($size * 2))}]
-    font create H2 -family $family -weight bold \
-            -size [expr {int(round($size * 1.5))}]
-    font create H3 -family $family -weight bold \
-            -size [expr {int(round($size * 1.3))}]
-    font create H4 -family $family -weight bold \
-            -size [expr {int(round($size * 1.1))}]
+}
+
+oo::define TextEdit classmethod font_name {kind suffix} {
+    switch $kind {
+        serif { return Serif$suffix }
+        mono { return Mono$suffix }
+    }
+    return $suffix
+}
+
+oo::define TextEdit classmethod font_size {} {
+    variable Size
+    return $Size
+}
+
+oo::define TextEdit classmethod family_for kind {
+    variable FamilyFor
+    dict get $FamilyFor $kind
+}
+
+# Tag names starting with this are internal (see refresh_fonts).
+oo::define TextEdit classmethod derived_tag {kind style} {
+    return fnt:$kind:$style
+}
+
+# Use after the user changes the font families or size.
+oo::define TextEdit method set_fonts {sans serif mono size} {
+    my make_fonts $sans $serif $mono $size
+    my ConfigureIndents
+    my refresh_fonts [list 1.0 end]
 }
 
 oo::define TextEdit method make_tags {} {
     classvariable URL_UL_COLOR
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
+    classvariable FONT_STYLES
+    classvariable FONT_FOR_STYLE
+    # The font tags must be the lowest priority; see refresh_fonts.
+    $Text tag configure serif -font SerifRoman
+    $Text tag configure mono -font MonoRoman
     $Text tag configure sub -font Small -offset -3p
     $Text tag configure sup -font Small -offset 3p
     $Text tag configure ul -underline 1
@@ -143,9 +203,27 @@ oo::define TextEdit method make_tags {} {
     $Text tag configure italic -font Italic
     $Text tag configure bolditalic -font BoldItalic
     $Text tag configure highlight -background $HIGHLIGHT_COLOR
-    const BINDENT [font measure Roman " • "]
-    const NINDENT [font measure Roman "9. "]
-    const TINDENT [font measure Roman "   "]
+    my ConfigureIndents
+    dict for {key value} $COLOR_FOR_TAG {
+        $Text tag configure $key -foreground $value
+    }
+    # One tag per family+style combination, e.g. fnt:serif:bold; Tk tags
+    # can't combine fonts so refresh_fonts applies these (highest
+    # priority) wherever a serif or mono run also has a font style.
+    foreach kind {serif mono} {
+        foreach style $FONT_STYLES {
+            $Text tag configure [my derived_tag $kind $style] \
+                -font [my font_name $kind [dict get $FONT_FOR_STYLE \
+                    $style]]
+        }
+    }
+}
+
+oo::define TextEdit method ConfigureIndents {} {
+    $Text configure -tabs "[expr {4 * [font measure Roman n]}] left"
+    set BINDENT [font measure Roman " • "]
+    set NINDENT [font measure Roman "9. "]
+    set TINDENT [font measure Roman "   "]
     $Text tag configure bindent0 -lmargin1 0 -lmargin2 $BINDENT
     $Text tag configure bindent1 -lmargin1 $BINDENT \
         -lmargin2 [expr {2 * $BINDENT}]
@@ -161,9 +239,6 @@ oo::define TextEdit method make_tags {} {
         -lmargin2 [expr {2 * $NINDENT}]
     $Text tag configure nindent2 -lmargin1 [expr {2 * $NINDENT}] \
         -lmargin2 [expr {3 * $NINDENT}]
-    dict for {key value} $COLOR_FOR_TAG {
-        $Text tag configure $key -foreground $value
-    }
 }
 
 oo::define TextEdit classmethod filetypes {} {
@@ -198,6 +273,7 @@ oo::define TextEdit method clear {} {
 
 oo::define TextEdit method after_load {{index insert}} {
     my highlight_urls
+    my refresh_fonts [list 1.0 end]
     $Text edit reset
     $Text edit modified 0
     if {$index ne "insert"} { $Text mark set insert $index }
@@ -283,8 +359,78 @@ oo::define TextEdit method apply_style_to {indexes style} {
             }
             $Text tag add $style {*}$indexes
         }
+        my refresh_fonts $indexes
         $Text edit modified 1
     }
+}
+
+oo::define TextEdit method apply_font kind {
+    my apply_font_to [my selected] $kind
+}
+
+# kind is sans (the default, no tag), serif, or mono
+oo::define TextEdit method apply_font_to {indexes kind} {
+    if {$indexes ne ""} {
+        $Text tag remove serif {*}$indexes
+        $Text tag remove mono {*}$indexes
+        if {$kind ne "sans"} { $Text tag add $kind {*}$indexes }
+        my refresh_fonts $indexes
+        $Text edit modified 1
+    }
+}
+
+# Tk tags cannot combine fonts: a bold tag's font replaces a serif
+# tag's. So for every span of text that is serif or mono and also has a
+# font-changing style (bold, h1, sub, etc.), add the derived tag
+# fnt:<kind>:<style> whose font has both. The derived tags are internal:
+# they are never saved or exported (see StripDerived and
+# XmlClassifyTag), so this must be called whenever the text's family or
+# styles change, or after loading.
+# `indexes` is a list of {from to ...} pairs.
+oo::define TextEdit method refresh_fonts indexes {
+    classvariable FONT_STYLES
+    foreach {from to} $indexes {
+        set from [$Text index $from]
+        set to [$Text index $to]
+        if {[$Text compare $from >= $to]} continue
+        foreach kind {serif mono} {
+            foreach style $FONT_STYLES {
+                $Text tag remove [my derived_tag $kind $style] $from $to
+            }
+        }
+        set points [list $from $to]
+        foreach tag [concat {serif mono} $FONT_STYLES] {
+            foreach {a b} [$Text tag ranges $tag] {
+                foreach p [list $a $b] {
+                    if {[$Text compare $p > $from] &&
+                            [$Text compare $p < $to]} {
+                        lappend points $p
+                    }
+                }
+            }
+        }
+        set points [lsort -unique -command [callback CompareIndexes] \
+                $points]
+        foreach a [lrange $points 0 end-1] b [lrange $points 1 end] {
+            set tags [$Text tag names $a]
+            set kind [expr {"mono" in $tags ? "mono" : "serif" in $tags \
+                    ? "serif" : ""}]
+            if {$kind eq ""} continue
+            set winner ""
+            foreach style $FONT_STYLES {
+                if {$style in $tags} { set winner $style }
+            }
+            if {$winner ne ""} {
+                $Text tag add [my derived_tag $kind $winner] $a $b
+            }
+        }
+    }
+}
+
+oo::define TextEdit method CompareIndexes {a b} {
+    if {[$Text compare $a < $b]} { return -1 }
+    if {[$Text compare $a > $b]} { return 1 }
+    return 0
 }
 
 oo::define TextEdit method apply_align align {

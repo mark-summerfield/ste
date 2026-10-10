@@ -139,14 +139,17 @@ oo::define App method on_file_print {} {
 oo::define App method on_config {} {
     set config [Config new]
     set ok [Ref new 0]
-    set family [$config family]
+    set families [list [$config family sans] [$config family serif] \
+            [$config family mono]]
     set size [$config size]
     set show_indents [$config show_indents]
     set form [ConfigForm new $ok]
     tkwait window [$form form]
     if {[$ok get]} {
-        if {$family ne [$config family] || $size != [$config size]} {
-            $ATextEdit make_fonts [$config family] [$config size]
+        set new_families [list [$config family sans] \
+                [$config family serif] [$config family mono]]
+        if {$families ne $new_families || $size != [$config size]} {
+            $ATextEdit set_fonts {*}$new_families [$config size]
         }
         if {$show_indents != [$config show_indents]} {
             $ATextEdit show_indents [$config show_indents]
@@ -205,9 +208,9 @@ oo::define App method on_edit_ins_chr {} {
 
 oo::define App method on_style style { $ATextEdit apply_style $style }
 
-oo::define App method on_style_color color {
-    $ATextEdit apply_color $color
-}
+oo::define App method on_style_font kind { $ATextEdit apply_font $kind }
+
+oo::define App method on_style_color color { $ATextEdit apply_color $color }
 
 oo::define App method on_style_align align { $ATextEdit apply_align $align }
 

@@ -3,15 +3,24 @@
 oo::define TextEdit initialize {
     variable Initialized 0
     variable N 0
-    variable STE_PREFIX
+    variable STE1_PREFIX
+    variable STE2_PREFIX
+    variable Size 0
     variable FILETYPES
     variable COMMON_WORDS
     variable HIGHLIGHT_COLOR
     variable URL_UL_COLOR
     variable COLOR_FOR_TAG
     variable TAG_FOR_COLOR
+    variable FONT_KINDS
+    variable FONT_SPECS
+    variable FONT_STYLES
+    variable FONT_FOR_STYLE
+    variable DEFAULT_FAMILIES
+    variable FamilyFor
 
-    const STE_PREFIX STE1\n
+    const STE1_PREFIX STE1\n
+    const STE2_PREFIX STE2\n
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
         {{compressed tkt files} {.tktz}} {{ste XML files} {.xml}}}
@@ -96,6 +105,35 @@ oo::define TextEdit initialize {
         wireless within without women words working works world would \
         write writing written yahoo years yellow young \
     }
+
+    # The three font kinds; sans is the default (no tag), serif and mono
+    # have tags of the same name.
+    const FONT_KINDS {sans serif mono}
+
+    const DEFAULT_FAMILIES {sans [font configure TkDefaultFont -family] \
+            serif Times mono [font configure TkFixedFont -family]}
+
+    set FamilyFor $DEFAULT_FAMILIES ;# updated by make_fonts
+
+    # suffix size-scale weight slant
+    const FONT_SPECS {
+        Roman 1 normal roman
+        Small 0.75 normal roman
+        Bold 1 bold roman
+        Italic 1 normal italic
+        BoldItalic 1 bold italic
+        H1 2 bold roman
+        H2 1.5 bold roman
+        H3 1.3 bold roman
+        H4 1.1 bold roman
+    }
+
+    # Tags that change the font, lowest to highest priority (this
+    # mirrors the order they are created in make_tags).
+    const FONT_STYLES {sub sup h1 h2 h3 h4 bold italic bolditalic}
+
+    const FONT_FOR_STYLE {sub Small sup Small h1 H1 h2 H2 h3 H3 h4 H4
+        bold Bold italic Italic bolditalic BoldItalic}
 
     const HIGHLIGHT_COLOR yellow
 

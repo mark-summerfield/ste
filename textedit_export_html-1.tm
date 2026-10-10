@@ -246,7 +246,8 @@ oo::define TextEdit method HtmlDocument {title body} {
     classvariable COLOR_FOR_TAG
 
     set css {}
-    append css "body{font-family:sans-serif;font-size:1em;line-height:1.5;"
+    append css "body{font-family:[my CssFamily sans];font-size:1em;\
+        line-height:1.5;"
     append css "max-width:50em;margin:2em auto;padding:0\
         1em;color:#000;background:#fff}\n"
     append css "p{margin:0 0 .6em 0}\n"
@@ -274,6 +275,8 @@ oo::define TextEdit method HtmlDocument {title body} {
     append css [string cat ".h4{font-size: 1.1em;" \
             "margin-top: 1.33em; margin-bottom: 1.33em; margin-left: 0;" \
             "margin-right: 0; font-weight:bold}\n"]
+    append css ".serif{font-family:[my CssFamily serif]}\n"
+    append css ".mono{font-family:[my CssFamily mono]}\n"
     append css ".bold{font-weight:bold}\n"
     append css ".italic{font-style:italic}\n"
     append css ".bolditalic{font-weight:bold;font-style:italic}\n"
@@ -295,4 +298,14 @@ oo::define TextEdit method HtmlDocument {title body} {
     append out "<title>$escTitle</title>\n<style>\n$css</style>\n</head>\n"
     append out "<body data-title=\"[my xml_escape_attr \
         $title]\">\n$body</body>\n</html>\n"
+}
+
+# The configured family followed by sensible fallbacks.
+oo::define TextEdit classmethod CssFamily kind {
+    set family [string map [list \" {} ' {}] [my family_for $kind]]
+    set generic [dict get {sans sans-serif serif serif mono monospace} \
+        $kind]
+    set fallback [dict get {sans Arial serif "Times New Roman"
+        mono "Courier New"} $kind]
+    return "'$family','$fallback',$generic"
 }

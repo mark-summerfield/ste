@@ -12,9 +12,9 @@ auto-completion is attempted. This is based on a few hundred common English
 5+ letter words plus the words already present.
 
 There is no support for numbered lists, for more than three levels of bullet
-lists, or for images or tables. Only one—user-defineable—font family is
-supported. (Supporting multiple fonts is perfectly possible but since I
-don't need this I haven't added it.)
+lists, or for images or tables. Three—user-defineable—font families
+are supported: Sans (default Helvetica), Serif (default Times), and Mono
+(default Courier).
 
 The HTML import and export are very poor and printing only does plain text.
 

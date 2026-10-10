@@ -247,6 +247,7 @@ oo::define TextEdit method OdtRunTagProps tag {
         h2 { return {fo:font-size="20pt" fo:font-weight="bold"} }
         h3 { return {fo:font-size="16pt" fo:font-weight="bold"} }
         h4 { return {fo:font-size="13pt" fo:font-weight="bold"} }
+        serif - mono { return [my OdtFontProps $tag] }
         bold        { return {fo:font-weight="bold"} }
         italic      { return {fo:font-style="italic"} }
         bolditalic  {
@@ -425,7 +426,8 @@ oo::define TextEdit method OdtStyles {} {
     append out " office:version=\"1.2\">\n"
     append out "<office:styles>\n"
     append out "<style:default-style style:family=\"paragraph\">"
-    append out "<style:text-properties style:font-name=\"Liberation Sans\" fo:font-size=\"11pt\"/>"
+    append out "<style:text-properties \
+        [join [my OdtFontProps sans] { }] fo:font-size=\"11pt\"/>"
     append out "</style:default-style>\n"
     append out "<style:style style:name=\"Standard\" style:family=\"paragraph\" style:class=\"text\"/>\n"
     append out "</office:styles>\n"
@@ -505,4 +507,15 @@ oo::define TextEdit method OdtWriteZip {path entries} {
     } finally {
         close $fh
     }
+}
+
+# ODF font attributes for sans, serif, or mono using the configured
+# family plus a generic family so a reader can substitute if need be.
+oo::define TextEdit classmethod OdtFontProps kind {
+    lassign [dict get {
+        sans {swiss variable} serif {roman variable} mono {modern fixed}
+    } $kind] generic pitch
+    list fo:font-family=\"[my xml_escape_attr [my family_for $kind]]\" \
+        style:font-family-generic=\"$generic\" \
+        style:font-pitch=\"$pitch\"
 }

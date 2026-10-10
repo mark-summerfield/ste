@@ -1,8 +1,9 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 oo::define TextEdit method serialize {{file_format .ste}} {
-    classvariable STE_PREFIX
-    set txt_dump [$Text dump -text -mark -tag 1.0 "end -1 char"]
+    classvariable STE2_PREFIX
+    set txt_dump [my StripDerived \
+        [$Text dump -text -mark -tag 1.0 "end -1 char"]]
     if {$file_format eq ".tkt"} {
         return $txt_dump
     }
@@ -10,13 +11,21 @@ oo::define TextEdit method serialize {{file_format .ste}} {
     if {$file_format eq ".tktz"} {
         return $txt_dumpz
     }
-    return $STE_PREFIX$txt_dumpz ;# .ste
+    # .ste: STE2\n then the families line, then the deflated dump
+    set families [list]
+    foreach kind {sans serif mono} {
+        lappend families $kind=[my family_for $kind]
+    }
+    set header [encoding convertto utf-8 \
+        "$STE2_PREFIX[join $families \t]\n"]
+    return $header$txt_dumpz
 }
 
 oo::define TextEdit method deserialize {raw file_format} {
     if {$file_format ni {.ste .tkt .tktz}} { return 0 }
+    if {[catch {my GetTxtDump $raw $file_format} result]} { return 0 }
     my clear
-    set txt_dump [my GetTxtDump $raw $file_format]
+    lassign $result txt_dump families
     array set tags {}
     set insert_index end
     set pending [list]
@@ -44,19 +53,70 @@ oo::define TextEdit method deserialize {raw file_format} {
         set value [lpop pending]
         $Text tag add $value $tags($value) end
     }
+    # Only v2 .ste files record their families; use them so the document
+    # looks as it did when saved.
+    if {[dict size $families]} {
+        set current [dict create]
+        foreach kind {sans serif mono} {
+            dict set current $kind [my family_for $kind]
+        }
+        foreach kind {sans serif mono} {
+            if {![dict exists $families $kind]} {
+                dict set families $kind [dict get $current $kind]
+            }
+        }
+        if {$families ne $current} {
+            my set_fonts [dict get $families sans] \
+                [dict get $families serif] [dict get $families mono] \
+                [my font_size]
+        }
+    }
     my after_load $insert_index
     return 1
 }
 
+# Returns {dump families} where families is a dict (kind -> family) that
+# is empty for v1 and non-.ste formats; errors on an unknown .ste version.
 oo::define TextEdit method GetTxtDump {raw file_format} {
+    classvariable STE1_PREFIX
+    classvariable STE2_PREFIX
+    set families [dict create]
     if {$file_format eq ".tkt"} {
-        return [encoding convertfrom utf-8 $raw]
+        return [list [encoding convertfrom utf-8 $raw] $families]
     }
     if {$file_format eq ".ste"} {
         set i [string first \n $raw]
-        # check here for STE_PREFIX if required
+        set magic [string range $raw 0 $i]
+        if {$magic eq $STE2_PREFIX} {
+            set j [string first \n $raw [incr i]]
+            set line [encoding convertfrom utf-8 \
+                [string range $raw $i [expr {$j - 1}]]]
+            foreach item [split $line \t] {
+                set k [string first = $item]
+                if {$k > 0} {
+                    dict set families [string range $item 0 $k-1] \
+                        [string range $item $k+1 end]
+                }
+            }
+            set i $j
+        } elseif {$magic ne $STE1_PREFIX} {
+            error "unrecognized .ste version"
+        }
         set raw [string range $raw [incr i] end]
     }
     # elseif $file_format eq ".tktz" then use $raw direct
-    encoding convertfrom utf-8 [zlib inflate $raw]
+    list [encoding convertfrom utf-8 [zlib inflate $raw]] $families
+}
+
+# The derived font tags (see refresh_fonts) are rebuilt on load so they
+# are never saved.
+oo::define TextEdit method StripDerived dump {
+    set result [list]
+    foreach {key value index} $dump {
+        if {$key in {tagon tagoff} && [string match fnt:* $value]} {
+            continue
+        }
+        lappend result $key $value $index
+    }
+    return $result
 }

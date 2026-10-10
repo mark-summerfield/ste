@@ -393,7 +393,9 @@ oo::define App method make_layout {} {
     const opts "-pady 3 -padx 3"
     grid .mf.tb -row 0 -column 0 -sticky we {*}$opts
     grid [$ATextEdit ttk_frame] -row 1 -column 0 -sticky news {*}$opts
-    grid .mf.sf -row 2 -column 0 -sticky we {*}$opts
+    grid .mf.ff -row 2 -column 0 -sticky we {*}$opts
+    grid remove .mf.ff
+    grid .mf.sf -row 3 -column 0 -sticky we {*}$opts
     pack .mf.sf.statusLabel -expand 1 -fill x {*}$opts
     pack [ttk::sizegrip .mf.sf.statusLabel.sizer] -side right -anchor se \
             {*}$opts

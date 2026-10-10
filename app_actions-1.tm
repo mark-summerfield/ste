@@ -228,9 +228,9 @@ oo::define App method on_style_unindent {} { $ATextEdit on_bs 0 }
 
 oo::define App method on_find_changed {} {
     const opts "-pady 3 -padx 3"
-    pack forget .mf.ff
+    grid remove .mf.ff
     if {$ShowFindPanel} {
-        pack .mf.ff -side bottom -fill x {*}$opts
+        grid .mf.ff
         focus .mf.ff.findEntry
     }
 }

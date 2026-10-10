@@ -2,6 +2,7 @@
 
 oo::define TextEdit method serialize {{file_format .ste}} {
     classvariable STE2_PREFIX
+    classvariable FONT_KINDS
     set txt_dump [my StripDerived \
         [$Text dump -text -mark -tag 1.0 "end -1 char"]]
     if {$file_format eq ".tkt"} {
@@ -13,7 +14,7 @@ oo::define TextEdit method serialize {{file_format .ste}} {
     }
     # .ste: STE2\n then the families line, then the deflated dump
     set families [list]
-    foreach kind {sans serif mono} {
+    foreach kind $FONT_KINDS {
         lappend families $kind=[my family_for $kind]
     }
     set header [encoding convertto utf-8 \
@@ -24,6 +25,7 @@ oo::define TextEdit method serialize {{file_format .ste}} {
 oo::define TextEdit method deserialize {raw file_format} {
     if {$file_format ni {.ste .tkt .tktz}} { return 0 }
     if {[catch {my GetTxtDump $raw $file_format} result]} { return 0 }
+    classvariable FONT_KINDS
     my clear
     lassign $result txt_dump families
     array set tags {}
@@ -57,10 +59,10 @@ oo::define TextEdit method deserialize {raw file_format} {
     # looks as it did when saved.
     if {[dict size $families]} {
         set current [dict create]
-        foreach kind {sans serif mono} {
+        foreach kind $FONT_KINDS {
             dict set current $kind [my family_for $kind]
         }
-        foreach kind {sans serif mono} {
+        foreach kind $FONT_KINDS {
             if {![dict exists $families $kind]} {
                 dict set families $kind [dict get $current $kind]
             }

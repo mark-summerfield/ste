@@ -88,7 +88,7 @@ oo::define ConfigForm method make_layout {} {
     grid .configForm.mf.scaleSpinbox -row 0 -column 1 -columnspan 2 \
         -sticky we {*}$opts
     set row 0
-    foreach kind {sans serif mono} {
+    foreach kind [set [info object namespace TextEdit]::FONT_KINDS] {
         grid .configForm.mf.${kind}Button -row [incr row] -column 0 \
                 -sticky w {*}$opts
         grid .configForm.mf.${kind}Label -row $row -column 1 \

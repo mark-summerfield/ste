@@ -102,7 +102,8 @@ oo::define TextEdit method MakeBindings {} {
 }
 
 oo::define TextEdit classmethod make_font_menu {the_menu the_callback} {
-    foreach kind {sans serif mono} index {0 1 0} {
+    variable FONT_KINDS
+    foreach kind $FONT_KINDS index {0 1 0} {
         $the_menu add command -underline $index \
                 -label [string totitle $kind] -command "$the_callback $kind"
     }
@@ -121,10 +122,11 @@ oo::define TextEdit classmethod ensure_fonts {sans serif mono size} {
 # (sans), and SerifRoman, ..., MonoRoman, ...
 oo::define TextEdit classmethod make_fonts {sans serif mono size} {
     variable DEFAULT_FAMILIES
+    variable FONT_KINDS
     variable FONT_SPECS
     variable FamilyFor
     variable Size
-    foreach kind {sans serif mono} {
+    foreach kind $FONT_KINDS {
         if {[set $kind] eq ""} {
             set $kind [dict get $DEFAULT_FAMILIES $kind]
         }
@@ -134,7 +136,7 @@ oo::define TextEdit classmethod make_fonts {sans serif mono size} {
     }
     set FamilyFor [dict create sans $sans serif $serif mono $mono]
     set Size $size
-    foreach kind {sans serif mono} {
+    foreach kind $FONT_KINDS {
         set family [dict get $FamilyFor $kind]
         foreach {suffix scale weight slant} $FONT_SPECS {
             set name [my font_name $kind $suffix]
@@ -153,8 +155,8 @@ oo::define TextEdit classmethod font_name {kind suffix} {
     switch $kind {
         serif { return Serif$suffix }
         mono { return Mono$suffix }
+        default { return $suffix }
     }
-    return $suffix
 }
 
 oo::define TextEdit classmethod font_size {} {
@@ -213,8 +215,7 @@ oo::define TextEdit method make_tags {} {
     foreach kind {serif mono} {
         foreach style $FONT_STYLES {
             $Text tag configure [my derived_tag $kind $style] \
-                -font [my font_name $kind [dict get $FONT_FOR_STYLE \
-                    $style]]
+                -font [my font_name $kind [dict get $FONT_FOR_STYLE $style]]
         }
     }
 }

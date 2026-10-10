@@ -1,10 +1,17 @@
 # TODO
-# 1. get rid of Style→Font submenu; have Sans|Serif|Mono directly in the
+# 1. review & apply ste-per-font-sizes.patch
+# 2. make sure fonts & font sizes works per-file, i.e., different fonts
+#    per .ste file
+# 3. get rid of Style→Font submenu; have Sans|Serif|Mono directly in the
 #    Style menu; will need altkey to go the accels
-# 2. ditto for TextEdit context menu so it is:
+# 4. ditto for TextEdit context menu so it is:
 #    Bold|Italic|Highlight|Sans|Serif|Mono|...colors... (use numbers as
 #    accels if needed)
-# 3. add font kind toolbar
+# 5. add font kind toolbar
+# 6. get rid of textedit_initialize-1.tm (or at least its consts) and
+#    create a textedit namespace with the consts in the namespace for
+#    direct internal & external access (no need for classmethod getters)
+#    & update config_form-1.tm and textedit_*1.tm accordingly
 
 ste.tk
 app-1.tm

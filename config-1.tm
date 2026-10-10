@@ -12,7 +12,7 @@ oo::singleton create Config {
     variable FontSize
     variable LastFile
     variable ShowIndents
-    variable HiddenToolbars ;# list of hidden toolbars
+    variable HiddenToolbars
 }
 
 oo::define Config constructor {} {
@@ -66,30 +66,30 @@ oo::define Config method save filename {
     }
 }
 
-oo::define Config method filename {} { return $Filename }
+oo::define Config method filename {} { set Filename }
 oo::define Config method set_filename filename { set Filename $filename }
 
-oo::define Config method blinking {} { return $Blinking }
+oo::define Config method blinking {} { set Blinking }
 oo::define Config method set_blinking blinking { set Blinking $blinking }
 
-oo::define Config method geometry {} { return $Geometry }
+oo::define Config method geometry {} { set Geometry }
 oo::define Config method set_geometry geometry { set Geometry $geometry }
 
-oo::define Config method size {} { return $FontSize }
+oo::define Config method size {} { set FontSize }
 oo::define Config method set_size size { set FontSize $size }
 
-oo::define Config method family {} { return $FontFamily }
+oo::define Config method family {} { set FontFamily }
 oo::define Config method set_family family { set FontFamily $family }
 
-oo::define Config method lastfile {} { return $LastFile }
+oo::define Config method lastfile {} { set LastFile }
 oo::define Config method set_lastfile lastfile { set LastFile $lastfile }
 
-oo::define Config method show_indents {} { return $ShowIndents }
+oo::define Config method show_indents {} { set ShowIndents }
 oo::define Config method set_show_indents show_indents {
     set ShowIndents $show_indents
 }
 
-oo::define Config method hidden_toolbars {} { return $HiddenToolbars }
+oo::define Config method hidden_toolbars {} { set HiddenToolbars }
 oo::define Config method set_hidden_toolbars toolbars {
     set HiddenToolbars $toolbars ;# toolbars must be a list
 }

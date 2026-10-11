@@ -1,5 +1,6 @@
 # TODO
-# 1. review & apply ste-per-font-sizes.patch
+# 1. review & apply ste-per-font-sizes.patch (looks like config-1.tm is
+#    broken but rest looks ok)
 # 2. make sure fonts & font sizes works per-file, i.e., different fonts
 #    per .ste file
 # 3. get rid of Style→Font submenu; have Sans|Serif|Mono directly in the
@@ -8,10 +9,20 @@
 #    Bold|Italic|Highlight|Sans|Serif|Mono|...colors... (use numbers as
 #    accels if needed)
 # 5. add font kind toolbar
-# 6. get rid of textedit_initialize-1.tm (or at least its consts) and
-#    create a textedit namespace with the consts in the namespace for
+# 6. rename textedit*-1.tm ste*-1.tm
+# 7. get rid of ste_initialize-1.tm (or at least its consts) and
+#    create an ste namespace with the consts in the namespace for
 #    direct internal & external access (no need for classmethod getters)
-#    & update config_form-1.tm and textedit_*1.tm accordingly
+#    & update config_form-1.tm and ste*1.tm accordingly
+# 8. Create separate File→Fonts… config dialog (& ∴ take fonts out of std.
+#    Config dialog)
+#    - 7 fonts: Sans Serif Mono H[1-4].
+#    - Update .ste format:
+#	STE4\nsans=Helvetica 11\tserif=Times New Roman 12\t …
+#	    h3=Helvetica 16\th4=Helvetica 13\n
+#    - const FONT_KINDS {sans serif mono h1 h2 h3 h4}
+#    - Get rid of all h[1-4] code in serialize|export|import & simply use
+#      them as fonts like serif et all.
 
 ste.tk
 app-1.tm

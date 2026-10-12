@@ -108,6 +108,10 @@ oo::define Config method geometry {} { set Geometry }
 oo::define Config method set_geometry geometry { set Geometry $geometry }
 
 oo::define Config method fonts {} { set Fonts }
+# fonts is a dict of kind -> {family size}, e.g., from TextEdit's fonts
+oo::define Config method set_fonts fonts {
+    dict for {kind font} $fonts { dict set Fonts $kind $font }
+}
 oo::define Config method font kind { dict get $Fonts $kind }
 oo::define Config method family kind { lindex [dict get $Fonts $kind] 0 }
 oo::define Config method size kind { lindex [dict get $Fonts $kind] 1 }

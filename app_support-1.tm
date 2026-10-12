@@ -5,6 +5,9 @@ package require util
 oo::define App method file_open {} {
     if {[$ATextEdit deserialize [readFile $Filename binary] \
             [file extension $Filename]]} {
+        # the document may have set its own fonts (.ste v2+) so keep the
+        # config (and so File->Config) in sync with what is displayed
+        [Config new] set_fonts [$ATextEdit fonts]
         $ATextEdit focus
         wm title . "[tk appname] — [file tail $Filename]"
         my show_message "Opened '$Filename'."

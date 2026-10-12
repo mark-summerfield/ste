@@ -102,8 +102,8 @@ oo::define TextEdit method GetTxtDump {raw file_format} {
                 # v3: sans-family size TAB serif-family size TAB mono-...
                 # v4: also h1 h2 h3 h4 in the same format
                 # a family may contain spaces so the size is the last word
-                set kinds [expr {$magic eq $STE4_PREFIX
-                    ? $ALL_FONT_KINDS : $FONT_KINDS}]
+                set kinds [expr {$magic eq $STE4_PREFIX ? $ALL_FONT_KINDS \
+                                                        : $FONT_KINDS}]
                 set items [split $line \t]
                 if {[llength $items] != [llength $kinds]} {
                     error "invalid .ste fonts"

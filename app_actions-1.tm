@@ -145,7 +145,10 @@ oo::define App method on_config {} {
     tkwait window [$form form]
     if {[$ok get]} {
         set new_fonts [$config fonts]
-        if {$fonts ne $new_fonts} { $ATextEdit set_fonts $new_fonts }
+        if {$fonts ne $new_fonts} {
+            $ATextEdit set_fonts $new_fonts
+            $ATextEdit edit modified 1
+        }
         if {$show_indents != [$config show_indents]} {
             $ATextEdit show_indents [$config show_indents]
         }

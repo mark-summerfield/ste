@@ -35,7 +35,7 @@ oo::define ConfigForm method make_widgets {} {
     ttk::frame .configForm.mf
     set tip tooltip::tooltip
     ttk::label .configForm.mf.scaleLabel -text "Application Scale" \
-        -underline 12
+        -underline 0
     ttk::spinbox .configForm.mf.scaleSpinbox -format %.2f -from 1.0 \
         -to 10.0 -increment 0.1
     ui::apply_edit_bindings .configForm.mf.scaleSpinbox
@@ -56,7 +56,7 @@ oo::define ConfigForm method make_widgets {} {
     $tip .configForm.mf.blinkCheckbutton \
         "Whether the text cursor should blink."
     set opts "-compound left -width 15"
-    foreach {kind text under} {sans Sans… 1 serif Serif… 1 mono Mono… 0
+    foreach {kind text under} {sans Sans… 0 serif Serif… 4 mono Mono… 0
             h1 Heading\ 1… 8 h2 Heading\ 2… 8 h3 Heading\ 3… 8
             h4 Heading\ 4… 8} {
         ttk::button .configForm.mf.${kind}Button -text $text \
@@ -95,9 +95,8 @@ oo::define ConfigForm method make_layout {} {
         grid .configForm.mf.${kind}Label -row $row -column 1 \
                 -columnspan 2 -sticky news {*}$opts
     }
-    grid .configForm.mf.showIndentsCheckbutton -row 8 -column 1 \
-            -sticky we
-    grid .configForm.mf.blinkCheckbutton -row 9 -column 1 -sticky we
+    grid .configForm.mf.showIndentsCheckbutton -row 8 -column 0 -sticky we
+    grid .configForm.mf.blinkCheckbutton -row 8 -column 1 -sticky we
     grid .configForm.mf.configFileLabel -row 10 -column 0 -sticky we \
             {*}$opts
     grid .configForm.mf.configFilenameLabel -row 10 -column 1 \
@@ -114,16 +113,16 @@ oo::define ConfigForm method make_layout {} {
 oo::define ConfigForm method make_bindings {} {
     bind .configForm <Escape> [callback on_cancel]
     bind .configForm <Return> [callback on_ok]
+    bind .configForm <Alt-a> {focus .configForm.mf.scaleSpinbox}
     bind .configForm <Alt-b> {.configForm.mf.blinkCheckbutton invoke}
-    bind .configForm <Alt-a> [callback on_font sans]
-    bind .configForm <Alt-e> [callback on_font serif]
+    bind .configForm <Alt-s> [callback on_font sans]
+    bind .configForm <Alt-f> [callback on_font serif]
     bind .configForm <Alt-m> [callback on_font mono]
     foreach n {1 2 3 4} {
         bind .configForm <Alt-Key-$n> [callback on_font h$n]
     }
     bind .configForm <Alt-i> {.configForm.mf.showIndentsCheckbutton invoke}
     bind .configForm <Alt-o> [callback on_ok]
-    bind .configForm <Alt-s> {focus .configForm.mf.scaleSpinbox}
 }
 
 oo::define ConfigForm method on_font kind {

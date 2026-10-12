@@ -1,6 +1,7 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 package require inifile
+package require textedit
 package require util
 
 # Also handles tk scaling
@@ -8,8 +9,7 @@ oo::singleton create Config {
     variable Filename
     variable Blinking
     variable Geometry
-    # dict of kind (sans serif mono h1 h2 h3 h4) -> {family size}
-    variable Fonts
+    variable Fonts ;# dict key=sans|serif|mono|h[1-4] value=size
     variable LastFile
     variable ShowIndents
     variable HiddenToolbars
@@ -44,7 +44,7 @@ oo::define Config constructor {} {
             # FontFamily and FontSize were the only font settings in
             # earlier versions
             set legacy_size [ini::value $ini General FontSize $size]
-            foreach kind {sans serif mono} {
+            foreach kind [TextEdit font_kinds] {
                 set Kind [string totitle $kind]
                 set family [lindex [dict get $Fonts $kind] 0]
                 if {$kind eq "sans"} {
@@ -52,16 +52,16 @@ oo::define Config constructor {} {
                         $family]
                 }
                 dict set Fonts $kind [list \
-                    [ini::value $ini General ${Kind}Family $family] \
-                    [ini::value $ini General ${Kind}Size $legacy_size]]
+                    [ini::value $ini Fonts ${Kind}Family $family] \
+                    [ini::value $ini Fonts ${Kind}Size $legacy_size]]
             }
             # headings default to the sans family and scaled sans size
             lassign [dict get $Fonts sans] sans_family sans_size
             foreach {kind scale} {h1 2 h2 1.5 h3 1.3 h4 1.1} {
                 set Kind [string toupper $kind]
                 dict set Fonts $kind [list \
-                    [ini::value $ini General ${Kind}Family $sans_family] \
-                    [ini::value $ini General ${Kind}Size \
+                    [ini::value $ini Fonts ${Kind}Family $sans_family] \
+                    [ini::value $ini Fonts ${Kind}Size \
                         [expr {int(round($sans_size * $scale))}]]]
             }
             set LastFile [ini::value $ini General LastFile $LastFile]
@@ -83,11 +83,11 @@ oo::define Config method save filename {
         ini::set $ini General Scale [tk scaling]
         ini::set $ini General Blinking [my blinking]
         ini::set $ini General Geometry [wm geometry .]
-        foreach kind {sans serif mono h1 h2 h3 h4} {
+        foreach kind [TextEdit all_font_kinds] {
             set Kind [expr {[string match h? $kind]
                 ? [string toupper $kind] : [string totitle $kind]}]
-            ini::set $ini General ${Kind}Family [my family $kind]
-            ini::set $ini General ${Kind}Size [my size $kind]
+            ini::set $ini Fonts ${Kind}Family [my family $kind]
+            ini::set $ini Fonts ${Kind}Size [my size $kind]
         }
         ini::set $ini General LastFile $filename
         ini::set $ini General ShowIndents [my show_indents]

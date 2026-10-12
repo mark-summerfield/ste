@@ -1,20 +1,3 @@
-# TODO
-# 3. get rid of Style→Font submenu; have Sans|Serif|Mono directly in the
-#    Style menu; will need altkey to go the accels
-# 4. ditto for TextEdit context menu so it is:
-#    Bold|Italic|Highlight|Sans|Serif|Mono|...colors... (use numbers as
-#    accels if needed)
-# 5. add font kind toolbar
-# 6. rename textedit*-1.tm ste*-1.tm
-# 7. create ste namespace and move all (public) consts into it from the
-#    initialize method so that they can be accessed from outside, e.g.,
-#    FONT_KINDS & ∴ get rid of classmethod getters)
-#    - update config_form-1.tm and ste*1.tm accordingly
-# 8. Create separate File→Fonts… config dialog (& ∴ take fonts out of std.
-#    Config dialog)
-#    - 7 fonts: Sans Serif Mono H[1-4].
-#    - const FONT_KINDS {sans serif mono h1 h2 h3 h4}
-
 ste.tk
 app-1.tm
 app_make-1.tm
@@ -50,6 +33,6 @@ README.md
 
 st.sh
 
-# NOTE idea: - add status indicators: [nnn Lines][MOD]
+# NOTE idea: add status indicators: [nnn Lines][MOD]
 
 # vim: syn=yaml

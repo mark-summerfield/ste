@@ -28,8 +28,8 @@ oo::define App method make_menus {} {
     my make_file_menu
     my make_edit_menu
     my make_style_menu
-    $Toolbars new_menu .menu {File Export Edit Headings "Bold etc." \
-            Colors Special Lists Alignment}
+    $Toolbars new_menu .menu {File Export Undo/Redo Copy/Cut/Paste Insert \
+            Fonts Headings Style Colors Special Lists Alignment}
     . configure -menu .menu
 }
 
@@ -118,12 +118,10 @@ oo::define App method make_edit_menu {} {
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
-    # underlines: a (shared with Center Align), f, M
-    foreach kind {sans serif mono} under {1 4 0} {
+    foreach kind {sans serif mono} under {0 4 0} {
         .menu.style add command -command [callback on_style_font $kind] \
                 -label [string totitle $kind] -underline $under \
-                -compound left -image [ui::icon \
-                    preferences-desktop-font.svg $::MENU_ICON_SIZE]
+                -compound left -image [ui::icon $kind.svg $::MENU_ICON_SIZE]
     }
     .menu.style add separator
     .menu.style add command -command [callback on_style h1] \
@@ -146,23 +144,24 @@ oo::define App method make_style_menu {} {
             -label Italic -underline 0 -compound left -accelerator Ctrl+I \
             -image [ui::icon format-text-italic.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style ul] \
-            -label Underline -underline 2 -compound left \
+            -label Underline -underline 0 -compound left \
             -image [ui::icon format-text-underline.svg $::MENU_ICON_SIZE]
+    .menu.style add separator
+    .menu.style add command -command [callback on_style highlight] \
+            -label Highlight -underline 0 -compound left \
+            -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
     menu .menu.style.colors
     .menu.style add cascade -menu .menu.style.colors -label Color \
             -underline 0 -compound left \
             -image [ui::icon color.svg $::MENU_ICON_SIZE]
     TextEdit make_color_menu .menu.style.colors [callback on_style_color]
-    .menu.style add command -command [callback on_style highlight] \
-            -label Highlight -underline 0 -compound left \
-            -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
+    .menu.style add separator
     .menu.style add command -command [callback on_style strike] \
             -label Strikeout -underline 4 -compound left \
             -image [ui::icon format-text-strikethrough.svg \
                 $::MENU_ICON_SIZE]
-    .menu.style add separator
     .menu.style add command -command [callback on_style sub] \
-            -label Subscript -underline 0 -compound left \
+            -label Subscript -underline 8 -compound left \
             -image [ui::icon subscript.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style sup] \
             -label Superscript -underline 3 -compound left \
@@ -178,11 +177,11 @@ oo::define App method make_style_menu {} {
                 $::MENU_ICON_SIZE]
     .menu.style add command \
             -command [callback on_style_indent_or_complete] \
-            -accelerator Tab -label "Indent or Complete" -underline 5 \
+            -accelerator Tab -label "Indent or Complete" -underline 11 \
             -compound left -image [ui::icon format-indent-more.svg \
                 $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_unindent] \
-            -label "Unindent" -underline 0 -compound left \
+            -label "Unindent" -underline 4 -compound left \
             -accelerator Backspace -image [ui::icon format-indent-less.svg \
                 $::MENU_ICON_SIZE]
     .menu.style add separator
@@ -242,36 +241,49 @@ oo::define App method make_file_toolbar {} {
 
 oo::define App method make_edit_toolbar {} {
     set tip tooltip::tooltip
-    ttk::frame .mf.tb.edit
-    ttk::button .mf.tb.edit.edit_undo -style Toolbutton -takefocus 0 \
+    ttk::frame .mf.tb.edit1
+    ttk::button .mf.tb.edit1.edit_undo -style Toolbutton -takefocus 0 \
             -command [callback on_edit_undo] \
             -image [ui::icon edit-undo.svg $::ICON_SIZE]
-    $tip .mf.tb.edit.edit_undo "Edit Undo"
-    ttk::button .mf.tb.edit.edit_redo -style Toolbutton -takefocus 0 \
+    $tip .mf.tb.edit1.edit_undo "Edit Undo"
+    ttk::button .mf.tb.edit1.edit_redo -style Toolbutton -takefocus 0 \
             -command [callback on_edit_redo] \
             -image [ui::icon edit-redo.svg $::ICON_SIZE]
-    $tip .mf.tb.edit.edit_redo "Edit Redo"
-    ttk::button .mf.tb.edit.edit_copy -style Toolbutton -takefocus 0 \
+    $tip .mf.tb.edit1.edit_redo "Edit Redo"
+    $Toolbars add_toolbar .mf.tb.edit1
+    ttk::frame .mf.tb.edit2
+    ttk::button .mf.tb.edit2.edit_copy -style Toolbutton -takefocus 0 \
             -command [callback on_edit_copy] \
             -image [ui::icon edit-copy.svg $::ICON_SIZE]
-    $tip .mf.tb.edit.edit_copy "Edit Copy"
-    ttk::button .mf.tb.edit.edit_cut -style Toolbutton -takefocus 0 \
+    $tip .mf.tb.edit2.edit_copy "Edit Copy"
+    ttk::button .mf.tb.edit2.edit_cut -style Toolbutton -takefocus 0 \
             -command [callback on_edit_cut] \
             -image [ui::icon edit-cut.svg $::ICON_SIZE]
-    $tip .mf.tb.edit.edit_cut "Edit Cut"
-    ttk::button .mf.tb.edit.edit_paste -style Toolbutton -takefocus 0 \
+    $tip .mf.tb.edit2.edit_cut "Edit Cut"
+    ttk::button .mf.tb.edit2.edit_paste -style Toolbutton -takefocus 0 \
             -command [callback on_edit_paste] \
             -image [ui::icon edit-paste.svg $::ICON_SIZE]
-    $tip .mf.tb.edit.edit_paste "Edit Paste"
-    ttk::button .mf.tb.edit.edit_ins_chr -style Toolbutton -takefocus 0 \
+    $tip .mf.tb.edit2.edit_paste "Edit Paste"
+    $Toolbars add_toolbar .mf.tb.edit2
+    ttk::frame .mf.tb.edit3
+    ttk::button .mf.tb.edit3.edit_ins_chr -style Toolbutton -takefocus 0 \
             -command [callback on_edit_ins_chr] \
             -image [ui::icon ins-char.svg $::ICON_SIZE]
-    $tip .mf.tb.edit.edit_ins_chr "Edit Insert Character…"
-    $Toolbars add_toolbar .mf.tb.edit
+    $tip .mf.tb.edit3.edit_ins_chr "Edit Insert Character…"
+    $Toolbars add_toolbar .mf.tb.edit3
 }
 
 oo::define App method make_style_toolbars {} {
     set tip tooltip::tooltip
+    ttk::frame .mf.tb.style0
+    foreach kind {sans serif mono} {
+        ttk::button .mf.tb.style0.style_$kind -style Toolbutton \
+                -takefocus 0 -text [string totitle $kind] \
+                -command [callback on_style_font $kind] \
+                -image [ui::icon $kind.svg $::ICON_SIZE]
+        $tip .mf.tb.style0.style_$kind [string totitle $kind]
+    }
+    $Toolbars add_toolbar .mf.tb.style0
     ttk::frame .mf.tb.h
     ttk::button .mf.tb.h.h1 -style Toolbutton -takefocus 0 \
             -command [callback on_style h1] \
@@ -303,12 +315,6 @@ oo::define App method make_style_toolbars {} {
             -takefocus 0 -command [callback on_style ul] \
             -image [ui::icon format-text-underline.svg $::ICON_SIZE]
     $tip .mf.tb.style1.style_underline "Style Underline"
-    foreach kind {sans serif mono} {
-        ttk::button .mf.tb.style1.style_$kind -style Toolbutton \
-                -takefocus 0 -text [string totitle $kind] \
-                -command [callback on_style_font $kind]
-        $tip .mf.tb.style1.style_$kind "Style [string totitle $kind]"
-    }
     $Toolbars add_toolbar .mf.tb.style1
     ttk::frame .mf.tb.style2
     ttk::button .mf.tb.style2.style_highlight -style Toolbutton \

@@ -264,6 +264,16 @@ oo::define TextEdit classmethod colors {} {
     return $COLOR_FOR_TAG
 }
 
+oo::define TextEdit classmethod font_kinds {} {
+    variable FONT_KINDS
+    return $FONT_KINDS
+}
+
+oo::define TextEdit classmethod all_font_kinds {} {
+    variable ALL_FONT_KINDS
+    return $ALL_FONT_KINDS
+}
+
 oo::define TextEdit method unknown {the_method args} {
     $Text $the_method {*}$args
 }

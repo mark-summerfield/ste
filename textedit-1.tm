@@ -44,9 +44,8 @@ oo::define TextEdit classmethod swatch {color size} {
         </svg>"
 }
 
-oo::define TextEdit constructor {parent {sans ""} {serif ""} {mono ""} \
-        {size 0}} {
-    my ensure_fonts $sans $serif $mono $size
+oo::define TextEdit constructor {parent {sans ""} {serif ""} {mono ""}} {
+    my ensure_fonts $sans $serif $mono
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
     set Frame ${parent}tf#[incr N] ;# unique
@@ -110,34 +109,33 @@ oo::define TextEdit classmethod make_font_menu {the_menu the_callback} {
 }
 
 # Only creates the fonts the first time
-oo::define TextEdit classmethod ensure_fonts {sans serif mono size} {
+oo::define TextEdit classmethod ensure_fonts {sans serif mono} {
     variable Initialized
     if {$Initialized} return
     set Initialized 1
-    my make_fonts $sans $serif $mono $size
+    my make_fonts $sans $serif $mono
 }
 
 # Creates (or reconfigures, so any widgets using them update) the three
 # families of named fonts: Roman, Small, Bold, Italic, BoldItalic, H1-H4
 # (sans), and SerifRoman, ..., MonoRoman, ...
-oo::define TextEdit classmethod make_fonts {sans serif mono size} {
+# Each of sans, serif, mono is a {family size} list; an empty family or
+# size means use the default.
+oo::define TextEdit classmethod make_fonts {sans serif mono} {
     variable DEFAULT_FAMILIES
     variable FONT_KINDS
     variable FONT_SPECS
-    variable FamilyFor
-    variable Size
+    variable FontFor
+    set default_size [expr {1 + [font configure TkDefaultFont -size]}]
     foreach kind $FONT_KINDS {
-        if {[set $kind] eq ""} {
-            set $kind [dict get $DEFAULT_FAMILIES $kind]
+        lassign [set $kind] family size
+        if {$family eq ""} {
+            set family [dict get $DEFAULT_FAMILIES $kind]
         }
-    }
-    if {!$size} {
-        set size [expr {1 + [font configure TkDefaultFont -size]}]
-    }
-    set FamilyFor [dict create sans $sans serif $serif mono $mono]
-    set Size $size
-    foreach kind $FONT_KINDS {
-        set family [dict get $FamilyFor $kind]
+        if {![string is integer -strict $size] || $size <= 0} {
+            set size $default_size
+        }
+        dict set FontFor $kind [list $family $size]
         foreach {suffix scale weight slant} $FONT_SPECS {
             set name [my font_name $kind $suffix]
             set opts [list -family $family -weight $weight -slant $slant \
@@ -159,14 +157,20 @@ oo::define TextEdit classmethod font_name {kind suffix} {
     }
 }
 
-oo::define TextEdit classmethod font_size {} {
-    variable Size
-    return $Size
+oo::define TextEdit classmethod family_for kind {
+    variable FontFor
+    lindex [dict get $FontFor $kind] 0
 }
 
-oo::define TextEdit classmethod family_for kind {
-    variable FamilyFor
-    dict get $FamilyFor $kind
+oo::define TextEdit classmethod size_for kind {
+    variable FontFor
+    lindex [dict get $FontFor $kind] 1
+}
+
+# {family size} for each kind
+oo::define TextEdit classmethod fonts {} {
+    variable FontFor
+    return $FontFor
 }
 
 # Tag names starting with this are internal (see refresh_fonts).
@@ -174,9 +178,10 @@ oo::define TextEdit classmethod derived_tag {kind style} {
     return fnt:$kind:$style
 }
 
-# Use after the user changes the font families or size.
-oo::define TextEdit method set_fonts {sans serif mono size} {
-    my make_fonts $sans $serif $mono $size
+# Use after the user changes the font families or sizes; each of sans,
+# serif, and mono is a {family size} list.
+oo::define TextEdit method set_fonts {sans serif mono} {
+    my make_fonts $sans $serif $mono
     my ConfigureIndents
     my refresh_fonts [list 1.0 end]
 }

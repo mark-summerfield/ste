@@ -9,8 +9,7 @@ oo::class create ConfigForm {
 
     variable Ok
     variable Blinking
-    variable Families
-    variable FontSize
+    variable Fonts
     variable FontKind ;# the font kind the font chooser is for
     variable ShowIndents
 }
@@ -19,9 +18,8 @@ oo::define ConfigForm constructor ok {
     set Ok $ok
     set config [Config new]
     set Blinking [$config blinking]
-    set Families [dict create sans [$config family sans] \
-            serif [$config family serif] mono [$config family mono]]
-    set FontSize [$config size]
+    set Fonts [dict create sans [$config font sans] \
+            serif [$config font serif] mono [$config font mono]]
     set ShowIndents [$config show_indents]
     my make_widgets 
     my make_layout
@@ -67,7 +65,7 @@ oo::define ConfigForm method make_widgets {} {
         $tip .configForm.mf.${kind}Button "The $kind font to use.\nBest\
             to set the application’s scale (and restart) first."
         ttk::label .configForm.mf.${kind}Label -relief sunken \
-            -text "[$config family $kind] [$config size]"
+            -text "[$config family $kind] [$config size $kind]"
     }
     ttk::label .configForm.mf.configFileLabel -foreground gray25 \
         -text "Config file"
@@ -125,7 +123,7 @@ oo::define ConfigForm method on_font kind {
     set FontKind $kind
     tk fontchooser configure -parent .configForm \
             -title "[tk appname] — Choose [string totitle $kind] Font" \
-            -font [list [dict get $Families $kind] $FontSize] \
+            -font [dict get $Fonts $kind] \
             -command [callback on_font_chosen]
     tk fontchooser show
 }
@@ -134,12 +132,11 @@ oo::define ConfigForm method on_font_chosen args {
     if {[llength $args] > 0} {
         set args [lindex $args 0]
         if {[llength $args] > 1} {
-            dict set Families $FontKind [lindex $args 0]
-            set FontSize [lindex $args 1] ;# one size for all three
-            foreach kind {sans serif mono} {
-                .configForm.mf.${kind}Label configure \
-                        -text "[dict get $Families $kind] $FontSize"
-            }
+            dict set Fonts $FontKind [list [lindex $args 0] \
+                [lindex $args 1]]
+            lassign [dict get $Fonts $FontKind] family size
+            .configForm.mf.${FontKind}Label configure \
+                    -text "$family $size"
         }
     }
     focus .configForm
@@ -150,9 +147,8 @@ oo::define ConfigForm method on_ok {} {
     tk scaling [.configForm.mf.scaleSpinbox get]
     $config set_blinking $Blinking
     foreach kind {sans serif mono} {
-        $config set_family $kind [dict get $Families $kind]
+        $config set_font $kind {*}[dict get $Fonts $kind]
     }
-    $config set_size $FontSize
     $config set_show_indents $ShowIndents
     $Ok set 1
     my delete

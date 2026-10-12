@@ -5,7 +5,7 @@ oo::define TextEdit initialize {
     variable N 0
     variable STE1_PREFIX
     variable STE2_PREFIX
-    variable Size 0
+    variable STE3_PREFIX
     variable FILETYPES
     variable COMMON_WORDS
     variable HIGHLIGHT_COLOR
@@ -17,10 +17,11 @@ oo::define TextEdit initialize {
     variable FONT_STYLES
     variable FONT_FOR_STYLE
     variable DEFAULT_FAMILIES
-    variable FamilyFor
+    variable FontFor
 
     const STE1_PREFIX STE1\n
     const STE2_PREFIX STE2\n
+    const STE3_PREFIX STE3\n
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
         {{compressed tkt files} {.tktz}} {{ste XML files} {.xml}}}
@@ -113,7 +114,7 @@ oo::define TextEdit initialize {
     const DEFAULT_FAMILIES {sans [font configure TkDefaultFont -family] \
             serif Times mono [font configure TkFixedFont -family]}
 
-    set FamilyFor $DEFAULT_FAMILIES ;# updated by make_fonts
+    set FontFor [dict create] ;# kind -> {family size}; see make_fonts
 
     # suffix size-scale weight slant
     const FONT_SPECS {

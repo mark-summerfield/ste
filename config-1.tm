@@ -8,8 +8,7 @@ oo::singleton create Config {
     variable Filename
     variable Blinking
     variable Geometry
-    variable Families ;# dict of kind (sans serif mono) -> family
-    variable FontSize
+    variable Fonts ;# dict of kind (sans serif mono) -> {family size}
     variable LastFile
     variable ShowIndents
     variable HiddenToolbars
@@ -19,9 +18,11 @@ oo::define Config constructor {} {
     set Filename [util::get_ini_filename]
     set Blinking 1
     set Geometry ""
-    set Families [list sans [font configure TkDefaultFont -family] \
-            serif Times mono [font configure TkFixedFont -family]]
-    set FontSize [expr {1 + [font configure TkDefaultFont -size]}]
+    set size [expr {1 + [font configure TkDefaultFont -size]}]
+    set Fonts [list \
+        sans [list [font configure TkDefaultFont -family] $size] \
+        serif [list Times $size] \
+        mono [list [font configure TkFixedFont -family] $size]]
     set LastFile ""
     set ShowIndents 0
     set HiddenToolbars [list]
@@ -35,15 +36,20 @@ oo::define Config constructor {} {
                 ttk::style configure . -insertofftime 0
             }
             set Geometry [ini::value $ini General Geometry $Geometry]
-            # FontFamily was the only family in earlier versions
-            dict set Families sans [ini::value $ini General SansFamily \
-                    [ini::value $ini General FontFamily \
-                        [dict get $Families sans]]]
-            dict set Families serif [ini::value $ini General \
-                    SerifFamily [dict get $Families serif]]
-            dict set Families mono [ini::value $ini General MonoFamily \
-                    [dict get $Families mono]]
-            set FontSize [ini::value $ini General FontSize $FontSize]
+            # FontFamily and FontSize were the only font settings in
+            # earlier versions
+            set legacy_size [ini::value $ini General FontSize $size]
+            foreach kind {sans serif mono} {
+                set Kind [string totitle $kind]
+                set family [lindex [dict get $Fonts $kind] 0]
+                if {$kind eq "sans"} {
+                    set family [ini::value $ini General FontFamily \
+                        $family]
+                }
+                dict set Fonts $kind [list \
+                    [ini::value $ini General ${Kind}Family $family] \
+                    [ini::value $ini General ${Kind}Size $legacy_size]]
+            }
             set LastFile [ini::value $ini General LastFile $LastFile]
             set ShowIndents [ini::value $ini General ShowIndents \
                 $ShowIndents]
@@ -63,10 +69,11 @@ oo::define Config method save filename {
         ini::set $ini General Scale [tk scaling]
         ini::set $ini General Blinking [my blinking]
         ini::set $ini General Geometry [wm geometry .]
-        ini::set $ini General SansFamily [my family sans]
-        ini::set $ini General SerifFamily [my family serif]
-        ini::set $ini General MonoFamily [my family mono]
-        ini::set $ini General FontSize [my size]
+        foreach kind {sans serif mono} {
+            set Kind [string totitle $kind]
+            ini::set $ini General ${Kind}Family [my family $kind]
+            ini::set $ini General ${Kind}Size [my size $kind]
+        }
         ini::set $ini General LastFile $filename
         ini::set $ini General ShowIndents [my show_indents]
         ini::set $ini General HiddenToolbars [join $HiddenToolbars]
@@ -85,12 +92,11 @@ oo::define Config method set_blinking blinking { set Blinking $blinking }
 oo::define Config method geometry {} { set Geometry }
 oo::define Config method set_geometry geometry { set Geometry $geometry }
 
-oo::define Config method size {} { set FontSize }
-oo::define Config method set_size size { set FontSize $size }
-
-oo::define Config method family kind { dict get $Families $kind }
-oo::define Config method set_family {kind family} {
-    dict set Families $kind $family
+oo::define Config method font kind { dict get $Fonts $kind }
+oo::define Config method family kind { lindex [dict get $Fonts $kind] 0 }
+oo::define Config method size kind { lindex [dict get $Fonts $kind] 1 }
+oo::define Config method set_font {kind family size} {
+    dict set Fonts $kind [list $family $size]
 }
 
 oo::define Config method lastfile {} { set LastFile }
@@ -108,7 +114,7 @@ oo::define Config method set_hidden_toolbars toolbars {
 
 oo::define Config method to_string {} {
     return "Config filename=$Filename blinking=$Blinking\
-        scaling=[tk scaling] geometry=$Geometry families=[list $Families]\
-        fontsize=$FontSize lastfile=$LastFile show_indents=$ShowIndents\
+        scaling=[tk scaling] geometry=$Geometry fonts=[list $Fonts]\
+        lastfile=$LastFile show_indents=$ShowIndents\
         hidden_toolbars=$HiddenToolbars"
 }

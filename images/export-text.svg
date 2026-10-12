@@ -9,7 +9,7 @@
    xml:space="preserve"
    id="svg405"
    sodipodi:docname="export-text.svg"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +26,7 @@
    showgrid="false"
    inkscape:zoom="0.057786977"
    inkscape:cx="7683.3921"
-   inkscape:cy="8989.9148"
+   inkscape:cy="8998.5673"
    inkscape:current-layer="svg405" />
  <defs
    class="ClipPathGroup"
@@ -463,17 +463,17 @@
    class="com.sun.star.drawing.CustomShape"
    id="g396"
    clip-path="url(#clipPath907)"
-   style="fill:#000080;stroke:#000080;stroke-width:17.8638"
+   style="fill:#de8787;stroke:#de8787;stroke-width:17.8638"
    transform="matrix(1.5728807,0,0,1.5868308,-9593.9142,-9986.0613)">
       <g
    id="id17"
-   style="fill:#000080;stroke:#000080;stroke-width:17.8638">
+   style="fill:#de8787;stroke:#de8787;stroke-width:17.8638">
        <path
    fill="#b2b2b2"
    stroke="none"
    d="m 7600,14303 h 594 v 696 h -594 z m 825,-1803 h 1881 v 617 h -631 v 1882 h -619 v -1882 h -631 z m 2022,1 h 681 l 356,769 343,-769 h 674 l -622,1210 681,1288 h -695 l -394,-803 -396,803 h -691 l 691,-1303 z m 2172,-1 h 1880 v 617 h -630 v 1882 h -620 v -1882 h -630 z"
    id="path385"
-   style="fill:#000080;stroke:#000080;stroke-width:13.1419" />
+   style="fill:#de8787;stroke:#de8787;stroke-width:13.1419" />
        <path
    fill="none"
    stroke="#000000"
@@ -481,7 +481,7 @@
    stroke-linejoin="miter"
    d="m 7600,14303 h 594 v 696 h -594 z"
    id="path387"
-   style="fill:#000080;stroke:#000080" />
+   style="fill:#de8787;stroke:#de8787" />
        <path
    fill="none"
    stroke="#000000"
@@ -489,7 +489,7 @@
    stroke-linejoin="miter"
    d="m 8425,12500 h 1881 v 617 h -631 v 1882 h -619 v -1882 h -631 z"
    id="path389"
-   style="fill:#000080;stroke:#000080" />
+   style="fill:#de8787;stroke:#de8787" />
        <path
    fill="none"
    stroke="#000000"
@@ -497,7 +497,7 @@
    stroke-linejoin="miter"
    d="m 10447,12501 h 681 l 356,769 343,-769 h 674 l -622,1210 681,1288 h -695 l -394,-803 -396,803 h -691 l 691,-1303 z"
    id="path391"
-   style="fill:#000080;stroke:#000080" />
+   style="fill:#de8787;stroke:#de8787" />
        <path
    fill="none"
    stroke="#000000"
@@ -505,7 +505,7 @@
    stroke-linejoin="miter"
    d="m 12619,12500 h 1880 v 617 h -630 v 1882 h -620 v -1882 h -630 z"
    id="path393"
-   style="fill:#000080;stroke:#000080" />
+   style="fill:#de8787;stroke:#de8787" />
       </g>
      </g>
    

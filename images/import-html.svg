@@ -6,7 +6,7 @@
    height="350"
    id="svg97"
    sodipodi:version="0.32"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    sodipodi:docname="import-html.svg"
    inkscape:export-filename="/home/jimmac/ximian_art/icons/nautilus/snowdunes/gnome-fs-directory-accept.png"
    inkscape:export-xdpi="90.000000"
@@ -288,7 +288,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.6053098"
      inkscape:cx="172.55236"
-     inkscape:cy="154.17585"
+     inkscape:cy="154.48731"
      inkscape:current-layer="text1395"
      showgrid="false"
      inkscape:grid-bbox="true"
@@ -524,22 +524,27 @@
          aria-label=".HTML"
          transform="scale(0.99878043,1.0012211)"
          id="text479"
-         style="font-size:73.4035px;line-height:125%;-inkscape-font-specification:'Nimbus Sans'">
+         style="font-size:73.4035px;line-height:125%;-inkscape-font-specification:'Nimbus Sans';fill:#5aa02c;stroke:#5aa02c">
         <path
            d="m 241.63756,309.95921 h -11.01052 v 10.71691 h 11.01052 z"
-           id="path2206" />
+           id="path2206"
+           style="fill:#5aa02c;stroke:#5aa02c" />
         <path
            d="m 283.55095,296.37956 v 24.29656 h 11.01053 v -53.51116 h -11.08393 v 20.03916 h -21.14021 v -20.03916 h -11.01052 v 53.51116 h 11.01052 v -24.29656 z"
-           id="path2208" />
+           id="path2208"
+           style="fill:#5aa02c;stroke:#5aa02c" />
         <path
            d="m 327.4462,276.3404 h 15.63495 v -9.17544 H 300.2135 v 9.17544 h 16.22218 v 44.33572 h 11.01052 z"
-           id="path2210" />
+           id="path2210"
+           style="fill:#5aa02c;stroke:#5aa02c" />
         <path
            d="m 359.74368,278.98293 9.61586,41.69319 h 11.01053 l 9.46905,-41.69319 v 41.69319 h 11.01053 v -53.51116 h -16.5892 l -9.39564,42.57403 -9.68927,-42.57403 h -16.44238 v 53.51116 h 11.01052 z"
-           id="path2212" />
+           id="path2212"
+           style="fill:#5aa02c;stroke:#5aa02c" />
         <path
            d="m 421.91647,267.16496 h -11.01053 v 53.51116 h 36.62835 v -9.17544 h -25.61782 z"
-           id="path2214" />
+           id="path2214"
+           style="fill:#5aa02c;stroke:#5aa02c" />
       </g>
     </g>
   </g>

@@ -9,7 +9,7 @@
    xml:space="preserve"
    id="svg141"
    sodipodi:docname="export-html.svg"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +26,7 @@
    showgrid="false"
    inkscape:zoom="0.057786977"
    inkscape:cx="7683.3921"
-   inkscape:cy="8989.9148"
+   inkscape:cy="8998.5673"
    inkscape:current-layer="svg141" />
  <defs
    class="ClipPathGroup"
@@ -464,16 +464,16 @@
    id="g132"
    clip-path="url(#clipPath653)"
    transform="matrix(1.5818819,0,0,1.5963116,-9766.0188,-9928.5842)"
-   style="fill:#441650;stroke:#441650;stroke-width:17.7599">
+   style="fill:#5aa02c;stroke:#5aa02c;stroke-width:17.7599">
       <g
    id="id17"
-   style="fill:#441650;stroke:#441650;stroke-width:17.7599">
+   style="fill:#5aa02c;stroke:#5aa02c;stroke-width:17.7599">
        <path
    fill="#3399ff"
    stroke="none"
    d="m 7600,14303 h 428 v 696 h -428 z m 700,-1803 h 447 v 874 h 490 v -874 h 450 v 2499 h -450 v -1012 h -490 v 1012 h -447 z m 1582,0 h 1360 v 617 h -456 v 1882 h -447 v -1882 h -457 z m 1558,0 h 588 l 227,1519 227,-1519 h 586 v 2499 h -365 v -1907 l -283,1907 h -331 l -283,-1907 v 1907 h -366 z m 1914,0 h 448 v 1883 h 697 v 616 h -1145 z"
    id="path119"
-   style="fill:#441650;stroke:#441650;stroke-width:12.9" />
+   style="fill:#5aa02c;stroke:#5aa02c;stroke-width:12.9" />
        <path
    fill="none"
    stroke="#000000"
@@ -481,7 +481,7 @@
    stroke-linejoin="miter"
    d="m 7600,14303 h 428 v 696 h -428 z"
    id="path121"
-   style="fill:#441650;stroke:#441650" />
+   style="fill:#5aa02c;stroke:#5aa02c" />
        <path
    fill="none"
    stroke="#000000"
@@ -489,7 +489,7 @@
    stroke-linejoin="miter"
    d="m 8300,12500 h 447 v 874 h 490 v -874 h 450 v 2499 h -450 v -1012 h -490 v 1012 h -447 z"
    id="path123"
-   style="fill:#441650;stroke:#441650" />
+   style="fill:#5aa02c;stroke:#5aa02c" />
        <path
    fill="none"
    stroke="#000000"
@@ -497,7 +497,7 @@
    stroke-linejoin="miter"
    d="m 9882,12500 h 1360 v 617 h -456 v 1882 h -447 v -1882 h -457 z"
    id="path125"
-   style="fill:#441650;stroke:#441650" />
+   style="fill:#5aa02c;stroke:#5aa02c" />
        <path
    fill="none"
    stroke="#000000"
@@ -505,7 +505,7 @@
    stroke-linejoin="miter"
    d="m 11440,12500 h 588 l 227,1519 227,-1519 h 586 v 2499 h -365 v -1907 l -283,1907 h -331 l -283,-1907 v 1907 h -366 z"
    id="path127"
-   style="fill:#441650;stroke:#441650" />
+   style="fill:#5aa02c;stroke:#5aa02c" />
        <path
    fill="none"
    stroke="#000000"
@@ -513,7 +513,7 @@
    stroke-linejoin="miter"
    d="m 13354,12500 h 448 v 1883 h 697 v 616 h -1145 z"
    id="path129"
-   style="fill:#441650;stroke:#441650" />
+   style="fill:#5aa02c;stroke:#5aa02c" />
       </g>
      </g>
    

@@ -118,6 +118,14 @@ oo::define App method make_edit_menu {} {
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
+    # underlines: a (shared with Center Align), f, M
+    foreach kind {sans serif mono} under {1 4 0} {
+        .menu.style add command -command [callback on_style_font $kind] \
+                -label [string totitle $kind] -underline $under \
+                -compound left -image [ui::icon \
+                    preferences-desktop-font.svg $::MENU_ICON_SIZE]
+    }
+    .menu.style add separator
     .menu.style add command -command [callback on_style h1] \
             -label "Heading 1" -underline 8 -compound left \
             -image [ui::icon h1.svg $::MENU_ICON_SIZE]
@@ -140,12 +148,6 @@ oo::define App method make_style_menu {} {
     .menu.style add command -command [callback on_style ul] \
             -label Underline -underline 2 -compound left \
             -image [ui::icon format-text-underline.svg $::MENU_ICON_SIZE]
-    menu .menu.style.fonts
-    .menu.style add cascade -menu .menu.style.fonts -label Font \
-            -underline 0 -compound left \
-            -image [ui::icon preferences-desktop-font.svg \
-                $::MENU_ICON_SIZE]
-    TextEdit make_font_menu .menu.style.fonts [callback on_style_font]
     menu .menu.style.colors
     .menu.style add cascade -menu .menu.style.colors -label Color \
             -underline 0 -compound left \
@@ -301,13 +303,12 @@ oo::define App method make_style_toolbars {} {
             -takefocus 0 -command [callback on_style ul] \
             -image [ui::icon format-text-underline.svg $::ICON_SIZE]
     $tip .mf.tb.style1.style_underline "Style Underline"
-    menu .mf._style_fonts_menu
-    ttk::menubutton .mf.tb.style1.style_fonts -style Toolbutton \
-            -takefocus 0 -menu .mf._style_fonts_menu \
-            -image [ui::icon preferences-desktop-font.svg $::ICON_SIZE]
-    $tip .mf.tb.style1.style_fonts "Style Font"
-    TextEdit make_font_menu .mf._style_fonts_menu \
-            [callback on_style_font]
+    foreach kind {sans serif mono} {
+        ttk::button .mf.tb.style1.style_$kind -style Toolbutton \
+                -takefocus 0 -text [string totitle $kind] \
+                -command [callback on_style_font $kind]
+        $tip .mf.tb.style1.style_$kind "Style [string totitle $kind]"
+    }
     $Toolbars add_toolbar .mf.tb.style1
     ttk::frame .mf.tb.style2
     ttk::button .mf.tb.style2.style_highlight -style Toolbutton \

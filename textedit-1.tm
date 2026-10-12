@@ -73,12 +73,6 @@ oo::define TextEdit method MakeContextMenu {} {
         -label Highlight -underline 0 -compound left \
         -image [ui::icon draw-highlight.svg $::MENU_ICON_SIZE]
     $ContextMenu add separator
-    menu $ContextMenu.fonts
-    $ContextMenu add cascade -menu $ContextMenu.fonts -label Font \
-            -underline 0 -compound left \
-            -image [ui::icon preferences-desktop-font.svg $::MENU_ICON_SIZE]
-    my make_font_menu $ContextMenu.fonts [callback apply_font]
-    $ContextMenu add separator
     my make_color_menu $ContextMenu [callback apply_color]
 }
 
@@ -98,14 +92,6 @@ oo::define TextEdit method MakeBindings {} {
     bind $Text <Control-Tab> [callback on_ctrl_tab]
     bind $Text <Control-Key-1> [callback on_ctrl_key_1]
     bind $Text <Return> [callback on_return]
-}
-
-oo::define TextEdit classmethod make_font_menu {the_menu the_callback} {
-    variable FONT_KINDS
-    foreach kind $FONT_KINDS index {0 1 0} {
-        $the_menu add command -underline $index \
-                -label [string totitle $kind] -command "$the_callback $kind"
-    }
 }
 
 # Only creates the fonts the first time

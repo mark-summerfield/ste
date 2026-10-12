@@ -8,7 +8,8 @@ oo::singleton create Config {
     variable Filename
     variable Blinking
     variable Geometry
-    variable Fonts ;# dict of kind (sans serif mono) -> {family size}
+    # dict of kind (sans serif mono h1 h2 h3 h4) -> {family size}
+    variable Fonts
     variable LastFile
     variable ShowIndents
     variable HiddenToolbars
@@ -23,6 +24,10 @@ oo::define Config constructor {} {
         sans [list [font configure TkDefaultFont -family] $size] \
         serif [list Times $size] \
         mono [list [font configure TkFixedFont -family] $size]]
+    foreach {kind scale} {h1 2 h2 1.5 h3 1.3 h4 1.1} {
+        dict set Fonts $kind [list [font configure TkDefaultFont -family] \
+            [expr {int(round($size * $scale))}]]
+    }
     set LastFile ""
     set ShowIndents 0
     set HiddenToolbars [list]
@@ -50,6 +55,15 @@ oo::define Config constructor {} {
                     [ini::value $ini General ${Kind}Family $family] \
                     [ini::value $ini General ${Kind}Size $legacy_size]]
             }
+            # headings default to the sans family and scaled sans size
+            lassign [dict get $Fonts sans] sans_family sans_size
+            foreach {kind scale} {h1 2 h2 1.5 h3 1.3 h4 1.1} {
+                set Kind [string toupper $kind]
+                dict set Fonts $kind [list \
+                    [ini::value $ini General ${Kind}Family $sans_family] \
+                    [ini::value $ini General ${Kind}Size \
+                        [expr {int(round($sans_size * $scale))}]]]
+            }
             set LastFile [ini::value $ini General LastFile $LastFile]
             set ShowIndents [ini::value $ini General ShowIndents \
                 $ShowIndents]
@@ -69,8 +83,9 @@ oo::define Config method save filename {
         ini::set $ini General Scale [tk scaling]
         ini::set $ini General Blinking [my blinking]
         ini::set $ini General Geometry [wm geometry .]
-        foreach kind {sans serif mono} {
-            set Kind [string totitle $kind]
+        foreach kind {sans serif mono h1 h2 h3 h4} {
+            set Kind [expr {[string match h? $kind]
+                ? [string toupper $kind] : [string totitle $kind]}]
             ini::set $ini General ${Kind}Family [my family $kind]
             ini::set $ini General ${Kind}Size [my size $kind]
         }
@@ -92,6 +107,7 @@ oo::define Config method set_blinking blinking { set Blinking $blinking }
 oo::define Config method geometry {} { set Geometry }
 oo::define Config method set_geometry geometry { set Geometry $geometry }
 
+oo::define Config method fonts {} { set Fonts }
 oo::define Config method font kind { dict get $Fonts $kind }
 oo::define Config method family kind { lindex [dict get $Fonts $kind] 0 }
 oo::define Config method size kind { lindex [dict get $Fonts $kind] 1 }

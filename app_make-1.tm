@@ -364,8 +364,7 @@ oo::define App method make_style_toolbars {} {
 
 oo::define App method make_widgets {} {
     set config [Config new]
-    set ATextEdit [TextEdit new .mf [$config font sans] \
-            [$config font serif] [$config font mono]]
+    set ATextEdit [TextEdit new .mf [$config fonts]]
     $ATextEdit show_indents [$config show_indents]
     my make_find_panel
     ttk::frame .mf.sf

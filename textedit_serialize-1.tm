@@ -1,8 +1,8 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 oo::define TextEdit method serialize {{file_format .ste}} {
-    classvariable STE3_PREFIX
-    classvariable FONT_KINDS
+    classvariable STE4_PREFIX
+    classvariable ALL_FONT_KINDS
     set txt_dump [my StripDerived \
         [$Text dump -text -mark -tag 1.0 "end -1 char"]]
     if {$file_format eq ".tkt"} {
@@ -12,21 +12,22 @@ oo::define TextEdit method serialize {{file_format .ste}} {
     if {$file_format eq ".tktz"} {
         return $txt_dumpz
     }
-    # .ste: STE3\n then the fonts line (family and size for each of sans,
-    # serif, mono, separated by tabs), then the deflated dump
+    # .ste: STE4\n then the fonts line (family and size for each of sans,
+    # serif, mono, h1, h2, h3, h4, separated by tabs), then the deflated
+    # dump
     set fonts [list]
-    foreach kind $FONT_KINDS {
+    foreach kind $ALL_FONT_KINDS {
         lappend fonts "[my family_for $kind] [my size_for $kind]"
     }
     set header [encoding convertto utf-8 \
-        "$STE3_PREFIX[join $fonts \t]\n"]
+        "$STE4_PREFIX[join $fonts \t]\n"]
     return $header$txt_dumpz
 }
 
 oo::define TextEdit method deserialize {raw file_format} {
     if {$file_format ni {.ste .tkt .tktz}} { return 0 }
     if {[catch {my GetTxtDump $raw $file_format} result]} { return 0 }
-    classvariable FONT_KINDS
+    classvariable ALL_FONT_KINDS
     my clear
     lassign $result txt_dump fonts
     array set tags {}
@@ -56,36 +57,36 @@ oo::define TextEdit method deserialize {raw file_format} {
         set value [lpop pending]
         $Text tag add $value $tags($value) end
     }
-    # Only v2 and v3 .ste files record fonts (v2 only families); use them
-    # so the document looks as it did when saved.
+    # Only v2+ .ste files record fonts (v2 only families, v3 no headings);
+    # use them so the document looks as it did when saved.
     if {[dict size $fonts]} {
         set current [dict create]
-        set wanted [list]
-        foreach kind $FONT_KINDS {
+        set wanted [dict create]
+        foreach kind $ALL_FONT_KINDS {
             set cur [list [my family_for $kind] [my size_for $kind]]
             dict set current $kind $cur
             lassign [expr {[dict exists $fonts $kind]
                 ? [dict get $fonts $kind] : ""}] family size
             if {$family eq ""} { set family [lindex $cur 0] }
             if {$size eq ""} { set size [lindex $cur 1] }
-            lappend wanted [list $family $size]
+            dict set wanted $kind [list $family $size]
         }
-        if {$wanted ne [dict values $current]} {
-            my set_fonts {*}$wanted
-        }
+        if {$wanted ne $current} { my set_fonts $wanted }
     }
     my after_load $insert_index
     return 1
 }
 
 # Returns {dump fonts} where fonts is a dict (kind -> {family size}),
-# empty for v1 and non-.ste formats, and with empty sizes for v2; errors
-# on an unknown .ste version.
+# empty for v1 and non-.ste formats, with empty sizes for v2, and without
+# the headings for v2 and v3; errors on an unknown .ste version.
 oo::define TextEdit method GetTxtDump {raw file_format} {
     classvariable FONT_KINDS
+    classvariable ALL_FONT_KINDS
     classvariable STE1_PREFIX
     classvariable STE2_PREFIX
     classvariable STE3_PREFIX
+    classvariable STE4_PREFIX
     set fonts [dict create]
     if {$file_format eq ".tkt"} {
         return [list [encoding convertfrom utf-8 $raw] $fonts]
@@ -93,14 +94,21 @@ oo::define TextEdit method GetTxtDump {raw file_format} {
     if {$file_format eq ".ste"} {
         set i [string first \n $raw]
         set magic [string range $raw 0 $i]
-        if {$magic eq $STE3_PREFIX || $magic eq $STE2_PREFIX} {
+        if {$magic in [list $STE4_PREFIX $STE3_PREFIX $STE2_PREFIX]} {
             set j [string first \n $raw [incr i]]
             set line [encoding convertfrom utf-8 \
                 [string range $raw $i [expr {$j - 1}]]]
-            if {$magic eq $STE3_PREFIX} {
-                # sans-family size TAB serif-family size TAB mono-...
+            if {$magic ne $STE2_PREFIX} {
+                # v3: sans-family size TAB serif-family size TAB mono-...
+                # v4: also h1 h2 h3 h4 in the same format
                 # a family may contain spaces so the size is the last word
-                foreach kind $FONT_KINDS item [split $line \t] {
+                set kinds [expr {$magic eq $STE4_PREFIX
+                    ? $ALL_FONT_KINDS : $FONT_KINDS}]
+                set items [split $line \t]
+                if {[llength $items] != [llength $kinds]} {
+                    error "invalid .ste fonts"
+                }
+                foreach kind $kinds item $items {
                     set k [string last " " $item]
                     set size [string range $item $k+1 end]
                     if {$k < 1 || ![string is integer -strict $size]} {

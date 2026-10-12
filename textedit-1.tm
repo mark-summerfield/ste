@@ -44,8 +44,8 @@ oo::define TextEdit classmethod swatch {color size} {
         </svg>"
 }
 
-oo::define TextEdit constructor {parent {sans ""} {serif ""} {mono ""}} {
-    my ensure_fonts $sans $serif $mono
+oo::define TextEdit constructor {parent {fonts {}}} {
+    my ensure_fonts $fonts
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
     set Frame ${parent}tf#[incr N] ;# unique
@@ -109,26 +109,29 @@ oo::define TextEdit classmethod make_font_menu {the_menu the_callback} {
 }
 
 # Only creates the fonts the first time
-oo::define TextEdit classmethod ensure_fonts {sans serif mono} {
+oo::define TextEdit classmethod ensure_fonts fonts {
     variable Initialized
     if {$Initialized} return
     set Initialized 1
-    my make_fonts $sans $serif $mono
+    my make_fonts $fonts
 }
 
-# Creates (or reconfigures, so any widgets using them update) the three
-# families of named fonts: Roman, Small, Bold, Italic, BoldItalic, H1-H4
-# (sans), and SerifRoman, ..., MonoRoman, ...
-# Each of sans, serif, mono is a {family size} list; an empty family or
-# size means use the default.
-oo::define TextEdit classmethod make_fonts {sans serif mono} {
+# Creates (or reconfigures, so any widgets using them update) the named
+# fonts: Roman, Small, Bold, Italic, BoldItalic (sans); SerifRoman, ...,
+# MonoRoman, ...; and H1-H4.
+# fonts is a dict of kind (sans serif mono h1 h2 h3 h4) -> {family size};
+# a missing kind, empty family, or empty size means use the default.
+oo::define TextEdit classmethod make_fonts fonts {
     variable DEFAULT_FAMILIES
     variable FONT_KINDS
     variable FONT_SPECS
+    variable HEADING_KINDS
+    variable HEADING_SCALE
     variable FontFor
     set default_size [expr {1 + [font configure TkDefaultFont -size]}]
     foreach kind $FONT_KINDS {
-        lassign [set $kind] family size
+        lassign [expr {[dict exists $fonts $kind]
+                ? [dict get $fonts $kind] : ""}] family size
         if {$family eq ""} {
             set family [dict get $DEFAULT_FAMILIES $kind]
         }
@@ -145,6 +148,25 @@ oo::define TextEdit classmethod make_fonts {sans serif mono} {
             } else {
                 font create $name {*}$opts
             }
+        }
+    }
+    lassign [dict get $FontFor sans] sans_family sans_size
+    foreach kind $HEADING_KINDS {
+        lassign [expr {[dict exists $fonts $kind]
+                ? [dict get $fonts $kind] : ""}] family size
+        if {$family eq ""} { set family $sans_family }
+        if {![string is integer -strict $size] || $size <= 0} {
+            set size [expr {int(round($sans_size *
+                [dict get $HEADING_SCALE $kind]))}]
+        }
+        dict set FontFor $kind [list $family $size]
+        set opts [list -family $family -weight bold -slant roman \
+                -size $size]
+        set name [string toupper $kind]
+        if {$name in [font names]} {
+            font configure $name {*}$opts
+        } else {
+            font create $name {*}$opts
         }
     }
 }
@@ -167,7 +189,7 @@ oo::define TextEdit classmethod size_for kind {
     lindex [dict get $FontFor $kind] 1
 }
 
-# {family size} for each kind
+# dict of {family size} for each of sans serif mono h1 h2 h3 h4
 oo::define TextEdit classmethod fonts {} {
     variable FontFor
     return $FontFor
@@ -178,10 +200,9 @@ oo::define TextEdit classmethod derived_tag {kind style} {
     return fnt:$kind:$style
 }
 
-# Use after the user changes the font families or sizes; each of sans,
-# serif, and mono is a {family size} list.
-oo::define TextEdit method set_fonts {sans serif mono} {
-    my make_fonts $sans $serif $mono
+# Use after the user changes the fonts; fonts is a dict as for make_fonts.
+oo::define TextEdit method set_fonts fonts {
+    my make_fonts $fonts
     my ConfigureIndents
     my refresh_fonts [list 1.0 end]
 }
@@ -190,7 +211,7 @@ oo::define TextEdit method make_tags {} {
     classvariable URL_UL_COLOR
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
-    classvariable FONT_STYLES
+    classvariable DERIVED_STYLES
     classvariable FONT_FOR_STYLE
     # The font tags must be the lowest priority; see refresh_fonts.
     $Text tag configure serif -font SerifRoman
@@ -218,7 +239,7 @@ oo::define TextEdit method make_tags {} {
     # can't combine fonts so refresh_fonts applies these (highest
     # priority) wherever a serif or mono run also has a font style.
     foreach kind {serif mono} {
-        foreach style $FONT_STYLES {
+        foreach style $DERIVED_STYLES {
             $Text tag configure [my derived_tag $kind $style] \
                 -font [my font_name $kind [dict get $FONT_FOR_STYLE $style]]
         }
@@ -395,12 +416,13 @@ oo::define TextEdit method apply_font_to {indexes kind} {
 # `indexes` is a list of {from to ...} pairs.
 oo::define TextEdit method refresh_fonts indexes {
     classvariable FONT_STYLES
+    classvariable DERIVED_STYLES
     foreach {from to} $indexes {
         set from [$Text index $from]
         set to [$Text index $to]
         if {[$Text compare $from >= $to]} continue
         foreach kind {serif mono} {
-            foreach style $FONT_STYLES {
+            foreach style $DERIVED_STYLES {
                 $Text tag remove [my derived_tag $kind $style] $from $to
             }
         }
@@ -426,7 +448,8 @@ oo::define TextEdit method refresh_fonts indexes {
             foreach style $FONT_STYLES {
                 if {$style in $tags} { set winner $style }
             }
-            if {$winner ne ""} {
+            # headings have their own fonts so serif/mono don't apply
+            if {$winner in $DERIVED_STYLES} {
                 $Text tag add [my derived_tag $kind $winner] $a $b
             }
         }

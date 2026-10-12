@@ -10,11 +10,11 @@ package require ref
 oo::define App method on_poll {} {
     set title [wm title .]
     if {[$ATextEdit edit modified]} {
-        if {[string index $title end] ne "❋"} {
-            wm title . "$title ❋"
+        if {[string index $title end] ne "★"} {
+            wm title . "$title ★"
         }
     } else {
-        if {[string index $title end] eq "❋"} {
+        if {[string index $title end] eq "★"} {
             wm title . [string trim [string range $title 0 end-1]]
         }
     }
@@ -139,15 +139,13 @@ oo::define App method on_file_print {} {
 oo::define App method on_config {} {
     set config [Config new]
     set ok [Ref new 0]
-    set fonts [list [$config font sans] [$config font serif] \
-            [$config font mono]]
+    set fonts [$config fonts]
     set show_indents [$config show_indents]
     set form [ConfigForm new $ok]
     tkwait window [$form form]
     if {[$ok get]} {
-        set new_fonts [list [$config font sans] [$config font serif] \
-                [$config font mono]]
-        if {$fonts ne $new_fonts} { $ATextEdit set_fonts {*}$new_fonts }
+        set new_fonts [$config fonts]
+        if {$fonts ne $new_fonts} { $ATextEdit set_fonts $new_fonts }
         if {$show_indents != [$config show_indents]} {
             $ATextEdit show_indents [$config show_indents]
         }

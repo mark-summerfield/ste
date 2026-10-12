@@ -263,20 +263,17 @@ oo::define TextEdit method HtmlDocument {title body} {
                 ".$kind$n\{margin-left:${ml}em;text-indent:-1.5em\}\n"
         }
     }
-    append css [string cat ".h1{font-size: 2em;" \
-            "margin-top: 0.67em; margin-bottom: 0.67em; margin-left: 0;" \
-            "margin-right: 0; font-weight:bold}\n"]
-    append css [string cat ".h2{font-size: 1.5em;" \
-            "margin-top: 0.83em; margin-bottom: 0.83em; margin-left: 0;" \
-            "margin-right: 0; font-weight:bold}\n"]
-    append css [string cat ".h3{font-size: 1.3em;" \
-            "margin-top: 1em; margin-bottom: 1em; margin-left: 0;" \
-            "margin-right: 0; font-weight:bold}\n"]
-    append css [string cat ".h4{font-size: 1.1em;" \
-            "margin-top: 1.33em; margin-bottom: 1.33em; margin-left: 0;" \
-            "margin-right: 0; font-weight:bold}\n"]
-    append css ".serif{font-family:[my CssFamily serif]}\n"
-    append css ".mono{font-family:[my CssFamily mono]}\n"
+    # serif and mono first so headings (which have their own fonts) win
+    foreach kind {serif mono} {
+        append css ".$kind\{font-family:[my CssFamily $kind];\
+            font-size:[my CssEm $kind]em\}\n"
+    }
+    foreach {kind top} {h1 0.67 h2 0.83 h3 1 h4 1.33} {
+        append css ".$kind\{font-family:[my CssFamily $kind];\
+            font-size:[my CssEm $kind]em;margin-top:${top}em;\
+            margin-bottom:${top}em;margin-left:0;margin-right:0;\
+            font-weight:bold\}\n"
+    }
     append css ".bold{font-weight:bold}\n"
     append css ".italic{font-style:italic}\n"
     append css ".bolditalic{font-weight:bold;font-style:italic}\n"
@@ -303,9 +300,15 @@ oo::define TextEdit method HtmlDocument {title body} {
 # The configured family followed by sensible fallbacks.
 oo::define TextEdit classmethod CssFamily kind {
     set family [string map [list \" {} ' {}] [my family_for $kind]]
+    if {[string match h? $kind]} { set kind sans } ;# only for fallbacks
     set generic [dict get {sans sans-serif serif serif mono monospace} \
         $kind]
     set fallback [dict get {sans Arial serif "Times New Roman"
         mono "Courier New"} $kind]
     return "'$family','$fallback',$generic"
+}
+
+# The kind's font size relative to the sans (body) size.
+oo::define TextEdit classmethod CssEm kind {
+    format %.3g [expr {double([my size_for $kind]) / [my size_for sans]}]
 }

@@ -243,10 +243,9 @@ oo::define TextEdit method OdtRunTagProps tag {
         return [list fo:color=\"[dict get $COLOR_FOR_TAG $tag]\"]
     }
     switch -- $tag {
-        h1 { return {fo:font-size="25pt" fo:font-weight="bold"} }
-        h2 { return {fo:font-size="20pt" fo:font-weight="bold"} }
-        h3 { return {fo:font-size="16pt" fo:font-weight="bold"} }
-        h4 { return {fo:font-size="13pt" fo:font-weight="bold"} }
+        h1 - h2 - h3 - h4 {
+            return [concat [my OdtFontProps $tag] {fo:font-weight="bold"}]
+        }
         serif - mono { return [my OdtFontProps $tag] }
         bold        { return {fo:font-weight="bold"} }
         italic      { return {fo:font-style="italic"} }
@@ -347,7 +346,16 @@ oo::define TextEdit method OdtBuildContent {paras title} {
                     # otherwise produce an invalid XML element with a
                     # duplicate attribute.
                     set propsDict [dict create]
+                    # serif and mono first so later tags (headings, bold,
+                    # etc.) override their font properties
+                    set ordered [list]
                     foreach t $tags {
+                        if {$t in {serif mono}} { lappend ordered $t }
+                    }
+                    foreach t $tags {
+                        if {$t ni {serif mono}} { lappend ordered $t }
+                    }
+                    foreach t $ordered {
                         foreach p [my OdtRunTagProps $t] {
                             set eqPos [string first "=" $p]
                             set key [string range $p 0 [expr {$eqPos - 1}]]
@@ -427,7 +435,7 @@ oo::define TextEdit method OdtStyles {} {
     append out "<office:styles>\n"
     append out "<style:default-style style:family=\"paragraph\">"
     append out "<style:text-properties \
-        [join [my OdtFontProps sans] { }] fo:font-size=\"11pt\"/>"
+        [join [my OdtFontProps sans] { }]/>"
     append out "</style:default-style>\n"
     append out "<style:style style:name=\"Standard\" style:family=\"paragraph\" style:class=\"text\"/>\n"
     append out "</office:styles>\n"
@@ -509,13 +517,17 @@ oo::define TextEdit method OdtWriteZip {path entries} {
     }
 }
 
-# ODF font attributes for sans, serif, or mono using the configured
-# family plus a generic family so a reader can substitute if need be.
+# ODF font attributes (family and size) for sans, serif, mono, or h1-h4
+# using the configured family plus a generic family so a reader can
+# substitute if need be.
 oo::define TextEdit classmethod OdtFontProps kind {
     lassign [dict get {
         sans {swiss variable} serif {roman variable} mono {modern fixed}
+        h1 {swiss variable} h2 {swiss variable} h3 {swiss variable}
+        h4 {swiss variable}
     } $kind] generic pitch
     list fo:font-family=\"[my xml_escape_attr [my family_for $kind]]\" \
         style:font-family-generic=\"$generic\" \
-        style:font-pitch=\"$pitch\"
+        style:font-pitch=\"$pitch\" \
+        fo:font-size=\"[my size_for $kind]pt\"
 }

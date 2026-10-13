@@ -8,9 +8,7 @@ globals-1.tm
 config-1.tm
 config_form-1.tm
 
-# TODO
-# STE5\n[zlib deflate: (font family size\t){7}\n...
-# Rename textedit → ste
+# TODO Rename textedit → ste
 textedit-1.tm
 textedit_initialize-1.tm
 textedit_actions-1.tm

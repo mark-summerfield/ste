@@ -7,6 +7,7 @@ oo::define TextEdit initialize {
     variable STE2_PREFIX
     variable STE3_PREFIX
     variable STE4_PREFIX
+    variable STE5_PREFIX
     variable ALL_FONT_KINDS
     variable HEADING_KINDS
     variable HEADING_SCALE
@@ -28,6 +29,7 @@ oo::define TextEdit initialize {
     const STE2_PREFIX STE2\n
     const STE3_PREFIX STE3\n
     const STE4_PREFIX STE4\n
+    const STE5_PREFIX STE5\n
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
         {{compressed tkt files} {.tktz}} {{ste XML files} {.xml}}}

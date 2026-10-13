@@ -68,8 +68,10 @@ oo::define ConfigForm method make_widgets {} {
             ? "heading [string index $kind 1]" : $kind}]
         $tip .configForm.mf.${kind}Button "The $what font to use.\nBest\
             to set the application’s scale (and restart) first."
+        set family [$config family $kind]
         ttk::label .configForm.mf.${kind}Label -relief sunken \
-            -text "[$config family $kind] [$config size $kind]"
+            -text "$family [$config size $kind]" \
+            -font [font create -family $family]
     }
     ttk::label .configForm.mf.configFileLabel -foreground gray25 \
         -text "Config file"
@@ -143,7 +145,8 @@ oo::define ConfigForm method on_font_chosen args {
                 [lindex $args 1]]
             lassign [dict get $Fonts $FontKind] family size
             .configForm.mf.${FontKind}Label configure \
-                    -text "$family $size"
+                    -text "$family $size" \
+                    -font [font create -family $family]
         }
     }
     focus .configForm

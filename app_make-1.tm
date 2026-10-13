@@ -197,7 +197,7 @@ oo::define App method make_style_menu {} {
 }
 
 oo::define App method make_toolbars {} {
-    set Toolbars [flowrow::Row new .mf.tb]
+    set Toolbars [Flowrow new .mf.tb]
     my make_file_toolbar
     my make_edit_toolbar
     my make_style_toolbars

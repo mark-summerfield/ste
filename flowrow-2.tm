@@ -1,8 +1,6 @@
 # Copyright © 2026 Mark Summerfield. All rights reserved.
 
-namespace eval flowrow {}
-
-oo::class create flowrow::Row {
+oo::class create Flowrow {
     variable Frame
     variable ShowAllToolbars
     variable Toolbars ;# dict of toolbar → 0|1 hide|show; insertion ordered
@@ -13,7 +11,7 @@ oo::class create flowrow::Row {
 }
 
 # name, e.g., .mainframe.toolbar; _must_ be managed by grid. 
-oo::define flowrow::Row constructor name {
+oo::define Flowrow constructor name {
     set Frame [ttk::frame $name -relief raised]
     set ShowAllToolbars 1
     set Toolbars [dict create] ;# ttk:frame keys; 0|1 → hide|show values
@@ -24,15 +22,15 @@ oo::define flowrow::Row constructor name {
     bind $Frame <Configure> [callback OnConfigure %w]
 }
 
-oo::define flowrow::Row method frame {} { return $Frame }
-oo::define flowrow::Row method toolbars {} { return $Toolbars }
+oo::define Flowrow method frame {} { return $Frame }
+oo::define Flowrow method toolbars {} { return $Toolbars }
 
-oo::define flowrow::Row method refresh {} {
+oo::define Flowrow method refresh {} {
     after cancel $RefreshToolbarsId
     my Refresh
 }
 
-oo::define flowrow::Row method add_toolbar toolbar {
+oo::define Flowrow method add_toolbar toolbar {
     dict set Toolbars $toolbar 1
     set ToobarsVars($toolbar) 1
     $toolbar configure -relief raised -borderwidth 3
@@ -40,7 +38,7 @@ oo::define flowrow::Row method add_toolbar toolbar {
 }
 
 # If hiding > 1 toolbars use hide_toolbars instead.
-oo::define flowrow::Row method show_toolbar {toolbar {show 1}} {
+oo::define Flowrow method show_toolbar {toolbar {show 1}} {
     dict set Toolbars $toolbar $show
     set ToobarsVars($toolbar) $show
     if {!$show} { set ShowAllToolbars 0 }
@@ -51,7 +49,7 @@ oo::define flowrow::Row method show_toolbar {toolbar {show 1}} {
     }
 }
 
-oo::define flowrow::Row method hide_toolbars args {
+oo::define Flowrow method hide_toolbars args {
     foreach toolbar $args {
         dict set Toolbars $toolbar 0
         set ToobarsVars($toolbar) 0
@@ -65,23 +63,23 @@ oo::define flowrow::Row method hide_toolbars args {
 }
 
 # Normally simply hide using: show_toolbar $toolbar 0
-oo::define flowrow::Row method remove_toolbar toolbar {
+oo::define Flowrow method remove_toolbar toolbar {
     dict unset Toolbars $toolbar
     array unset ToobarsVars $toolbar
     my refresh
 }
 
-oo::define flowrow::Row method HasVisibleToolbars {} {
+oo::define Flowrow method HasVisibleToolbars {} {
     dict for {toolbar show} $Toolbars { if {$show} { return 1 } }
     return 0
 }
 
-oo::define flowrow::Row method show {{show 1}} {
+oo::define Flowrow method show {{show 1}} {
     set ShowAllToolbars $show
     my OnShowHideAll
 }
 
-oo::define flowrow::Row method new_menu {parent_menu names} {
+oo::define Flowrow method new_menu {parent_menu names} {
     if {$Menu ne ""} return
     set accels [lreverse [split 123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ""]]
     set Menu $parent_menu._flowrow
@@ -106,7 +104,7 @@ oo::define flowrow::Row method new_menu {parent_menu names} {
     }
 }
 
-oo::define flowrow::Row method OnShowHideAll {} {
+oo::define Flowrow method OnShowHideAll {} {
     foreach toolbar [dict keys $Toolbars] {
         dict set Toolbars $toolbar $ShowAllToolbars
         set ToobarsVars($toolbar) $ShowAllToolbars
@@ -119,7 +117,7 @@ oo::define flowrow::Row method OnShowHideAll {} {
     }
 }
 
-oo::define flowrow::Row method OnMenu {} {
+oo::define Flowrow method OnMenu {} {
     set show 0 ;# the loop is also used to update the Toolbars dict
     foreach toolbar [array names ToobarsVars] {
         dict set Toolbars $toolbar $ToobarsVars($toolbar)
@@ -129,14 +127,14 @@ oo::define flowrow::Row method OnMenu {} {
     my refresh
 }
 
-oo::define flowrow::Row method OnConfigure width {
+oo::define Flowrow method OnConfigure width {
     if {$width != $Width} {
         after cancel $RefreshToolbarsId
         set RefreshToolbarsId [after 100 [callback Refresh]]
     }
 }
 
-oo::define flowrow::Row method Refresh {} {
+oo::define Flowrow method Refresh {} {
     set Width [winfo width $Frame]
     if {$Width <= 1} return
     dict for {toolbar _} $Toolbars { grid forget $toolbar }
@@ -167,7 +165,7 @@ oo::define flowrow::Row method Refresh {} {
     set ShowAllToolbars [expr {$size == [llength $Toolbars]}]
 }
 
-oo::define flowrow::Row method GetToolbarData {} {
+oo::define Flowrow method GetToolbarData {} {
     set column_width -1
     set toolbars [dict create] ;# key=toolbar value=tb_width
     dict for {toolbar show} $Toolbars {

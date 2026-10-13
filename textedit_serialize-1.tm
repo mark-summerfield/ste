@@ -12,9 +12,6 @@ oo::define TextEdit method serialize {{file_format .ste}} {
     if {$file_format eq ".tktz"} {
         return $txt_dumpz
     }
-    # .ste: STE4\n then the fonts line (family and size for each of sans,
-    # serif, mono, h1, h2, h3, h4, separated by tabs), then the deflated
-    # dump
     set fonts [list]
     foreach kind $ALL_FONT_KINDS {
         lappend fonts "[my family_for $kind] [my size_for $kind]"

@@ -97,7 +97,7 @@ oo::define TextEdit method GetTxtDump {raw file_format} {
         if {$magic in [list $STE4_PREFIX $STE3_PREFIX $STE2_PREFIX]} {
             set j [string first \n $raw [incr i]]
             set line [encoding convertfrom utf-8 \
-                [string range $raw $i [expr {$j - 1}]]]
+                    [string range $raw $i [expr {$j - 1}]]]
             if {$magic ne $STE2_PREFIX} {
                 # v3: sans-family size TAB serif-family size TAB mono-...
                 # v4: also h1 h2 h3 h4 in the same format

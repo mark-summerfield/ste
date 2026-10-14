@@ -20,14 +20,7 @@ oo::define Config constructor {} {
     set Blinking 1
     set Geometry ""
     set size [expr {1 + [font configure TkDefaultFont -size]}]
-    set Fonts [list \
-        sans [list [font configure TkDefaultFont -family] $size] \
-        serif [list Times $size] \
-        mono [list [font configure TkFixedFont -family] $size]]
-    foreach {kind scale} {h1 2 h2 1.5 h3 1.3 h4 1.1} {
-        dict set Fonts $kind [list [font configure TkDefaultFont -family] \
-            [expr {int(round($size * $scale))}]]
-    }
+    set Fonts [Ste make_default_font_dict $size]
     set LastFile ""
     set ShowIndents 0
     set HiddenToolbars [list]

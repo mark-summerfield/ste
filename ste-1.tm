@@ -99,7 +99,23 @@ oo::define Ste classmethod ensure_fonts fonts {
     variable Initialized
     if {$Initialized} return
     set Initialized 1
+    if {$fonts eq ""} { set fonts [my make_default_font_dict] }
     my make_fonts $fonts
+}
+
+# Useful for initializing a config file
+# size is the base size; if < 8 a sensible default is used
+oo::define Ste classmethod make_default_font_dict {{size 0}} {
+    if {$size < 8} { set size [font configure TkDefaultFont -size] }
+    set fonts [list \
+            sans [list [font configure TkDefaultFont -family] $size] \
+            serif [list Times $size] \
+            mono [list [font configure TkFixedFont -family] $size]]
+    foreach {kind scale} {h1 2 h2 1.5 h3 1.3 h4 1.1} {
+        dict set fonts $kind [list [font configure TkDefaultFont -family] \
+            [expr {int(round($size * $scale))}]]
+    }
+    return $fonts
 }
 
 # Creates (or reconfigures, so any widgets using them update) the named

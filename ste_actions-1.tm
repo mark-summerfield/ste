@@ -2,21 +2,21 @@
 
 package require util
 
-oo::define TextEdit method on_undo {} {
+oo::define Ste method on_undo {} {
     if {[$Text edit canundo]} { $Text edit undo }
 }
 
-oo::define TextEdit method on_redo {} {
+oo::define Ste method on_redo {} {
     if {[$Text edit canredo]} { $Text edit redo }
 }
 
-oo::define TextEdit method on_copy {} { tk_textCopy $Text }
+oo::define Ste method on_copy {} { tk_textCopy $Text }
 
-oo::define TextEdit method on_cut {} { tk_textCut $Text }
+oo::define Ste method on_cut {} { tk_textCut $Text }
 
-oo::define TextEdit method on_paste {} { tk_textPaste $Text }
+oo::define Ste method on_paste {} { tk_textPaste $Text }
 
-oo::define TextEdit method on_bs {{brk 1}} {
+oo::define Ste method on_bs {{brk 1}} {
     if {[string match "*.0" [$Text index insert]]} { ;# start of new line
         if {[set indent [my GetIndent]] ne ""} {
             my ReduceIndent $indent
@@ -39,16 +39,16 @@ oo::define TextEdit method on_bs {{brk 1}} {
     # otherwise normal backspace delete
 }
 
-oo::define TextEdit method on_ctrl_prior {} {
+oo::define Ste method on_ctrl_prior {} {
     $Text mark set insert [$Text index @0,0]
 }
 
-oo::define TextEdit method on_ctrl_next {} {
+oo::define Ste method on_ctrl_next {} {
     $Text mark set insert \
         [$Text index "@0,[expr {[winfo height $Text] - 1}]"]
 }
 
-oo::define TextEdit method on_ctrl_bs {} {
+oo::define Ste method on_ctrl_bs {} {
     set i [$Text index "insert -1c"]
     set x [$Text index "$i wordstart"]
     set y [$Text index "$x wordend"]
@@ -56,7 +56,7 @@ oo::define TextEdit method on_ctrl_bs {} {
     return -code break
 }
 
-oo::define TextEdit method on_ctrl_del {} {
+oo::define Ste method on_ctrl_del {} {
     set i [$Text index "insert +1c"]
     set x [$Text index "$i wordstart"]
     set y [$Text index "$x wordend"]
@@ -64,9 +64,9 @@ oo::define TextEdit method on_ctrl_del {} {
     return -code break
 }
 
-oo::define TextEdit method on_ctrl_a {} { $Text tag add sel 1.0 end }
+oo::define Ste method on_ctrl_a {} { $Text tag add sel 1.0 end }
 
-oo::define TextEdit method on_return {} {
+oo::define Ste method on_return {} {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend"]
     set line [$Text get $i $j]
@@ -82,7 +82,7 @@ oo::define TextEdit method on_return {} {
     return -code break
 }
 
-oo::define TextEdit method on_tab {{user 1} {kind 0} {brk 1}} {
+oo::define Ste method on_tab {{user 1} {kind 0} {brk 1}} {
     if {[string match "*.0" [$Text index insert]]} { ;# start of new line
         switch $kind {
             1 {
@@ -124,17 +124,17 @@ oo::define TextEdit method on_tab {{user 1} {kind 0} {brk 1}} {
     return
 }
 
-oo::define TextEdit method on_ctrl_tab {{brk 1}} {
+oo::define Ste method on_ctrl_tab {{brk 1}} {
     catch {my on_tab 0 1}
     if {$brk} { return -code break }
 }
 
-oo::define TextEdit method on_ctrl_key_1 {{brk 1}} {
+oo::define Ste method on_ctrl_key_1 {{brk 1}} {
     catch {my on_tab 0 2}
     if {$brk} { return -code break }
 }
 
-oo::define TextEdit method TryCompletion p {
+oo::define Ste method TryCompletion p {
     classvariable COMMON_WORDS
     set i $p
     set i [$Text index "$p wordstart"]
@@ -181,7 +181,7 @@ oo::define TextEdit method TryCompletion p {
 }
 
 # longest to shortest or compare strings for tie-break
-oo::define TextEdit classmethod ByLength {a b} {
+oo::define Ste classmethod ByLength {a b} {
     set asize [string length $a]
     set bsize [string length $b]
     if {$asize < $bsize} { return 1 }
@@ -189,14 +189,14 @@ oo::define TextEdit classmethod ByLength {a b} {
     string compare $a $b
 }
 
-oo::define TextEdit method Complete word { $Text insert insert $word }
+oo::define Ste method Complete word { $Text insert insert $word }
 
-oo::define TextEdit method on_single_quote {} {
+oo::define Ste method on_single_quote {} {
     $Text insert insert ’
     return -code break
 }
 
-oo::define TextEdit method on_double_click {} {
+oo::define Ste method on_double_click {} {
     set url [my get_whole_word]
     if {[string match ~* $url]} {
         set url file://[file home][string range $url 1 end]
@@ -207,7 +207,7 @@ oo::define TextEdit method on_double_click {} {
     }
 }
 
-oo::define TextEdit method ClearIndents {} {
+oo::define Ste method ClearIndents {} {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend +1c"]
     $Text tag remove NtextTab $i $j
@@ -218,13 +218,13 @@ oo::define TextEdit method ClearIndents {} {
     }
 }
 
-oo::define TextEdit method GetIndent {} {
+oo::define Ste method GetIndent {} {
     foreach tag [$Text tag names insert] {
         if {[string match ?indent? $tag]} { return $tag }
     }
 }
 
-oo::define TextEdit method ReduceIndent indent {
+oo::define Ste method ReduceIndent indent {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend"]
     my ClearIndents
@@ -242,7 +242,7 @@ oo::define TextEdit method ReduceIndent indent {
     }
 }
 
-oo::define TextEdit method IncreaseIndent {i j indent {match ""}} {
+oo::define Ste method IncreaseIndent {i j indent {match ""}} {
     $Text tag remove NtextTab $i $j
     if {$indent in {bindent0 bindent1 nindent0 nindent1 tindent0 \
                     tindent1}} {

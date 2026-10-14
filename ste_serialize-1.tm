@@ -1,6 +1,6 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
-oo::define TextEdit method serialize {{file_format .ste}} {
+oo::define Ste method serialize {{file_format .ste}} {
     classvariable STE5_PREFIX
     classvariable ALL_FONT_KINDS
     set txt_dump [my StripDerived \
@@ -22,7 +22,7 @@ oo::define TextEdit method serialize {{file_format .ste}} {
     return $header$txt_dumpz
 }
 
-oo::define TextEdit method deserialize {raw file_format} {
+oo::define Ste method deserialize {raw file_format} {
     if {$file_format ni {.ste .tkt .tktz}} { return 0 }
     try {
         lassign [my GetTxtDumpAndFonts $raw $file_format] txt_dump fontline
@@ -82,7 +82,7 @@ oo::define TextEdit method deserialize {raw file_format} {
 # Returns {dump fonts} where fonts is a dict (kind -> {family size}),
 # empty for v1 and non-.ste formats, with empty sizes for v2, and without
 # the headings for v2 and v3; errors on an unknown .ste version.
-oo::define TextEdit method GetTxtDumpAndFonts {raw file_format} {
+oo::define Ste method GetTxtDumpAndFonts {raw file_format} {
     classvariable FONT_KINDS
     classvariable ALL_FONT_KINDS
     classvariable STE1_PREFIX
@@ -136,7 +136,7 @@ oo::define TextEdit method GetTxtDumpAndFonts {raw file_format} {
     list [encoding convertfrom utf-8 [zlib inflate $raw]] $fonts
 }
 
-oo::define TextEdit method GetFonts {fontline kinds} {
+oo::define Ste method GetFonts {fontline kinds} {
     set items [split $fontline \t]
     if {[llength $items] != [llength $kinds]} { error "invalid .ste fonts" }
     foreach kind $kinds item $items {
@@ -152,7 +152,7 @@ oo::define TextEdit method GetFonts {fontline kinds} {
 
 # The derived font tags (see refresh_fonts) are rebuilt on load so they
 # are never saved.
-oo::define TextEdit method StripDerived dump {
+oo::define Ste method StripDerived dump {
     set result [list]
     foreach {key value index} $dump {
         if {$key in {tagon tagoff} && [string match fnt:* $value]} {

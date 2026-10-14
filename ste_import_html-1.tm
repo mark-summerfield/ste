@@ -20,7 +20,7 @@
 # currently inside an open <p> and, if so, treats any text found between
 # two tags as an untagged run rather than silently dropping it.
 
-oo::define TextEdit method from_html html {
+oo::define Ste method from_html html {
     set bodyStart [string first "<body" $html]
     if {$bodyStart < 0} { return {} }
 

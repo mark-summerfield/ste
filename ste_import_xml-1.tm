@@ -23,11 +23,11 @@
 # Paragraphs are separated by inserting "\n" *before* each <para> after
 # the first, rather than after each </para> -- $Text already has an
 # implicit trailing newline of its own, and this mirrors the
-# `dump ... "end -1 char"` convention textedit_serialize-1.tm::serialize
+# `dump ... "end -1 char"` convention ste_serialize-1.tm::serialize
 # uses, so a round trip via as_xml/from_xml doesn't add a spurious blank
 # line at the end.
 
-oo::define TextEdit method from_xml xml {
+oo::define Ste method from_xml xml {
     set pos 0
     set len [string length $xml]
     set title {}
@@ -109,13 +109,13 @@ oo::define TextEdit method from_xml xml {
     return $title
 }
 
-oo::define TextEdit classmethod xml_unescape s {
+oo::define Ste classmethod xml_unescape s {
     string map {&quot; \" &lt; < &gt; > &amp; &} $s
 }
 
 # Parse `key="value"` pairs out of a raw attribute string into a dict,
 # unescaping each value.
-oo::define TextEdit classmethod XmlParseAttrs s {
+oo::define Ste classmethod XmlParseAttrs s {
     set result [dict create]
     foreach {whole key val} [regexp -all -inline \
             {([A-Za-z0-9_:-]+)="([^"]*)"} $s] { ;# "
@@ -126,7 +126,7 @@ oo::define TextEdit classmethod XmlParseAttrs s {
 
 # indent="bullet"/"indent"/"number" + level="N" _ \
 # bindent<N>/tindent<N>/nindent<N>
-oo::define TextEdit classmethod XmlIndentTag attrs {
+oo::define Ste classmethod XmlIndentTag attrs {
     if {![dict exists $attrs indent] || ![dict exists $attrs level]} {
         return {}
     }
@@ -137,7 +137,7 @@ oo::define TextEdit classmethod XmlIndentTag attrs {
 
 # Compute the paragraph-level tag list (justify + indent) for a <para>'s
 # attribute dict.
-oo::define TextEdit classmethod XmlParaTags attrs {
+oo::define Ste classmethod XmlParaTags attrs {
     set tags {}
     if {[dict exists $attrs justify]} {
         lappend tags [dict get $attrs justify]

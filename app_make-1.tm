@@ -2,7 +2,7 @@
 
 package require config
 package require flowrow
-package require textedit
+package require ste
 package require tooltip 2
 package require ui
 
@@ -154,7 +154,7 @@ oo::define App method make_style_menu {} {
     .menu.style add cascade -menu .menu.style.colors -label Color \
             -underline 0 -compound left \
             -image [ui::icon color.svg $::MENU_ICON_SIZE]
-    TextEdit make_color_menu .menu.style.colors [callback on_style_color]
+    Ste make_color_menu .menu.style.colors [callback on_style_color]
     .menu.style add separator
     .menu.style add command -command [callback on_style strike] \
             -label Strikeout -underline 4 -compound left \
@@ -325,8 +325,7 @@ oo::define App method make_style_toolbars {} {
             -takefocus 0 -menu .mf._style_colors_menu \
             -image [ui::icon color-menu.svg $::ICON_SIZE]
     $tip .mf.tb.style2.style_colors "Style Color"
-    TextEdit make_color_menu .mf._style_colors_menu \
-            [callback on_style_color]
+    Ste make_color_menu .mf._style_colors_menu [callback on_style_color]
     $tip .mf.tb.style2.style_highlight "Style Highlight"
     $Toolbars add_toolbar .mf.tb.style2
     ttk::frame .mf.tb.style3
@@ -371,8 +370,8 @@ oo::define App method make_style_toolbars {} {
 
 oo::define App method make_widgets {} {
     set config [Config new]
-    set ATextEdit [TextEdit new .mf [$config fonts]]
-    $ATextEdit show_indents [$config show_indents]
+    set AnSte [Ste new .mf [$config fonts]]
+    $AnSte show_indents [$config show_indents]
     my make_find_panel
     ttk::frame .mf.sf
     set StatusLabel [ttk::label .mf.sf.statusLabel]
@@ -398,7 +397,7 @@ oo::define App method make_find_panel {} {
 oo::define App method make_layout {} {
     const opts "-pady 3 -padx 3"
     grid .mf.tb -row 0 -column 0 -sticky we {*}$opts
-    grid [$ATextEdit ttk_frame] -row 1 -column 0 -sticky news {*}$opts
+    grid [$AnSte ttk_frame] -row 1 -column 0 -sticky news {*}$opts
     grid .mf.ff -row 2 -column 0 -sticky we {*}$opts
     grid remove .mf.ff
     grid .mf.sf -row 3 -column 0 -sticky we {*}$opts

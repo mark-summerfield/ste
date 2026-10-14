@@ -3,7 +3,7 @@
 package require lambda 1
 package require textutil
 
-oo::define TextEdit method as_text {} {
+oo::define Ste method as_text {} {
     set lines [list]
     foreach line [split [$Text get 1.0 end] \n] {
         lappend lines [textutil::adjust $line -length 76]
@@ -11,7 +11,7 @@ oo::define TextEdit method as_text {} {
     join $lines \n
 }
 
-oo::define TextEdit method GetTagDicts {} {
+oo::define Ste method GetTagDicts {} {
     set tags_on [list]
     set tags_off [list]
     foreach tag [$Text tag names] {
@@ -29,7 +29,7 @@ oo::define TextEdit method GetTagDicts {} {
     list [my DictFromTagList $tags_on] [my DictFromTagList $tags_off]
 }
 
-oo::define TextEdit classmethod MergeTags old {
+oo::define Ste classmethod MergeTags old {
     set new [list]
     set prev ""
     foreach tag [lsort -command [lambda {a b} { $a compare $b }] $old] {
@@ -44,7 +44,7 @@ oo::define TextEdit classmethod MergeTags old {
     return $new
 }
 
-oo::define TextEdit classmethod DictFromTagList tag_list {
+oo::define Ste classmethod DictFromTagList tag_list {
     set tag_dict [dict create]
     foreach tag $tag_list {
         dict set tag_dict [$tag para].[$tag char] $tag

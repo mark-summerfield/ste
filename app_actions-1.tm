@@ -9,7 +9,7 @@ package require ref
 
 oo::define App method on_poll {} {
     set title [wm title .]
-    if {[$ATextEdit edit modified]} {
+    if {[$AnSte edit modified]} {
         if {[string index $title end] ne "★"} {
             wm title . "$title ★"
         }
@@ -24,8 +24,8 @@ oo::define App method on_poll {} {
 oo::define App method on_file_new {} {
     my on_file_save
     set Filename ""
-    $ATextEdit clear
-    $ATextEdit focus
+    $AnSte clear
+    $AnSte focus
     wm title . [tk appname]
     my show_message "New file."
 }
@@ -34,7 +34,7 @@ oo::define App method on_file_open {} {
     my on_file_save
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    const FILETYPES [TextEdit filetypes]
+    const FILETYPES [Ste filetypes]
     if {[set filename [tk_getOpenFile -initialdir $dir \
             -filetypes $FILETYPES \
             -title "[tk appname] — Open" -parent .]] ne ""} {
@@ -82,7 +82,7 @@ oo::define App method on_file_import_text {} {
 oo::define App method on_file_save {} {
     if {$Filename ne ""} {
         my file_save
-    } elseif {![$ATextEdit isempty]} {
+    } elseif {![$AnSte isempty]} {
         my on_file_save_as
     }
 }
@@ -90,7 +90,7 @@ oo::define App method on_file_save {} {
 oo::define App method on_file_save_as {} {
     set dir [expr {$Filename eq "" ? [file home] \
                                    : [file dirname $Filename]}]
-    const FILETYPES [TextEdit filetypes]
+    const FILETYPES [Ste filetypes]
     if {[set filename [tk_getSaveFile -initialdir $dir \
             -filetypes $FILETYPES \
             -title "[tk appname] — Save As" -parent .]] ne ""} {
@@ -103,7 +103,7 @@ oo::define App method on_file_export_html {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .html]
     set title [html::html_entities [file rootname [file tail $filename]]]
-    writeFile $filename [$ATextEdit as_html $title]
+    writeFile $filename [$AnSte as_html $title]
     my show_message "Exported '$filename'"
 }
 
@@ -111,27 +111,27 @@ oo::define App method on_file_export_odt {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .odt]
     set title [file rootname [file tail $filename]]
-    $ATextEdit as_odt $filename $title
+    $AnSte as_odt $filename $title
     my show_message "Exported '$filename'"
 }
 
 oo::define App method on_file_export_text {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .txt]
-    writeFile $filename [$ATextEdit as_text]
+    writeFile $filename [$AnSte as_text]
     my show_message "Exported '$filename'"
 }
 
 oo::define App method on_file_export_xml {} {
     if {$Filename eq ""} { my save_as }
     set filename [regsub {\.ste$} $Filename .xml]
-    set title [TextEdit xml_escape [file rootname [file tail $filename]]]
-    writeFile $filename [$ATextEdit as_xml $title]
+    set title [Ste xml_escape [file rootname [file tail $filename]]]
+    writeFile $filename [$AnSte as_xml $title]
     my show_message "Exported '$filename'"
 }
 
 oo::define App method on_file_print {} {
-    if {[catch {tk print [$ATextEdit tk_text]} err]} {
+    if {[catch {tk print [$AnSte tk_text]} err]} {
         my show_error $err
     }
 }
@@ -146,11 +146,11 @@ oo::define App method on_config {} {
     if {[$ok get]} {
         set new_fonts [$config fonts]
         if {$fonts ne $new_fonts} {
-            $ATextEdit set_fonts $new_fonts
-            $ATextEdit edit modified 1
+            $AnSte set_fonts $new_fonts
+            $AnSte edit modified 1
         }
         if {$show_indents != [$config show_indents]} {
-            $ATextEdit show_indents [$config show_indents]
+            $AnSte show_indents [$config show_indents]
         }
     }
 }
@@ -161,7 +161,7 @@ oo::define App method on_about {} {
 }
 
 oo::define App method on_quit {} {
-    if {[[$ATextEdit tk_text] edit modified]} {
+    if {[[$AnSte tk_text] edit modified]} {
         set reply [MaybeSaveForm show "[tk appname] — Unsaved Changes" \
             "Save unsaved changes?"]
         switch $reply {
@@ -183,46 +183,46 @@ oo::define App method save_config {} {
     $config save [file normalize $Filename]
 }
 
-oo::define App method on_edit_undo {} { $ATextEdit on_undo }
+oo::define App method on_edit_undo {} { $AnSte on_undo }
 
-oo::define App method on_edit_redo {} { $ATextEdit on_redo }
+oo::define App method on_edit_redo {} { $AnSte on_redo }
 
-oo::define App method on_edit_copy {} { $ATextEdit on_copy }
+oo::define App method on_edit_copy {} { $AnSte on_copy }
 
-oo::define App method on_edit_cut {} { $ATextEdit on_cut }
+oo::define App method on_edit_cut {} { $AnSte on_cut }
 
-oo::define App method on_edit_paste {} { $ATextEdit on_paste }
+oo::define App method on_edit_paste {} { $AnSte on_paste }
 
 oo::define App method on_edit_ins_chr {} {
     if {[set ch [InsChrForm show]] ne ""} {
         if {$ch eq "Q"} {
-            $ATextEdit insert insert “”
-            $ATextEdit mark set insert "insert -1 char"
+            $AnSte insert insert “”
+            $AnSte mark set insert "insert -1 char"
         } else {
-            $ATextEdit insert insert $ch
+            $AnSte insert insert $ch
         }
     }
 }
 
-oo::define App method on_style style { $ATextEdit apply_style $style }
+oo::define App method on_style style { $AnSte apply_style $style }
 
-oo::define App method on_style_font kind { $ATextEdit apply_font $kind }
+oo::define App method on_style_font kind { $AnSte apply_font $kind }
 
-oo::define App method on_style_color color { $ATextEdit apply_color $color }
+oo::define App method on_style_color color { $AnSte apply_color $color }
 
-oo::define App method on_style_align align { $ATextEdit apply_align $align }
+oo::define App method on_style_align align { $AnSte apply_align $align }
 
-oo::define App method on_style_insert_bullet {} { $ATextEdit on_ctrl_tab 0 }
+oo::define App method on_style_insert_bullet {} { $AnSte on_ctrl_tab 0 }
 
 oo::define App method on_style_insert_number {} {
-    $ATextEdit on_ctrl_key_1 0
+    $AnSte on_ctrl_key_1 0
 }
 
 oo::define App method on_style_indent_or_complete {} {
-    $ATextEdit on_tab 1 0 0
+    $AnSte on_tab 1 0 0
 }
 
-oo::define App method on_style_unindent {} { $ATextEdit on_bs 0 }
+oo::define App method on_style_unindent {} { $AnSte on_bs 0 }
 
 oo::define App method on_find_changed {} {
     const opts "-pady 3 -padx 3"
@@ -237,13 +237,13 @@ oo::define App method on_find {} {
     $FindEntry configure -foreground black
     set what [$FindEntry get]
     if {$what ne ""} {
-        set i [$ATextEdit search -exact -nocase -- $what $FindIndex end]
-        if {$i ne "" && [$ATextEdit compare $i != $FindIndex]} {
-            $ATextEdit tag remove sel 1.0 end
-            set j [$ATextEdit index "$i + [string length $what] chars"]
-            $ATextEdit tag add sel $i $j
-            $ATextEdit see $i
-            set FindIndex [$ATextEdit index $j]
+        set i [$AnSte search -exact -nocase -- $what $FindIndex end]
+        if {$i ne "" && [$AnSte compare $i != $FindIndex]} {
+            $AnSte tag remove sel 1.0 end
+            set j [$AnSte index "$i + [string length $what] chars"]
+            $AnSte tag add sel $i $j
+            $AnSte see $i
+            set FindIndex [$AnSte index $j]
         } else {
             $FindEntry configure -foreground red
             set FindIndex 1.0

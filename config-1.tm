@@ -1,7 +1,7 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 package require inifile
-package require textedit
+package require ste
 package require util
 
 # Also handles tk scaling
@@ -44,7 +44,7 @@ oo::define Config constructor {} {
             # FontFamily and FontSize were the only font settings in
             # earlier versions
             set legacy_size [ini::value $ini General FontSize $size]
-            foreach kind [TextEdit font_kinds] {
+            foreach kind [Ste font_kinds] {
                 set Kind [string totitle $kind]
                 set family [lindex [dict get $Fonts $kind] 0]
                 if {$kind eq "sans"} {
@@ -83,7 +83,7 @@ oo::define Config method save filename {
         ini::set $ini General Scale [tk scaling]
         ini::set $ini General Blinking [my blinking]
         ini::set $ini General Geometry [wm geometry .]
-        foreach kind [TextEdit all_font_kinds] {
+        foreach kind [Ste all_font_kinds] {
             set Kind [expr {[string match h? $kind]
                 ? [string toupper $kind] : [string totitle $kind]}]
             ini::set $ini Fonts ${Kind}Family [my family $kind]
@@ -108,7 +108,7 @@ oo::define Config method geometry {} { set Geometry }
 oo::define Config method set_geometry geometry { set Geometry $geometry }
 
 oo::define Config method fonts {} { set Fonts }
-# fonts is a dict of kind -> {family size}, e.g., from TextEdit's fonts
+# fonts is a dict of kind -> {family size}, e.g., from Ste's fonts
 oo::define Config method set_fonts fonts {
     dict for {kind font} $fonts { dict set Fonts $kind $font }
 }

@@ -3,23 +3,21 @@ app-1.tm
 app_make-1.tm
 app_actions-1.tm
 app_support-1.tm
-misc-1.tm
 globals-1.tm
 config-1.tm
 config_form-1.tm
 
-# TODO Rename textedit → ste
-textedit-1.tm
-textedit_initialize-1.tm
-textedit_actions-1.tm
-textedit_serialize-1.tm
-textedit_export-1.tm
-textedit_import-1.tm
-textedit_export_xml-1.tm
-textedit_import_xml-1.tm
-textedit_export_html-1.tm
-textedit_import_html-1.tm
-textedit_export_odt-1.tm
+ste-1.tm
+ste_initialize-1.tm
+ste_actions-1.tm
+ste_serialize-1.tm
+ste_export-1.tm
+ste_import-1.tm
+ste_export_xml-1.tm
+ste_import_xml-1.tm
+ste_export_html-1.tm
+ste_import_html-1.tm
+ste_export_odt-1.tm
 ins_chr_form-1.tm
 
 ref-1.tm

@@ -6,7 +6,7 @@ package require ui
 oo::singleton create App {
     variable Filename
     variable Toolbars
-    variable ATextEdit
+    variable AnSte
     variable FindEntry
     variable FindIndex
     variable ShowFindPanel
@@ -45,10 +45,10 @@ oo::define App method on_startup {} {
     if {$Filename ne "" && [file isfile $Filename]} {
         my file_open
     } else {
-        $ATextEdit clear
-        $ATextEdit mark set insert end
-        $ATextEdit see insert
-        $ATextEdit focus
+        $AnSte clear
+        $AnSte mark set insert end
+        $AnSte see insert
+        $AnSte focus
     }
 }
 

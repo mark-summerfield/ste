@@ -5,7 +5,7 @@ package require ntext 1
 package require scrollutil_tile 2
 package require ui
 
-oo::class create TextEdit {
+oo::class create Ste {
     variable Frame
     variable Text
     variable Completion
@@ -13,21 +13,21 @@ oo::class create TextEdit {
     variable ContextMenu
 }
 
-package require textedit_actions
-package require textedit_export
-package require textedit_export_html
-package require textedit_export_odt
-package require textedit_export_xml
-package require textedit_import
-package require textedit_import_html
-package require textedit_import_xml
-package require textedit_initialize
-package require textedit_serialize
+package require ste_actions
+package require ste_export
+package require ste_export_html
+package require ste_export_odt
+package require ste_export_xml
+package require ste_import
+package require ste_import_html
+package require ste_import_xml
+package require ste_initialize
+package require ste_serialize
 
-oo::define TextEdit classmethod make_color_menu {the_menu the_callback} {
+oo::define Ste classmethod make_color_menu {the_menu the_callback} {
     ;#             K E N B L C T V G I A W D O R P U M
     const INDEXES {4 2 0 0 0 0 0 3 0 1 1 3 3 0 0 0 1 0}
-    foreach index $INDEXES {name color} [TextEdit colors] {
+    foreach index $INDEXES {name color} [Ste colors] {
         $the_menu add command -underline $index \
             -image [my swatch $color $::MENU_ICON_SIZE] \
             -compound left -label [string totitle $name] \
@@ -35,7 +35,7 @@ oo::define TextEdit classmethod make_color_menu {the_menu the_callback} {
     }
 }
 
-oo::define TextEdit classmethod swatch {color size} {
+oo::define Ste classmethod swatch {color size} {
     const R [expr {max(3, $size / 4.0)}]
     const W [expr {$R + 2.5}]
     image create photo -data "<svg width=\"$size\" height=\"$size\">
@@ -44,7 +44,7 @@ oo::define TextEdit classmethod swatch {color size} {
         </svg>"
 }
 
-oo::define TextEdit constructor {parent {fonts {}}} {
+oo::define Ste constructor {parent {fonts {}}} {
     my ensure_fonts $fonts
     classvariable N
     if {![string match *. $parent]} { set parent $parent. }
@@ -63,11 +63,11 @@ oo::define TextEdit constructor {parent {fonts {}}} {
     my MakeBindings
 }
 
-oo::define TextEdit method completion {} { return $Completion }
+oo::define Ste method completion {} { return $Completion }
 
-oo::define TextEdit method set_completion value { set Completion $value }
+oo::define Ste method set_completion value { set Completion $value }
 
-oo::define TextEdit method MakeContextMenu {} {
+oo::define Ste method MakeContextMenu {} {
     set ContextMenu [menu $Frame.contextMenu]
     $ContextMenu add command -command [callback apply_style highlight] \
         -label Highlight -underline 0 -compound left \
@@ -76,7 +76,7 @@ oo::define TextEdit method MakeContextMenu {} {
     my make_color_menu $ContextMenu [callback apply_color]
 }
 
-oo::define TextEdit method MakeBindings {} {
+oo::define Ste method MakeBindings {} {
     set ::ntext::tabColor ""
     bindtags $Text [list $Text Ntext [winfo toplevel $Text] all]
     bind $Text <<ContextMenu>> "tk_popup $ContextMenu %X %Y"
@@ -95,7 +95,7 @@ oo::define TextEdit method MakeBindings {} {
 }
 
 # Only creates the fonts the first time
-oo::define TextEdit classmethod ensure_fonts fonts {
+oo::define Ste classmethod ensure_fonts fonts {
     variable Initialized
     if {$Initialized} return
     set Initialized 1
@@ -107,7 +107,7 @@ oo::define TextEdit classmethod ensure_fonts fonts {
 # MonoRoman, ...; and H1-H4.
 # fonts is a dict of kind (sans serif mono h1 h2 h3 h4) -> {family size};
 # a missing kind, empty family, or empty size means use the default.
-oo::define TextEdit classmethod make_fonts fonts {
+oo::define Ste classmethod make_fonts fonts {
     variable DEFAULT_FAMILIES
     variable FONT_KINDS
     variable FONT_SPECS
@@ -157,7 +157,7 @@ oo::define TextEdit classmethod make_fonts fonts {
     }
 }
 
-oo::define TextEdit classmethod font_name {kind suffix} {
+oo::define Ste classmethod font_name {kind suffix} {
     switch $kind {
         serif { return Serif$suffix }
         mono { return Mono$suffix }
@@ -165,35 +165,35 @@ oo::define TextEdit classmethod font_name {kind suffix} {
     }
 }
 
-oo::define TextEdit classmethod family_for kind {
+oo::define Ste classmethod family_for kind {
     variable FontFor
     lindex [dict get $FontFor $kind] 0
 }
 
-oo::define TextEdit classmethod size_for kind {
+oo::define Ste classmethod size_for kind {
     variable FontFor
     lindex [dict get $FontFor $kind] 1
 }
 
 # dict of {family size} for each of sans serif mono h1 h2 h3 h4
-oo::define TextEdit classmethod fonts {} {
+oo::define Ste classmethod fonts {} {
     variable FontFor
     return $FontFor
 }
 
 # Tag names starting with this are internal (see refresh_fonts).
-oo::define TextEdit classmethod derived_tag {kind style} {
+oo::define Ste classmethod derived_tag {kind style} {
     return fnt:$kind:$style
 }
 
 # Use after the user changes the fonts; fonts is a dict as for make_fonts.
-oo::define TextEdit method set_fonts fonts {
+oo::define Ste method set_fonts fonts {
     my make_fonts $fonts
     my ConfigureIndents
     my refresh_fonts [list 1.0 end]
 }
 
-oo::define TextEdit method make_tags {} {
+oo::define Ste method make_tags {} {
     classvariable URL_UL_COLOR
     classvariable HIGHLIGHT_COLOR
     classvariable COLOR_FOR_TAG
@@ -232,7 +232,7 @@ oo::define TextEdit method make_tags {} {
     }
 }
 
-oo::define TextEdit method ConfigureIndents {} {
+oo::define Ste method ConfigureIndents {} {
     $Text configure -tabs "[expr {4 * [font measure Roman n]}] left"
     set BINDENT [font measure Roman " • "]
     set NINDENT [font measure Roman "9. "]
@@ -254,47 +254,47 @@ oo::define TextEdit method ConfigureIndents {} {
         -lmargin2 [expr {3 * $NINDENT}]
 }
 
-oo::define TextEdit classmethod filetypes {} {
+oo::define Ste classmethod filetypes {} {
     variable FILETYPES
     return $FILETYPES
 }
 
-oo::define TextEdit classmethod colors {} {
+oo::define Ste classmethod colors {} {
     variable COLOR_FOR_TAG
     return $COLOR_FOR_TAG
 }
 
-oo::define TextEdit classmethod font_kinds {} {
+oo::define Ste classmethod font_kinds {} {
     variable FONT_KINDS
     return $FONT_KINDS
 }
 
-oo::define TextEdit classmethod all_font_kinds {} {
+oo::define Ste classmethod all_font_kinds {} {
     variable ALL_FONT_KINDS
     return $ALL_FONT_KINDS
 }
 
-oo::define TextEdit method unknown {the_method args} {
+oo::define Ste method unknown {the_method args} {
     $Text $the_method {*}$args
 }
 
-oo::define TextEdit method focus {} { focus $Text }
+oo::define Ste method focus {} { focus $Text }
 
-oo::define TextEdit method ttk_frame {} { return $Frame }
+oo::define Ste method ttk_frame {} { return $Frame }
 
-oo::define TextEdit method tk_text {} { return $Text }
+oo::define Ste method tk_text {} { return $Text }
 
-oo::define TextEdit method isempty {} {
+oo::define Ste method isempty {} {
     expr {[string trim [$Text get 1.0 end]] eq ""}
 }
 
-oo::define TextEdit method clear {} {
+oo::define Ste method clear {} {
     $Text delete 1.0 end
     $Text edit reset
     $Text edit modified 0
 }
 
-oo::define TextEdit method after_load {{index insert}} {
+oo::define Ste method after_load {{index insert}} {
     my highlight_urls
     my refresh_fonts [list 1.0 end]
     $Text edit reset
@@ -303,9 +303,9 @@ oo::define TextEdit method after_load {{index insert}} {
     $Text see $index
 }
 
-oo::define TextEdit method first_line {} { string trim [$Text get 1.0 2.0] }
+oo::define Ste method first_line {} { string trim [$Text get 1.0 2.0] }
 
-oo::define TextEdit method highlight_urls {} {
+oo::define Ste method highlight_urls {} {
     foreach i [$Text search -all -regexp {(?:https?://|~/)} 1.0] {
         set j [$Text search -regexp {[\s>]} $i]
         if {[$Text get "$j -1 char"] eq "."} {
@@ -315,14 +315,14 @@ oo::define TextEdit method highlight_urls {} {
     }
 }
 
-oo::define TextEdit method selected {} {
+oo::define Ste method selected {} {
     if {[set indexes [$Text tag ranges sel]] ne ""} {
         return $indexes
     }
     return "[$Text index "insert wordstart"] [$Text index "insert wordend"]"
 }
 
-oo::define TextEdit method get_whole_word {} {
+oo::define Ste method get_whole_word {} {
     set a [$Text index "insert linestart"]
     set b [$Text index "insert lineend"]
     set c [$Text index "insert wordstart"]
@@ -333,11 +333,11 @@ oo::define TextEdit method get_whole_word {} {
     string trim [string trimright [$Text get $i $j] ",;:!?."]
 }
 
-oo::define TextEdit method apply_style style {
+oo::define Ste method apply_style style {
     my apply_style_to [my selected] $style
 }
 
-oo::define TextEdit method apply_style_to {indexes style} {
+oo::define Ste method apply_style_to {indexes style} {
     if {$indexes ne ""} {
         set tags [$Text tag names [lindex $indexes 0]]
         if {$style eq "bold" && "bolditalic" in $tags} {
@@ -387,12 +387,12 @@ oo::define TextEdit method apply_style_to {indexes style} {
     }
 }
 
-oo::define TextEdit method apply_font kind {
+oo::define Ste method apply_font kind {
     my apply_font_to [my selected] $kind
 }
 
 # kind is sans (the default, no tag), serif, or mono
-oo::define TextEdit method apply_font_to {indexes kind} {
+oo::define Ste method apply_font_to {indexes kind} {
     if {$indexes ne ""} {
         $Text tag remove serif {*}$indexes
         $Text tag remove mono {*}$indexes
@@ -410,7 +410,7 @@ oo::define TextEdit method apply_font_to {indexes kind} {
 # XmlClassifyTag), so this must be called whenever the text's family or
 # styles change, or after loading.
 # `indexes` is a list of {from to ...} pairs.
-oo::define TextEdit method refresh_fonts indexes {
+oo::define Ste method refresh_fonts indexes {
     classvariable FONT_STYLES
     classvariable DERIVED_STYLES
     foreach {from to} $indexes {
@@ -452,19 +452,19 @@ oo::define TextEdit method refresh_fonts indexes {
     }
 }
 
-oo::define TextEdit method CompareIndexes {a b} {
+oo::define Ste method CompareIndexes {a b} {
     if {[$Text compare $a < $b]} { return -1 }
     if {[$Text compare $a > $b]} { return 1 }
     return 0
 }
 
-oo::define TextEdit method apply_align align {
+oo::define Ste method apply_align align {
     set i [$Text index "insert linestart"]
     set j [$Text index "insert lineend"]
     my apply_align_to [list $i $j] $align
 }
 
-oo::define TextEdit method apply_align_to {indexes align} {
+oo::define Ste method apply_align_to {indexes align} {
     if {$indexes ne ""} {
         if {$align eq "left"} {
             $Text tag remove center {*}$indexes
@@ -488,11 +488,11 @@ oo::define TextEdit method apply_align_to {indexes align} {
     }
 }
 
-oo::define TextEdit method apply_color color {
+oo::define Ste method apply_color color {
     my apply_color_to [my selected] $color
 }
 
-oo::define TextEdit method apply_color_to {indexes color} {
+oo::define Ste method apply_color_to {indexes color} {
     classvariable COLOR_FOR_TAG
     foreach tag [dict keys $COLOR_FOR_TAG] {
         $Text tag remove $tag {*}$indexes
@@ -503,7 +503,7 @@ oo::define TextEdit method apply_color_to {indexes color} {
     $Text edit modified 1
 }
 
-oo::define TextEdit method show_indents show {
+oo::define Ste method show_indents show {
     if {$show} {
         $Text tag configure bindent0 -background #FFB4B4
         $Text tag configure bindent1 -background #FFCDCD

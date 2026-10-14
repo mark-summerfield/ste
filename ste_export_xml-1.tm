@@ -38,7 +38,7 @@
 # skips them) are kept in place as empty elements so their position in
 # the flow isn't lost.
 
-oo::define TextEdit method as_xml title {
+oo::define Ste method as_xml title {
     set tkt [$Text dump -text -mark -tag 1.0 "end -1 char"]
     my XmlFromDump $tkt $title
 }
@@ -46,7 +46,7 @@ oo::define TextEdit method as_xml title {
 # Pure function of the dump list (plus a title for the root element) --
 # kept separate from as_xml so it can be unit tested without a live text
 # widget, e.g. against a loaded .tkt file's contents.
-oo::define TextEdit classmethod XmlFromDump {tkt title} {
+oo::define Ste classmethod XmlFromDump {tkt title} {
     set inlineTags {}     ;# ordered list of currently-active inline tags
     set justifyStack {}   ;# stack of currently-active justify tags
     set indentStack {}    ;# stack of currently-active indent tags
@@ -213,7 +213,7 @@ oo::define TextEdit classmethod XmlFromDump {tkt title} {
 }
 
 # Classify a tag name: skip, justify, indent, or inline (default).
-oo::define TextEdit classmethod XmlClassifyTag tag {
+oo::define Ste classmethod XmlClassifyTag tag {
     if {$tag eq "left" || [string match fnt:* $tag]} { return skip }
     if {$tag in {center right}} { return justify }
     if {[regexp {^[bnt]indent[0-9]+$} $tag]} { return indent }
@@ -221,7 +221,7 @@ oo::define TextEdit classmethod XmlClassifyTag tag {
 }
 
 # Build a <run> element (or bare escaped text if no tags are active).
-oo::define TextEdit classmethod XmlMakeRun {text tags} {
+oo::define Ste classmethod XmlMakeRun {text tags} {
     if {![llength $tags]} { return "<run>[my xml_escape $text]</run>" }
     return "<run tags=\"[my xml_escape_attr \
         [join $tags { }]]\">[my xml_escape $text]</run>"
@@ -231,7 +231,7 @@ oo::define TextEdit classmethod XmlMakeRun {text tags} {
 # paragraph, resolve to a single winner using the given lowest->highest
 # priority list (this mirrors Tk's own tag-priority based conflict
 # resolution, i.e. creation order in make_tags: center before right).
-oo::define TextEdit classmethod XmlResolveTag {seen priority} {
+oo::define Ste classmethod XmlResolveTag {seen priority} {
     set winner {} ;# We want to keep overwriting with highest priority
     foreach cand $priority { if {$cand in $seen} { set winner $cand } }
     # Fall back to whatever was seen first if nothing matched the
@@ -243,7 +243,7 @@ oo::define TextEdit classmethod XmlResolveTag {seen priority} {
 # Build a <para ...>...</para> (or self-closed <para/> when empty).
 # justifySeen/indentSeen are the *sets* of paragraph-level tags that were
 # active at any point while this paragraph's content was being emitted.
-oo::define TextEdit classmethod XmlMakePara {justifySeen indentSeen \
+oo::define Ste classmethod XmlMakePara {justifySeen indentSeen \
         paraChildren} {
     const INDENT_KIND [dict create bindent bullet tindent indent \
             nindent number]
@@ -287,10 +287,10 @@ oo::define TextEdit classmethod XmlMakePara {justifySeen indentSeen \
     append body "  </para>\n"
 }
 
-oo::define TextEdit classmethod xml_escape s {
+oo::define Ste classmethod xml_escape s {
     string map {& &amp; < &lt; > &gt;} $s
 }
 
-oo::define TextEdit classmethod xml_escape_attr s {
+oo::define Ste classmethod xml_escape_attr s {
     string map {& &amp; < &lt; > &gt; \" &quot;} $s
 }

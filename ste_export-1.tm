@@ -18,9 +18,9 @@ oo::define Ste method GetTagDicts {} {
         if {$tag ne "left"} {
             foreach {from to} [$Text tag ranges $tag] {
                 lassign [split $from .] frompara fromchar
-                lappend tags_on [TextEditTag new $tag $frompara $fromchar]
+                lappend tags_on [SteTag new $tag $frompara $fromchar]
                 lassign [split $to .] topara tochar
-                lappend tags_off [TextEditTag new $tag $topara $tochar]
+                lappend tags_off [SteTag new $tag $topara $tochar]
             }
         }
     }
@@ -52,7 +52,7 @@ oo::define Ste classmethod DictFromTagList tag_list {
     return $tag_dict
 }
 
-oo::class create TextEditTag {
+oo::class create SteTag {
     variable Tags
     variable Para
     variable Char
@@ -84,5 +84,5 @@ oo::class create TextEditTag {
         string compare [my tag] [$other tag]
     }
 
-    method to_string {} { return "TextEditTag: $Para.$Char $Tags" }
+    method to_string {} { return "SteTag: $Para.$Char $Tags" }
 }

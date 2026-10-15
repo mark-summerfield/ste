@@ -145,6 +145,7 @@ oo::define App method make_style_menu {} {
             -image [ui::icon format-text-italic.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style ul] \
             -label Underline -underline 0 -compound left \
+            -accelerator Ctrl+U \
             -image [ui::icon format-text-underline.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style highlight] \
@@ -187,12 +188,15 @@ oo::define App method make_style_menu {} {
     .menu.style add separator
     .menu.style add command -command [callback on_style_align left] \
             -label "Left Align" -underline 0 -compound left \
+            -accelerator Ctrl+L \
             -image [ui::icon format-justify-left.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_align center] \
             -label "Center Align" -underline 7 -compound left \
+            -accelerator Ctrl+E \
             -image [ui::icon format-justify-center.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style_align right] \
             -label "Right Align" -underline 0 -compound left \
+            -accelerator Ctrl+R \
             -image [ui::icon format-justify-right.svg $::MENU_ICON_SIZE]
 }
 
@@ -426,6 +430,7 @@ oo::define App method make_bindings {} {
     bind . <Control-q> [callback on_quit]
     bind . <Control-r> [callback on_style_align right]
     bind . <Control-s> [callback on_file_save]
+    bind . <Control-u> [callback on_style ul]
     # Auto: Control-v Paste
     # Auto: Control-x Cut
     # Auto: Control-z Undo

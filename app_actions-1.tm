@@ -214,13 +214,9 @@ oo::define App method on_style_align align { $AnSte apply_align $align }
 
 oo::define App method on_style_insert_bullet {} { $AnSte on_ctrl_tab 0 }
 
-oo::define App method on_style_insert_number {} {
-    $AnSte on_ctrl_key_1 0
-}
+oo::define App method on_style_insert_number {} { $AnSte on_ctrl_key_1 0 }
 
-oo::define App method on_style_indent_or_complete {} {
-    $AnSte on_tab 1 0 0
-}
+oo::define App method on_style_indent_or_complete {} { $AnSte on_tab 1 0 0 }
 
 oo::define App method on_style_unindent {} { $AnSte on_bs 0 }
 

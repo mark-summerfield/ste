@@ -409,7 +409,13 @@ oo::define Ste method apply_font kind {
 
 # kind is sans (the default, no tag), serif, or mono
 oo::define Ste method apply_font_to {indexes kind} {
+    classvariable HEADING_KINDS
     if {$indexes ne ""} {
+        # headings have their own fonts (which override sans, serif, and
+        # mono) so choosing a family means the text is no longer a heading
+        foreach heading $HEADING_KINDS {
+            $Text tag remove $heading {*}$indexes
+        }
         $Text tag remove serif {*}$indexes
         $Text tag remove mono {*}$indexes
         if {$kind ne "sans"} { $Text tag add $kind {*}$indexes }

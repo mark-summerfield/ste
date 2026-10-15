@@ -9,6 +9,7 @@ oo::define Ste initialize {
     variable STE4_PREFIX
     variable STE5_PREFIX
     variable ALL_FONT_KINDS
+    variable BASE_FONT_KINDS
     variable HEADING_KINDS
     variable HEADING_SCALE
     variable DERIVED_STYLES
@@ -18,7 +19,6 @@ oo::define Ste initialize {
     variable URL_UL_COLOR
     variable COLOR_FOR_TAG
     variable TAG_FOR_COLOR
-    variable FONT_KINDS
     variable FONT_SPECS
     variable FONT_STYLES
     variable FONT_FOR_STYLE
@@ -117,14 +117,14 @@ oo::define Ste initialize {
 
     # The three font kinds; sans is the default (no tag), serif and mono
     # have tags of the same name.
-    const FONT_KINDS {sans serif mono}
+    const BASE_FONT_KINDS {sans serif mono}
 
     # The headings each have their own font (family and size) and take
     # precedence over serif and mono; by default they use the sans family
     # at the sans size times HEADING_SCALE.
     const HEADING_KINDS {h1 h2 h3 h4}
     const HEADING_SCALE {h1 2 h2 1.5 h3 1.3 h4 1.1}
-    const ALL_FONT_KINDS {sans serif mono h1 h2 h3 h4}
+    const ALL_FONT_KINDS [list {*}$BASE_FONT_KINDS h1 h2 h3 h4]
 
     const DEFAULT_FAMILIES {sans [font configure TkDefaultFont -family] \
             serif Times mono [font configure TkFixedFont -family]}

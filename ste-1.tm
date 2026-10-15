@@ -125,13 +125,13 @@ oo::define Ste classmethod make_default_font_dict {{size 0}} {
 # a missing kind, empty family, or empty size means use the default.
 oo::define Ste classmethod make_fonts fonts {
     variable DEFAULT_FAMILIES
-    variable FONT_KINDS
+    variable BASE_FONT_KINDS
     variable FONT_SPECS
     variable HEADING_KINDS
     variable HEADING_SCALE
     variable FontFor
     set default_size [expr {1 + [font configure TkDefaultFont -size]}]
-    foreach kind $FONT_KINDS {
+    foreach kind $BASE_FONT_KINDS {
         lassign [expr {[dict exists $fonts $kind]
                 ? [dict get $fonts $kind] : ""}] family size
         if {$family eq ""} {
@@ -280,9 +280,9 @@ oo::define Ste classmethod colors {} {
     return $COLOR_FOR_TAG
 }
 
-oo::define Ste classmethod font_kinds {} {
-    variable FONT_KINDS
-    return $FONT_KINDS
+oo::define Ste classmethod base_font_kinds {} {
+    variable BASE_FONT_KINDS
+    return $BASE_FONT_KINDS
 }
 
 oo::define Ste classmethod all_font_kinds {} {

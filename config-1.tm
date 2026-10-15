@@ -37,7 +37,7 @@ oo::define Config constructor {} {
             # FontFamily and FontSize were the only font settings in
             # earlier versions
             set legacy_size [ini::value $ini General FontSize $size]
-            foreach kind [Ste font_kinds] {
+            foreach kind [Ste base_font_kinds] {
                 set Kind [string totitle $kind]
                 set family [lindex [dict get $Fonts $kind] 0]
                 if {$kind eq "sans"} {

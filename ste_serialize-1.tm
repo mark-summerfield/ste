@@ -83,7 +83,7 @@ oo::define Ste method deserialize {raw file_format} {
 # empty for v1 and non-.ste formats, with empty sizes for v2, and without
 # the headings for v2 and v3; errors on an unknown .ste version.
 oo::define Ste method GetTxtDumpAndFonts {raw file_format} {
-    classvariable FONT_KINDS
+    classvariable BASE_FONT_KINDS
     classvariable ALL_FONT_KINDS
     classvariable STE1_PREFIX
     classvariable STE2_PREFIX
@@ -115,7 +115,7 @@ oo::define Ste method GetTxtDumpAndFonts {raw file_format} {
                 # v4: also h1 h2 h3 h4 in the same format
                 # a family may contain spaces so the size is the last word
                 set kinds [expr {$magic eq $STE4_PREFIX ? $ALL_FONT_KINDS \
-                                                        : $FONT_KINDS}]
+                                                        : $BASE_FONT_KINDS}]
                 set fonts [my GetFonts $line $kinds]
             } else { ;# v2: kind=family TAB kind=family TAB ...
                 foreach item [split $line \t] {

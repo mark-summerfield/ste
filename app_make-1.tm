@@ -279,15 +279,15 @@ oo::define App method make_edit_toolbar {} {
 
 oo::define App method make_style_toolbars {} {
     set tip tooltip::tooltip
-    ttk::frame .mf.tb.style0
+    ttk::frame .mf.tb.bf
     foreach kind [Ste base_font_kinds] {
-        ttk::button .mf.tb.style0.style_$kind -style Toolbutton \
+        ttk::button .mf.tb.bf.style_$kind -style Toolbutton \
                 -takefocus 0 -text [string totitle $kind] \
                 -command [callback on_style_font $kind] \
                 -image [ui::icon $kind.svg $::ICON_SIZE]
-        $tip .mf.tb.style0.style_$kind [string totitle $kind]
+        $tip .mf.tb.bf.style_$kind [string totitle $kind]
     }
-    $Toolbars add_toolbar .mf.tb.style0
+    $Toolbars add_toolbar .mf.tb.bf
     ttk::frame .mf.tb.h
     ttk::button .mf.tb.h.h1 -style Toolbutton -takefocus 0 \
             -command [callback on_style h1] \

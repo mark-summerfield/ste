@@ -118,7 +118,7 @@ oo::define App method make_edit_menu {} {
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
-    foreach kind {sans serif mono} under {0 4 0} {
+    foreach kind [Ste base_font_kinds] under {0 4 0} {
         .menu.style add command -command [callback on_style_font $kind] \
                 -label [string totitle $kind] -underline $under \
                 -compound left -image [ui::icon $kind.svg $::MENU_ICON_SIZE]
@@ -280,7 +280,7 @@ oo::define App method make_edit_toolbar {} {
 oo::define App method make_style_toolbars {} {
     set tip tooltip::tooltip
     ttk::frame .mf.tb.style0
-    foreach kind {sans serif mono} {
+    foreach kind [Ste base_font_kinds] {
         ttk::button .mf.tb.style0.style_$kind -style Toolbutton \
                 -takefocus 0 -text [string totitle $kind] \
                 -command [callback on_style_font $kind] \

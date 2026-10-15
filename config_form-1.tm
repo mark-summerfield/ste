@@ -156,7 +156,7 @@ oo::define ConfigForm method on_ok {} {
     set config [Config new]
     tk scaling [.configForm.mf.scaleSpinbox get]
     $config set_blinking $Blinking
-    foreach kind {sans serif mono h1 h2 h3 h4} {
+    foreach kind [Ste all_font_kinds] {
         $config set_font $kind {*}[dict get $Fonts $kind]
     }
     $config set_show_indents $ShowIndents

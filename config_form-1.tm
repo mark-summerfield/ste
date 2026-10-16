@@ -57,13 +57,13 @@ oo::define ConfigForm method make_widgets {} {
     $tip .configForm.mf.blinkCheckbutton \
         "Whether the text cursor should blink."
     set opts "-compound left -width 15"
-    foreach {kind text under} {sans Sans… 0 serif Serif… 4 mono Mono… 0
+    foreach {kind text ul} {sans Sans… 0 serif Serif… 4 mono Mono… 0
+            casual Casual… 0 gothic Gothic… 0 script Script 5
             h1 Heading\ 1… 8 h2 Heading\ 2… 8 h3 Heading\ 3… 8
             h4 Heading\ 4… 8} {
         ttk::button .configForm.mf.${kind}Button -text $text \
-            -underline $under -command [callback on_font $kind] \
-            -image [ui::icon preferences-desktop-font.svg $::ICON_SIZE] \
-            {*}$opts
+            -underline $ul -command [callback on_font $kind] \
+            -image [ui::icon $kind.svg $::ICON_SIZE] {*}$opts
         set what [expr {[string match h? $kind]
             ? "heading [string index $kind 1]" : $kind}]
         $tip .configForm.mf.${kind}Button "The $what font to use.\nBest\
@@ -88,28 +88,42 @@ oo::define ConfigForm method make_widgets {} {
 
 oo::define ConfigForm method make_layout {} {
     const opts "-padx 3 -pady 3"
-    grid .configForm.mf.scaleLabel -row 0 -column 0 -sticky w {*}$opts
-    grid .configForm.mf.scaleSpinbox -row 0 -column 1 -columnspan 2 \
-        -sticky we {*}$opts
     set row 0
-    foreach kind [Ste all_font_kinds] {
-        grid .configForm.mf.${kind}Button -row [incr row] -column 0 \
+    grid .configForm.mf.scaleLabel -row $row -column 0 -sticky w {*}$opts
+    grid .configForm.mf.scaleSpinbox -row $row -column 1 -sticky w {*}$opts
+    grid .configForm.mf.showIndentsCheckbutton -row $row -column 2 -sticky w
+    grid .configForm.mf.blinkCheckbutton -row $row -column 3 -sticky w
+    incr row
+    set first_row $row
+    set inner_row $row
+    set column 0
+    foreach kind {sans serif mono casual gothic script h1 h2 h3 h4} {
+        grid .configForm.mf.${kind}Button -row $inner_row -column $column \
                 -sticky w {*}$opts
-        grid .configForm.mf.${kind}Label -row $row -column 1 \
-                -columnspan 2 -sticky news {*}$opts
+        grid .configForm.mf.${kind}Label -row $inner_row \
+                -column [expr {$column + 1}] -sticky news {*}$opts
+        incr row
+        incr inner_row
+        if {$inner_row == 6} {
+            set inner_row $first_row
+            set column 2
+        }
     }
-    grid .configForm.mf.showIndentsCheckbutton -row 8 -column 0 -sticky we
-    grid .configForm.mf.blinkCheckbutton -row 8 -column 1 -sticky we
-    grid .configForm.mf.configFileLabel -row 10 -column 0 -sticky we \
+    incr row
+    grid .configForm.mf.configFileLabel -row $row -column 0 -sticky we \
             {*}$opts
-    grid .configForm.mf.configFilenameLabel -row 10 -column 1 \
-            -columnspan 2 -sticky we {*}$opts
-    grid .configForm.mf.buttons -row 11 -column 0 -columnspan 3 -sticky we
+    grid .configForm.mf.configFilenameLabel -row $row -column 1 \
+            -columnspan 3 -sticky we {*}$opts
+    incr row
+    grid .configForm.mf.buttons -row $row -column 0 -columnspan 4 -sticky we
+    grid columnconfigure .configForm.mf 0 -uniform button
+    grid columnconfigure .configForm.mf 1 -uniform label
+    grid columnconfigure .configForm.mf 2 -uniform button
+    grid columnconfigure .configForm.mf 3 -uniform label
     pack [ttk::frame .configForm.mf.buttons.pad1] -side left -expand 1
     pack .configForm.mf.buttons.okButton -side left {*}$opts
     pack .configForm.mf.buttons.cancelButton -side left {*}$opts
     pack [ttk::frame .configForm.mf.buttons.pad2] -side right -expand 1
-    grid columnconfigure .configForm.mf 1 -weight 1
     pack .configForm.mf -fill both -expand 1
 }
 
@@ -118,20 +132,30 @@ oo::define ConfigForm method make_bindings {} {
     bind .configForm <Return> [callback on_ok]
     bind .configForm <Alt-a> {focus .configForm.mf.scaleSpinbox}
     bind .configForm <Alt-b> {.configForm.mf.blinkCheckbutton invoke}
-    bind .configForm <Alt-s> [callback on_font sans]
+    bind .configForm <Alt-c> [callback on_font casual]
     bind .configForm <Alt-f> [callback on_font serif]
+    bind .configForm <Alt-g> [callback on_font gothic]
+    bind .configForm <Alt-i> {.configForm.mf.showIndentsCheckbutton invoke}
+    bind .configForm <Alt-s> [callback on_font sans]
     bind .configForm <Alt-m> [callback on_font mono]
+    bind .configForm <Alt-o> [callback on_ok]
+    bind .configForm <Alt-t> [callback on_font script]
     foreach n {1 2 3 4} {
         bind .configForm <Alt-Key-$n> [callback on_font h$n]
     }
-    bind .configForm <Alt-i> {.configForm.mf.showIndentsCheckbutton invoke}
-    bind .configForm <Alt-o> [callback on_ok]
 }
 
 oo::define ConfigForm method on_font kind {
     set FontKind $kind
+    set name $kind
+    switch $name {
+        h1 { set name "Heading 1" }
+        h2 { set name "Heading 2" }
+        h3 { set name "Heading 3" }
+        h4 { set name "Heading 4" }
+    }
     tk fontchooser configure -parent .configForm \
-            -title "[tk appname] — Choose [string totitle $kind] Font" \
+            -title "[tk appname] — Choose [string totitle $name] Font" \
             -font [dict get $Fonts $kind] \
             -command [callback on_font_chosen]
     tk fontchooser show
@@ -156,7 +180,7 @@ oo::define ConfigForm method on_ok {} {
     set config [Config new]
     tk scaling [.configForm.mf.scaleSpinbox get]
     $config set_blinking $Blinking
-    foreach kind [Ste all_font_kinds] {
+    foreach kind [Ste font_kinds] {
         $config set_font $kind {*}[dict get $Fonts $kind]
     }
     $config set_show_indents $ShowIndents

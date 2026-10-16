@@ -9,7 +9,8 @@ oo::singleton create Config {
     variable Filename
     variable Blinking
     variable Geometry
-    variable Fonts ;# dict key=sans|serif|mono|h[1-4] value=size
+    # Fonts: dict key=sans|serif|mono|casual|gothic|script|h[1-4] value=size
+    variable Fonts
     variable LastFile
     variable ShowIndents
     variable HiddenToolbars
@@ -37,7 +38,9 @@ oo::define Config constructor {} {
             # FontFamily and FontSize were the only font settings in
             # earlier versions
             set legacy_size [ini::value $ini General FontSize $size]
-            foreach kind [Ste base_font_kinds] {
+            set font_kinds [Ste base_font_kinds]
+            lappend font_kinds {*}[Ste extra_font_kinds]
+            foreach kind $font_kinds {
                 set Kind [string totitle $kind]
                 set family [lindex [dict get $Fonts $kind] 0]
                 if {$kind eq "sans"} {
@@ -76,7 +79,7 @@ oo::define Config method save filename {
         ini::set $ini General Scale [tk scaling]
         ini::set $ini General Blinking [my blinking]
         ini::set $ini General Geometry [wm geometry .]
-        foreach kind [Ste all_font_kinds] {
+        foreach kind [Ste font_kinds] {
             set Kind [expr {[string match h? $kind]
                 ? [string toupper $kind] : [string totitle $kind]}]
             ini::set $ini Fonts ${Kind}Family [my family $kind]

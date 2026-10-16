@@ -246,7 +246,9 @@ oo::define Ste method OdtRunTagProps tag {
         h1 - h2 - h3 - h4 {
             return [concat [my OdtFontProps $tag] {fo:font-weight="bold"}]
         }
-        serif - mono { return [my OdtFontProps $tag] }
+        serif - mono - casual - script - gothic {
+            return [my OdtFontProps $tag]
+        }
         bold        { return {fo:font-weight="bold"} }
         italic      { return {fo:font-style="italic"} }
         bolditalic  {
@@ -349,11 +351,12 @@ oo::define Ste method OdtBuildContent {paras title} {
                     # serif and mono first so later tags (headings, bold,
                     # etc.) override their font properties
                     set ordered [list]
+                    set names {serif mono casual gothic script}
                     foreach t $tags {
-                        if {$t in {serif mono}} { lappend ordered $t }
+                        if {$t in $names} { lappend ordered $t }
                     }
                     foreach t $tags {
-                        if {$t ni {serif mono}} { lappend ordered $t }
+                        if {$t ni $names} { lappend ordered $t }
                     }
                     foreach t $ordered {
                         foreach p [my OdtRunTagProps $t] {
@@ -523,8 +526,9 @@ oo::define Ste method OdtWriteZip {path entries} {
 oo::define Ste classmethod OdtFontProps kind {
     lassign [dict get {
         sans {swiss variable} serif {roman variable} mono {modern fixed}
-        h1 {swiss variable} h2 {swiss variable} h3 {swiss variable}
-        h4 {swiss variable}
+        casual {roman variable} gothic {roman variable}
+        script {roman variable} h1 {swiss variable} h2 {swiss variable}
+        h3 {swiss variable} h4 {swiss variable}
     } $kind] generic pitch
     list fo:font-family=\"[my xml_escape_attr [my family_for $kind]]\" \
         style:font-family-generic=\"$generic\" \

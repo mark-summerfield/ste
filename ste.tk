@@ -8,7 +8,7 @@ if {![catch {file readlink [info script]} name]} {
 }
 tcl::tm::path add $APPPATH
 
-const VERSION 1.6.1
+const VERSION 1.7.0
 const APPNAME ste
 
 package require config

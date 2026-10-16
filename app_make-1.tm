@@ -118,10 +118,11 @@ oo::define App method make_edit_menu {} {
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
-    foreach kind [Ste base_font_kinds] under {0 4 0} {
+    # TODO icons for: casual gothic script
+    foreach kind [Ste font_body_kinds] under {0 4 0 "" 0 ""} {
         .menu.style add command -command [callback on_style_font $kind] \
                 -label [string totitle $kind] -underline $under \
-                -compound left -image [ui::icon $kind.svg $::MENU_ICON_SIZE]
+                -compound left ;#-image [ui::icon $kind.svg $::MENU_ICON_SIZE]
     }
     .menu.style add separator
     .menu.style add command -command [callback on_style h1] \

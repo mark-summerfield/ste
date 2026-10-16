@@ -1,8 +1,8 @@
 # Copyright © 2025-26 Mark Summerfield. All rights reserved.
 
 oo::define Ste method serialize {{file_format .ste}} {
-    classvariable STE5_PREFIX
-    classvariable ALL_FONT_KINDS
+    classvariable STE6_PREFIX
+    classvariable FONT_KINDS
     set txt_dump [my StripDerived \
         [$Text dump -text -mark -tag 1.0 "end -1 char"]]
     if {$file_format eq ".tkt"} {
@@ -13,12 +13,12 @@ oo::define Ste method serialize {{file_format .ste}} {
         return $txt_dumpz
     }
     set fonts [list]
-    foreach kind $ALL_FONT_KINDS {
+    foreach kind $FONT_KINDS {
         lappend fonts "[my family_for $kind] [my size_for $kind]"
     }
     set fontdata [zlib deflate [encoding convertto utf-8 [join $fonts \t]] \
             9]
-    set header "$STE5_PREFIX[string length $fontdata]\n$fontdata"
+    set header "$STE6_PREFIX[string length $fontdata]\n$fontdata"
     return $header$txt_dumpz
 }
 
@@ -30,7 +30,7 @@ oo::define Ste method deserialize {raw file_format} {
         puts stderr $err
         return 0
     }
-    classvariable ALL_FONT_KINDS
+    classvariable FONT_KINDS
     my clear
     array set tags {}
     set insert_index end
@@ -64,7 +64,7 @@ oo::define Ste method deserialize {raw file_format} {
     if {[dict size $fontline]} {
         set current [dict create]
         set wanted [dict create]
-        foreach kind $ALL_FONT_KINDS {
+        foreach kind $FONT_KINDS {
             set cur [list [my family_for $kind] [my size_for $kind]]
             dict set current $kind $cur
             lassign [expr {[dict exists $fontline $kind]
@@ -85,11 +85,13 @@ oo::define Ste method deserialize {raw file_format} {
 oo::define Ste method GetTxtDumpAndFonts {raw file_format} {
     classvariable BASE_FONT_KINDS
     classvariable ALL_FONT_KINDS
+    classvariable FONT_KINDS
     classvariable STE1_PREFIX
     classvariable STE2_PREFIX
     classvariable STE3_PREFIX
     classvariable STE4_PREFIX
     classvariable STE5_PREFIX
+    classvariable STE6_PREFIX
     set fonts [dict create]
     if {$file_format eq ".tkt"} {
         return [list [encoding convertfrom utf-8 $raw] $fonts]
@@ -100,12 +102,14 @@ oo::define Ste method GetTxtDumpAndFonts {raw file_format} {
         set j [string first \n $raw [incr i]]
         set line [encoding convertfrom utf-8 [string range $raw $i \
                 [expr {$j - 1}]]]
-        if {$magic eq $STE5_PREFIX} {
+        if {$magic in [list $STE5_PREFIX $STE6_PREFIX]} {
             set i [incr j]
             set j [expr {$i + $line}]
             set fontline [encoding convertto utf-8 [zlib inflate \
                     [string range $raw $i $j]]]
-            set fonts [my GetFonts $fontline $ALL_FONT_KINDS]
+            set font_kinds [expr {$magic eq $STE6_PREFIX ? $FONT_KINDS \
+                                                         : $ALL_FONT_KINDS}]
+            set fonts [my GetFonts $fontline $font_kinds]
             set raw [string range $raw $j end]
             return [list [encoding convertfrom utf-8 [zlib inflate $raw]] \
                     $fonts]

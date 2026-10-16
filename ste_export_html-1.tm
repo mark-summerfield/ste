@@ -264,7 +264,7 @@ oo::define Ste method HtmlDocument {title body} {
         }
     }
     # serif and mono first so headings (which have their own fonts) win
-    foreach kind {serif mono} {
+    foreach kind {serif mono casual gothic script} {
         append css ".$kind\{font-family:[my CssFamily $kind];\
             font-size:[my CssEm $kind]em\}\n"
     }
@@ -301,10 +301,11 @@ oo::define Ste method HtmlDocument {title body} {
 oo::define Ste classmethod CssFamily kind {
     set family [string map [list \" {} ' {}] [my family_for $kind]]
     if {[string match h? $kind]} { set kind sans } ;# only for fallbacks
-    set generic [dict get {sans sans-serif serif serif mono monospace} \
-        $kind]
+    set generic [dict get {sans sans-serif serif serif mono monospace \
+            casual serif gothic serif script serif} $kind]
     set fallback [dict get {sans Arial serif "Times New Roman"
-        mono "Courier New"} $kind]
+            mono "Courier New" casual "Comic Sans" gothic Gothic \
+            script Script} $kind]
     return "'$family','$fallback',$generic"
 }
 

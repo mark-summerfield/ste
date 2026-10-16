@@ -8,8 +8,12 @@ oo::define Ste initialize {
     variable STE3_PREFIX
     variable STE4_PREFIX
     variable STE5_PREFIX
+    variable STE6_PREFIX
     variable ALL_FONT_KINDS
     variable BASE_FONT_KINDS
+    variable EXTRA_FONT_KINDS
+    variable FONT_BODY_KINDS
+    variable FONT_KINDS
     variable HEADING_KINDS
     variable HEADING_SCALE
     variable DERIVED_STYLES
@@ -30,6 +34,7 @@ oo::define Ste initialize {
     const STE3_PREFIX STE3\n
     const STE4_PREFIX STE4\n
     const STE5_PREFIX STE5\n
+    const STE6_PREFIX STE6\n
 
     const FILETYPES {{{ste files} {.ste}} {{tkt files} {.tkt}} \
         {{compressed tkt files} {.tktz}} {{ste XML files} {.xml}}}
@@ -125,6 +130,10 @@ oo::define Ste initialize {
     const HEADING_KINDS {h1 h2 h3 h4}
     const HEADING_SCALE {h1 2 h2 1.5 h3 1.3 h4 1.1}
     const ALL_FONT_KINDS [list {*}$BASE_FONT_KINDS h1 h2 h3 h4]
+    # Allow 3 more body fonts
+    const EXTRA_FONT_KINDS {casual gothic script}
+    const FONT_BODY_KINDS [list {*}$BASE_FONT_KINDS {*}$EXTRA_FONT_KINDS]
+    const FONT_KINDS [list {*}$ALL_FONT_KINDS {*}$EXTRA_FONT_KINDS]
 
     const DEFAULT_FAMILIES {sans [font configure TkDefaultFont -family] \
             serif Times mono [font configure TkFixedFont -family]}

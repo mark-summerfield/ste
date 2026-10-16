@@ -110,7 +110,10 @@ oo::define Ste classmethod make_default_font_dict {{size 0}} {
     set fonts [list \
             sans [list [font configure TkDefaultFont -family] $size] \
             serif [list Times $size] \
-            mono [list [font configure TkFixedFont -family] $size]]
+            mono [list [font configure TkFixedFont -family] $size] \
+            casual [list Comic $size] gothic [list Gothic $size] \
+            script [list Script $size] \
+            ]
     foreach {kind scale} {h1 2 h2 1.5 h3 1.3 h4 1.1} {
         dict set fonts $kind [list [font configure TkDefaultFont -family] \
             [expr {int(round($size * $scale))}]]
@@ -126,6 +129,7 @@ oo::define Ste classmethod make_default_font_dict {{size 0}} {
 oo::define Ste classmethod make_fonts fonts {
     variable DEFAULT_FAMILIES
     variable BASE_FONT_KINDS
+    variable EXTRA_FONT_KINDS
     variable FONT_SPECS
     variable HEADING_KINDS
     variable HEADING_SCALE
@@ -137,6 +141,25 @@ oo::define Ste classmethod make_fonts fonts {
         if {$family eq ""} {
             set family [dict get $DEFAULT_FAMILIES $kind]
         }
+        if {![string is integer -strict $size] || $size <= 0} {
+            set size $default_size
+        }
+        dict set FontFor $kind [list $family $size]
+        foreach {suffix scale weight slant} $FONT_SPECS {
+            set name [my font_name $kind $suffix]
+            set opts [list -family $family -weight $weight -slant $slant \
+                    -size [expr {int(round($size * $scale))}]]
+            if {$name in [font names]} {
+                font configure $name {*}$opts
+            } else {
+                font create $name {*}$opts
+            }
+        }
+    }
+    foreach kind $EXTRA_FONT_KINDS {
+        lassign [expr {[dict exists $fonts $kind]
+                ? [dict get $fonts $kind] : ""}] family size
+        if {$family eq ""} { set family serif }
         if {![string is integer -strict $size] || $size <= 0} {
             set size $default_size
         }
@@ -177,6 +200,9 @@ oo::define Ste classmethod font_name {kind suffix} {
     switch $kind {
         serif { return Serif$suffix }
         mono { return Mono$suffix }
+        casual { return Casual$suffix }
+        gothic { return Gothic$suffix }
+        script { return Script$suffix }
         default { return $suffix }
     }
 }
@@ -217,6 +243,9 @@ oo::define Ste method make_tags {} {
     classvariable FONT_FOR_STYLE
     # The font tags must be the lowest priority; see refresh_fonts.
     $Text tag configure serif -font SerifRoman
+    $Text tag configure casual -font CasualRoman
+    $Text tag configure gothic -font GothicRoman
+    $Text tag configure script -font ScriptRoman
     $Text tag configure mono -font MonoRoman
     $Text tag configure sub -font Small -offset -3p
     $Text tag configure sup -font Small -offset 3p
@@ -288,6 +317,26 @@ oo::define Ste classmethod base_font_kinds {} {
 oo::define Ste classmethod all_font_kinds {} {
     variable ALL_FONT_KINDS
     return $ALL_FONT_KINDS
+}
+
+oo::define Ste classmethod extra_font_kinds {} {
+    variable EXTRA_FONT_KINDS
+    return $EXTRA_FONT_KINDS
+}
+
+oo::define Ste classmethod font_heading_kinds {} {
+    variable HEADING_KINDS
+    return $HEADING_KINDS
+}
+
+oo::define Ste classmethod font_body_kinds {} {
+    variable FONT_BODY_KINDS
+    return $FONT_BODY_KINDS
+}
+
+oo::define Ste classmethod font_kinds {} {
+    variable FONT_KINDS
+    return $FONT_KINDS
 }
 
 oo::define Ste method unknown {the_method args} {

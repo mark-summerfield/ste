@@ -169,7 +169,7 @@ oo::define ConfigForm method on_font_chosen args {
             dict set Fonts $FontKind [list [lindex $args 0] \
                 [lindex $args 1]]
             lassign [dict get $Fonts $FontKind] family size
-            .configForm.mf.${FontKind}Label configure \
+            .configForm.mf.bf.${FontKind}Label configure \
                     -text "$family $size" \
                     -font [font create -family $family]
         }

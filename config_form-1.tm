@@ -38,7 +38,7 @@ oo::define ConfigForm method make_widgets {} {
     ttk::label .configForm.mf.scaleLabel -text "Application Scale" \
         -underline 0
     ttk::spinbox .configForm.mf.scaleSpinbox -format %.2f -from 1.0 \
-        -to 10.0 -increment 0.1
+        -to 10.0 -increment 0.1 -width 6
     ui::apply_edit_bindings .configForm.mf.scaleSpinbox
     $tip .configForm.mf.scaleSpinbox "Application’s scale factor.\n\
         Restart to apply."
@@ -56,27 +56,28 @@ oo::define ConfigForm method make_widgets {} {
     if {$Blinking} { .configForm.mf.blinkCheckbutton state selected }
     $tip .configForm.mf.blinkCheckbutton \
         "Whether the text cursor should blink."
-    set opts "-compound left -width 15"
+    ttk::frame .configForm.mf.bf -relief sunken -borderwidth 5
+    set opts "-compound left"
     foreach {kind text ul} {sans Sans… 0 serif Serif… 4 mono Mono… 0
             casual Casual… 0 gothic Gothic… 0 script Script 5
             h1 Heading\ 1… 8 h2 Heading\ 2… 8 h3 Heading\ 3… 8
             h4 Heading\ 4… 8} {
-        ttk::button .configForm.mf.${kind}Button -text $text \
+        ttk::button .configForm.mf.bf.${kind}Button -text $text \
             -underline $ul -command [callback on_font $kind] \
             -image [ui::icon $kind.svg $::ICON_SIZE] {*}$opts
         set what [expr {[string match h? $kind]
             ? "heading [string index $kind 1]" : $kind}]
-        $tip .configForm.mf.${kind}Button "The $what font to use.\nBest\
+        $tip .configForm.mf.bf.${kind}Button "The $what font to use.\nBest\
             to set the application’s scale (and restart) first."
         set family [$config family $kind]
-        ttk::label .configForm.mf.${kind}Label -relief sunken \
+        ttk::label .configForm.mf.bf.${kind}Label \
             -text "$family [$config size $kind]" \
             -font [font create -family $family]
     }
     ttk::label .configForm.mf.configFileLabel -foreground gray25 \
         -text "Config file"
     ttk::label .configForm.mf.configFilenameLabel -foreground gray25 \
-        -text [$config filename] -relief sunken
+        -text [$config filename]
     ttk::frame .configForm.mf.buttons
     ttk::button .configForm.mf.buttons.okButton -text OK -underline 0 \
         -compound left -image [ui::icon ok.svg $::ICON_SIZE] \
@@ -94,28 +95,28 @@ oo::define ConfigForm method make_layout {} {
     grid .configForm.mf.showIndentsCheckbutton -row $row -column 2 -sticky w
     grid .configForm.mf.blinkCheckbutton -row $row -column 3 -sticky w
     incr row
-    set first_row $row
-    set inner_row $row
-    set column 0
+    grid .configForm.mf.bf -row $row -column 0 -columnspan 4 -sticky we \
+            {*}$opts
+    set irow 0
+    set icolumn 0
     foreach kind {sans serif mono casual gothic script h1 h2 h3 h4} {
-        grid .configForm.mf.${kind}Button -row $inner_row -column $column \
-                -sticky w {*}$opts
-        grid .configForm.mf.${kind}Label -row $inner_row \
-                -column [expr {$column + 1}] -sticky news {*}$opts
-        incr row
-        incr inner_row
-        if {$inner_row == 6} {
-            set inner_row $first_row
-            set column 2
+        grid .configForm.mf.bf.${kind}Button -row $irow \
+                -column $icolumn -sticky w {*}$opts
+        grid .configForm.mf.bf.${kind}Label -row $irow \
+                -column [expr {$icolumn + 1}] -sticky nws {*}$opts
+        incr irow
+        if {$irow == 5} {
+            set irow 0
+            set icolumn 2
         }
     }
     incr row
-    grid .configForm.mf.configFileLabel -row $row -column 0 -sticky we \
+    grid .configForm.mf.configFileLabel -row $row -column 0 -sticky w \
             {*}$opts
     grid .configForm.mf.configFilenameLabel -row $row -column 1 \
-            -columnspan 3 -sticky we {*}$opts
+            -columnspan 3 -sticky w {*}$opts
     incr row
-    grid .configForm.mf.buttons -row $row -column 0 -columnspan 4 -sticky we
+    grid .configForm.mf.buttons -row $row -column 0 -columnspan 4
     grid columnconfigure .configForm.mf 0 -uniform button
     grid columnconfigure .configForm.mf 1 -uniform label
     grid columnconfigure .configForm.mf 2 -uniform button

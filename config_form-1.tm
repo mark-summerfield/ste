@@ -36,9 +36,9 @@ oo::define ConfigForm method make_widgets {} {
     ttk::frame .configForm.mf
     set tip tooltip::tooltip
     ttk::label .configForm.mf.scaleLabel -text "Application Scale" \
-        -underline 0
+            -underline 0
     ttk::spinbox .configForm.mf.scaleSpinbox -format %.2f -from 1.0 \
-        -to 10.0 -increment 0.1 -width 6
+            -to 10.0 -increment 0.1 -width 5
     ui::apply_edit_bindings .configForm.mf.scaleSpinbox
     $tip .configForm.mf.scaleSpinbox "Application’s scale factor.\n\
         Restart to apply."

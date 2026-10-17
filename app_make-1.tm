@@ -27,9 +27,11 @@ oo::define App method make_menus {} {
     menu .menu
     my make_file_menu
     my make_edit_menu
+    my make_font_menu
     my make_style_menu
     $Toolbars new_menu .menu {File Export Undo/Redo Copy/Cut/Paste Insert \
-            Fonts Headings Style Colors Special Lists Alignment}
+            Fonts "Extra Fonts" Headings Style Colors Special Lists \
+            Alignment}
     . configure -menu .menu
 }
 
@@ -115,29 +117,32 @@ oo::define App method make_edit_menu {} {
             -accelerator Ctrl+F -variable [my varname ShowFindPanel]
 }
 
+oo::define App method make_font_menu {} {
+    menu .menu.font
+    .menu add cascade -menu .menu.font -label Font -underline 1
+    foreach kind [Ste font_body_kinds] ul {0 4 0 0 0 5} {
+        .menu.font add command -command [callback on_style_font $kind] \
+                -label [string totitle $kind] -underline $ul \
+                -compound left -image [ui::icon $kind.svg $::MENU_ICON_SIZE]
+    }
+    .menu.font add separator
+    .menu.font add command -command [callback on_style h1] \
+            -label "Heading 1" -underline 8 -compound left \
+            -image [ui::icon h1.svg $::MENU_ICON_SIZE]
+    .menu.font add command -command [callback on_style h2] \
+            -label "Heading 2" -underline 8 -compound left \
+            -image [ui::icon h2.svg $::MENU_ICON_SIZE]
+    .menu.font add command -command [callback on_style h3] \
+            -label "Heading 3" -underline 8 -compound left \
+            -image [ui::icon h3.svg $::MENU_ICON_SIZE]
+    .menu.font add command -command [callback on_style h4] \
+            -label "Heading 4" -underline 8 -compound left \
+            -image [ui::icon h4.svg $::MENU_ICON_SIZE]
+}
+
 oo::define App method make_style_menu {} {
     menu .menu.style
     .menu add cascade -menu .menu.style -label Style -underline 0
-    # TODO icons for: casual gothic script
-    foreach kind [Ste font_body_kinds] under {0 4 0 "" 0 ""} {
-        .menu.style add command -command [callback on_style_font $kind] \
-                -label [string totitle $kind] -underline $under \
-                -compound left ;#-image [ui::icon $kind.svg $::MENU_ICON_SIZE]
-    }
-    .menu.style add separator
-    .menu.style add command -command [callback on_style h1] \
-            -label "Heading 1" -underline 8 -compound left \
-            -image [ui::icon h1.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_style h2] \
-            -label "Heading 2" -underline 8 -compound left \
-            -image [ui::icon h2.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_style h3] \
-            -label "Heading 3" -underline 8 -compound left \
-            -image [ui::icon h3.svg $::MENU_ICON_SIZE]
-    .menu.style add command -command [callback on_style h4] \
-            -label "Heading 4" -underline 8 -compound left \
-            -image [ui::icon h4.svg $::MENU_ICON_SIZE]
-    .menu.style add separator
     .menu.style add command -command [callback on_style bold] \
             -label Bold -underline 0 -compound left -accelerator Ctrl+B \
             -image [ui::icon format-text-bold.svg $::MENU_ICON_SIZE]
@@ -166,7 +171,7 @@ oo::define App method make_style_menu {} {
             -label Subscript -underline 8 -compound left \
             -image [ui::icon subscript.svg $::MENU_ICON_SIZE]
     .menu.style add command -command [callback on_style sup] \
-            -label Superscript -underline 3 -compound left \
+            -label Superscript -underline 0 -compound left \
             -image [ui::icon superscript.svg $::MENU_ICON_SIZE]
     .menu.style add separator
     .menu.style add command -command [callback on_style_insert_bullet] \
@@ -289,6 +294,15 @@ oo::define App method make_style_toolbars {} {
         $tip .mf.tb.bf.style_$kind [string totitle $kind]
     }
     $Toolbars add_toolbar .mf.tb.bf
+    ttk::frame .mf.tb.xf
+    foreach kind [Ste extra_font_kinds] {
+        ttk::button .mf.tb.xf.style_$kind -style Toolbutton \
+                -takefocus 0 -text [string totitle $kind] \
+                -command [callback on_style_font $kind] \
+                -image [ui::icon $kind.svg $::ICON_SIZE]
+        $tip .mf.tb.xf.style_$kind [string totitle $kind]
+    }
+    $Toolbars add_toolbar .mf.tb.xf
     ttk::frame .mf.tb.h
     ttk::button .mf.tb.h.h1 -style Toolbutton -takefocus 0 \
             -command [callback on_style h1] \

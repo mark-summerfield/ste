@@ -12,6 +12,7 @@ oo::define Ste initialize {
     variable ALL_FONT_KINDS
     variable BASE_FONT_KINDS
     variable EXTRA_FONT_KINDS
+    variable FONT_KINDS_EXCL_SANS
     variable FONT_BODY_KINDS
     variable FONT_KINDS
     variable HEADING_KINDS
@@ -132,6 +133,8 @@ oo::define Ste initialize {
     const ALL_FONT_KINDS [list {*}$BASE_FONT_KINDS h1 h2 h3 h4]
     # Allow 3 more body fonts
     const EXTRA_FONT_KINDS {casual gothic script}
+    const FONT_KINDS_EXCL_SANS [list {*}[lrange $BASE_FONT_KINDS 1 end] \
+            {*}$EXTRA_FONT_KINDS]
     const FONT_BODY_KINDS [list {*}$BASE_FONT_KINDS {*}$EXTRA_FONT_KINDS]
     const FONT_KINDS [list {*}$ALL_FONT_KINDS {*}$EXTRA_FONT_KINDS]
 

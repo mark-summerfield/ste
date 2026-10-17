@@ -111,7 +111,8 @@ oo::define Ste classmethod make_default_font_dict {{size 0}} {
             sans [list [font configure TkDefaultFont -family] $size] \
             serif [list Times $size] \
             mono [list [font configure TkFixedFont -family] $size] \
-            casual [list Comic $size] gothic [list Gothic $size] \
+            casual [list Comic $size] \
+            gothic [list Gothic $size] \
             script [list Script $size] \
             ]
     foreach {kind scale} {h1 2 h2 1.5 h3 1.3 h4 1.1} {
@@ -459,14 +460,16 @@ oo::define Ste method apply_font kind {
 # kind is sans (the default, no tag), serif, or mono
 oo::define Ste method apply_font_to {indexes kind} {
     classvariable HEADING_KINDS
+    classvariable FONT_KINDS_EXCL_SANS
     if {$indexes ne ""} {
         # headings have their own fonts (which override sans, serif, and
         # mono) so choosing a family means the text is no longer a heading
         foreach heading $HEADING_KINDS {
             $Text tag remove $heading {*}$indexes
         }
-        $Text tag remove serif {*}$indexes
-        $Text tag remove mono {*}$indexes
+        foreach kind $FONT_KINDS_EXCL_SANS {
+            $Text tag remove $kind {*}$indexes
+        }
         if {$kind ne "sans"} { $Text tag add $kind {*}$indexes }
         my refresh_fonts $indexes
         $Text edit modified 1
@@ -484,11 +487,12 @@ oo::define Ste method apply_font_to {indexes kind} {
 oo::define Ste method refresh_fonts indexes {
     classvariable FONT_STYLES
     classvariable DERIVED_STYLES
+    classvariable FONT_KINDS_EXCL_SANS
     foreach {from to} $indexes {
         set from [$Text index $from]
         set to [$Text index $to]
         if {[$Text compare $from >= $to]} continue
-        foreach kind {serif mono} {
+        foreach kind $FONT_KINDS_EXCL_SANS {
             foreach style $DERIVED_STYLES {
                 $Text tag remove [my derived_tag $kind $style] $from $to
             }

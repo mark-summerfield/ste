@@ -242,6 +242,7 @@ oo::define Ste method make_tags {} {
     classvariable COLOR_FOR_TAG
     classvariable DERIVED_STYLES
     classvariable FONT_FOR_STYLE
+    classvariable FONT_KINDS_EXCL_SANS
     # The font tags must be the lowest priority; see refresh_fonts.
     $Text tag configure serif -font SerifRoman
     $Text tag configure casual -font CasualRoman
@@ -269,8 +270,8 @@ oo::define Ste method make_tags {} {
     }
     # One tag per family+style combination, e.g. fnt:serif:bold; Tk tags
     # can't combine fonts so refresh_fonts applies these (highest
-    # priority) wherever a serif or mono run also has a font style.
-    foreach kind {serif mono} {
+    # priority) wherever a non-sans run also has a font style.
+    foreach kind $FONT_KINDS_EXCL_SANS {
         foreach style $DERIVED_STYLES {
             $Text tag configure [my derived_tag $kind $style] \
                 -font [my font_name $kind [dict get $FONT_FOR_STYLE $style]]
@@ -457,7 +458,7 @@ oo::define Ste method apply_font kind {
     my apply_font_to [my selected] $kind
 }
 
-# kind is sans (the default, no tag), serif, or mono
+# kind is sans (the default, no tag), or any of the other body kinds
 oo::define Ste method apply_font_to {indexes kind} {
     classvariable HEADING_KINDS
     classvariable FONT_KINDS_EXCL_SANS
@@ -467,8 +468,8 @@ oo::define Ste method apply_font_to {indexes kind} {
         foreach heading $HEADING_KINDS {
             $Text tag remove $heading {*}$indexes
         }
-        foreach kind $FONT_KINDS_EXCL_SANS {
-            $Text tag remove $kind {*}$indexes
+        foreach body $FONT_KINDS_EXCL_SANS {
+            $Text tag remove $body {*}$indexes
         }
         if {$kind ne "sans"} { $Text tag add $kind {*}$indexes }
         my refresh_fonts $indexes
@@ -477,7 +478,7 @@ oo::define Ste method apply_font_to {indexes kind} {
 }
 
 # Tk tags cannot combine fonts: a bold tag's font replaces a serif
-# tag's. So for every span of text that is serif or mono and also has a
+# tag's. So for every span of text that is non-sans and also has a
 # font-changing style (bold, h1, sub, etc.), add the derived tag
 # fnt:<kind>:<style> whose font has both. The derived tags are internal:
 # they are never saved or exported (see StripDerived and
@@ -498,7 +499,7 @@ oo::define Ste method refresh_fonts indexes {
             }
         }
         set points [list $from $to]
-        foreach tag [concat {serif mono} $FONT_STYLES] {
+        foreach tag [concat $FONT_KINDS_EXCL_SANS $FONT_STYLES] {
             foreach {a b} [$Text tag ranges $tag] {
                 foreach p [list $a $b] {
                     if {[$Text compare $p > $from] &&
@@ -512,8 +513,10 @@ oo::define Ste method refresh_fonts indexes {
                 $points]
         foreach a [lrange $points 0 end-1] b [lrange $points 1 end] {
             set tags [$Text tag names $a]
-            set kind [expr {"mono" in $tags ? "mono" : "serif" in $tags \
-                    ? "serif" : ""}]
+            set kind "" ;# the last (highest priority) family tag wins
+            foreach body $FONT_KINDS_EXCL_SANS {
+                if {$body in $tags} { set kind $body }
+            }
             if {$kind eq ""} continue
             set winner ""
             foreach style $FONT_STYLES {

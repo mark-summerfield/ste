@@ -160,7 +160,7 @@ oo::define Ste classmethod make_fonts fonts {
     foreach kind $EXTRA_FONT_KINDS {
         lassign [expr {[dict exists $fonts $kind]
                 ? [dict get $fonts $kind] : ""}] family size
-        if {$family eq ""} { set family serif }
+        if {$family eq ""} { set family [string totitle $kind] }
         if {![string is integer -strict $size] || $size <= 0} {
             set size $default_size
         }

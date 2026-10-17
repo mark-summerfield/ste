@@ -117,10 +117,10 @@ oo::define ConfigForm method make_layout {} {
             -columnspan 3 -sticky w {*}$opts
     incr row
     grid .configForm.mf.buttons -row $row -column 0 -columnspan 4
-    grid columnconfigure .configForm.mf 0 -uniform button
-    grid columnconfigure .configForm.mf 1 -uniform label
-    grid columnconfigure .configForm.mf 2 -uniform button
-    grid columnconfigure .configForm.mf 3 -uniform label
+    grid columnconfigure .configForm.mf.bf 0 -uniform button
+    grid columnconfigure .configForm.mf.bf 1 -uniform label
+    grid columnconfigure .configForm.mf.bf 2 -uniform button
+    grid columnconfigure .configForm.mf.bf 3 -uniform label
     pack [ttk::frame .configForm.mf.buttons.pad1] -side left -expand 1
     pack .configForm.mf.buttons.okButton -side left {*}$opts
     pack .configForm.mf.buttons.cancelButton -side left {*}$opts

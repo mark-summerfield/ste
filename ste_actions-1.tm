@@ -142,7 +142,7 @@ oo::define Ste method TryCompletion p {
     set prefix [string tolower [$Text get $i $j]]
     if {[string trim $prefix] eq ""} { return 0 }
     set candidates [dict create]
-    foreach word [list {*}$COMMON_WORDS {*}[split [$Text get 1.0 end]]] {
+    foreach word [concat $COMMON_WORDS [split [$Text get 1.0 end]]] {
         set word [regsub {^\W+} [regsub {\W+$} $word ""] ""]
         set lword [string tolower $word]
         if {$lword ne "" && $prefix ne $lword && \

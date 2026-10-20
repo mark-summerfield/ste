@@ -130,13 +130,13 @@ oo::define Ste initialize {
     # at the sans size times HEADING_SCALE.
     const HEADING_KINDS {h1 h2 h3 h4}
     const HEADING_SCALE {h1 2 h2 1.5 h3 1.3 h4 1.1}
-    const ALL_FONT_KINDS [list {*}$BASE_FONT_KINDS h1 h2 h3 h4]
+    const ALL_FONT_KINDS [concat $BASE_FONT_KINDS h1 h2 h3 h4]
     # Allow 3 more body fonts
     const EXTRA_FONT_KINDS {casual gothic script}
-    const FONT_KINDS_EXCL_SANS [list {*}[lrange $BASE_FONT_KINDS 1 end] \
-            {*}$EXTRA_FONT_KINDS]
-    const FONT_BODY_KINDS [list {*}$BASE_FONT_KINDS {*}$EXTRA_FONT_KINDS]
-    const FONT_KINDS [list {*}$ALL_FONT_KINDS {*}$EXTRA_FONT_KINDS]
+    const FONT_KINDS_EXCL_SANS [concat [lrange $BASE_FONT_KINDS 1 end] \
+            $EXTRA_FONT_KINDS]
+    const FONT_BODY_KINDS [concat $BASE_FONT_KINDS $EXTRA_FONT_KINDS]
+    const FONT_KINDS [concat $ALL_FONT_KINDS $EXTRA_FONT_KINDS]
 
     const DEFAULT_FAMILIES {sans [font configure TkDefaultFont -family] \
             serif Times mono [font configure TkFixedFont -family]}

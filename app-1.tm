@@ -34,14 +34,14 @@ oo::define App method show {} {
     set config [Config new]
     wm geometry . [$config geometry]
     raise .
-    update
-    after idle [callback on_startup]
+    update idletasks
+    my on_startup
 }
 
 oo::define App method on_startup {} {
     set config [Config new]
     $Toolbars hide_toolbars {*}[$config hidden_toolbars]
-    update
+    update idletasks
     if {$Filename ne "" && [file isfile $Filename]} {
         my file_open
     } else {

@@ -4,7 +4,7 @@ package require inifile
 package require ste
 package require util
 
-# Also handles tk scaling
+# Also handles tk scaling & UIF (user interface font)
 oo::singleton create Config {
     variable Filename
     variable Blinking
@@ -35,6 +35,14 @@ oo::define Config constructor {} {
                 ttk::style configure . -insertofftime 0
             }
             set Geometry [ini::value $ini General Geometry $Geometry]
+            set ui_family [ini::value $ini General UIFfamily TkDefaultFont]
+            set ui_default_size [font configure TkDefaultFont -size]
+            set ui_size [ini::value $ini General UIFsize $ui_default_size]
+            if {$ui_family ne "TkDefaultFont" || \
+                    $ui_size != $ui_default_size} {
+                font configure TkDefaultFont -family $ui_family \
+                        -size $ui_size
+            }
             # FontFamily and FontSize were the only font settings in
             # earlier versions
             set legacy_size [ini::value $ini General FontSize $size]
@@ -78,6 +86,9 @@ oo::define Config method save filename {
         ini::set $ini General Scale [tk scaling]
         ini::set $ini General Blinking [my blinking]
         ini::set $ini General Geometry [wm geometry .]
+        ini::set $ini General UIFfamily [font configure TkDefaultFont \
+                                            -family]
+        ini::set $ini General UIFsize [font configure TkDefaultFont -size]
         foreach kind [Ste font_kinds] {
             set Kind [expr {[string match h? $kind]
                 ? [string toupper $kind] : [string totitle $kind]}]

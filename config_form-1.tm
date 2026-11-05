@@ -56,8 +56,17 @@ oo::define ConfigForm method make_widgets {} {
     if {$Blinking} { .configForm.mf.blinkCheckbutton state selected }
     $tip .configForm.mf.blinkCheckbutton \
         "Whether the text cursor should blink."
-    ttk::frame .configForm.mf.bf -relief sunken -borderwidth 5
     set opts "-compound left"
+    ttk::button .configForm.mf.uif -text "UI Font…" \
+            -underline 0 -command [callback on_uif] \
+            -image [ui::icon sans.svg $::ICON_SIZE] {*}$opts
+    $tip .configForm.mf.uif "The user interface font to use.\nBest\
+        to set the application’s scale (and restart) first."
+    set family [font actual TkDefaultFont -family]
+    set size [font actual TkDefaultFont -size]
+    ttk::label .configForm.mf.uiflabel -text "$family $size" \
+            -font TkDefaultFont
+    ttk::frame .configForm.mf.bf -relief sunken -borderwidth 5
     foreach {kind text ul} {sans Sans… 0 serif Serif… 4 mono Mono… 0
             casual Casual… 0 gothic Gothic… 0 script Script 5
             h1 Heading\ 1… 8 h2 Heading\ 2… 8 h3 Heading\ 3… 8
@@ -94,6 +103,10 @@ oo::define ConfigForm method make_layout {} {
     grid .configForm.mf.scaleSpinbox -row $row -column 1 -sticky w {*}$opts
     grid .configForm.mf.showIndentsCheckbutton -row $row -column 2 -sticky w
     grid .configForm.mf.blinkCheckbutton -row $row -column 3 -sticky w
+    incr row
+    grid .configForm.mf.uif -row $row -column 0 -sticky w {*}$opts
+    grid .configForm.mf.uiflabel -row $row -column 2 -columnspan 3 \
+            -sticky w {*}$opts
     incr row
     grid .configForm.mf.bf -row $row -column 0 -columnspan 4 -sticky we \
             {*}$opts
@@ -141,8 +154,28 @@ oo::define ConfigForm method make_bindings {} {
     bind .configForm <Alt-m> [callback on_font mono]
     bind .configForm <Alt-o> [callback on_ok]
     bind .configForm <Alt-t> [callback on_font script]
+    bind .configForm <Alt-u> [callback on_uif]
     foreach n {1 2 3 4} {
         bind .configForm <Alt-Key-$n> [callback on_font h$n]
+    }
+}
+
+oo::define ConfigForm method on_uif {} {
+    tk fontchooser configure -parent .configForm \
+            -title "[tk appname] — Choose User Interface Font" \
+            -font TkDefaultFont -command [callback on_uif_chosen]
+    tk fontchooser show
+}
+
+oo::define ConfigForm method on_uif_chosen args {
+    if {[llength $args] > 0} {
+        set args [lindex $args 0]
+        if {[llength $args] > 1} {
+            set family [lindex $args 0]
+            set size [lindex $args 1]
+            font configure TkDefaultFont -family $family -size $size
+            .configForm.mf.uiflabel configure -text "$family $size"
+        }
     }
 }
 

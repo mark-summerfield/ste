@@ -177,6 +177,7 @@ oo::define ConfigForm method on_uif_chosen args {
             .configForm.mf.uiflabel configure -text "$family $size"
         }
     }
+    focus .configForm
 }
 
 oo::define ConfigForm method on_font kind {

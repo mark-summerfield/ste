@@ -3,8 +3,7 @@
 oo::define Ste method serialize {{file_format .ste}} {
     classvariable STE6_PREFIX
     classvariable FONT_KINDS
-    set txt_dump [my StripDerived \
-        [$Text dump -text -mark -tag 1.0 "end -1 char"]]
+    set txt_dump [my StripDerived [my DumpWithFinalNewlineTags]]
     if {$file_format eq ".tkt"} {
         return $txt_dump
     }
@@ -165,4 +164,29 @@ oo::define Ste method StripDerived dump {
         lappend result $key $value $index
     }
     return $result
+}
+
+# Tk's text widget always has a final newline which "end -1 char" leaves
+# out; but an empty last line's indent tag lives on that newline, so
+# dump up to "end" and drop the newline's text (the widget supplies it).
+oo::define Ste method DumpWithFinalNewlineTags {} {
+    set dump [$Text dump -text -mark -tag 1.0 end]
+    set last -1
+    set n 0
+    foreach {key value index} $dump {
+        if {$key eq "text"} { set last $n }
+        incr n 3
+    }
+    if {$last > -1} {
+        set value [lindex $dump $last+1]
+        if {[string index $value end] eq "\n"} {
+            set value [string range $value 0 end-1]
+            if {$value eq ""} {
+                set dump [lreplace $dump $last $last+2]
+            } else {
+                set dump [lreplace $dump $last+1 $last+1 $value]
+            }
+        }
+    }
+    return $dump
 }
